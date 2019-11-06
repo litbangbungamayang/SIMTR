@@ -8,8 +8,10 @@ class Rdkk_add extends CI_Controller{
     parent :: __construct();
     $this->load->model("masatanam_model");
     $this->load->model("varietas_model");
+    $this->load->model("petani_model");
     $this->load->library('form_validation');
     $this->load->helper('url');
+    $arrayPetani = array();
   }
 
   public function index(){
@@ -18,6 +20,7 @@ class Rdkk_add extends CI_Controller{
     } else {
       $data['pageTitle'] = "Pendaftaran RDKK";
       $data['content'] = $this->loadContent();
+      $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
     }
   }
@@ -115,12 +118,13 @@ class Rdkk_add extends CI_Controller{
               <div class="row"></div>
               <div class="row">
                 <div class="table-responsive col-md-6">
-                  <table class="table card-table table-vcenter text-nowrap datatable table-sm">
+                  <table id="tblPetani" class="table card-table table-vcenter text-nowrap datatable table-sm">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
                         <th>Nama Petani</th>
                         <th>Luas Areal</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody id="dataPetani">
@@ -151,12 +155,12 @@ class Rdkk_add extends CI_Controller{
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-              <form id="formAddPetani">
+              <form id="formAddPetani" action="'.site_url('Rdkk_add/addPetaniTemp').'" method="POST" enctype="multipart/form-data">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaPetani">
                       <label class="form-label">Nama Petani</label>
-                      <input type="text" class="form-control" id="namaKelompok" name="namaKelompok" placeholder="Nama Petani">
+                      <input type="text" class="form-control" id="namaPetani" name="namaPetani" placeholder="Nama Petani">
                     </div>
                     <div class="form-group" id="grUploadPeta">
                       <div class="form-label">File GPX area kebun</div>
@@ -167,7 +171,7 @@ class Rdkk_add extends CI_Controller{
                     </div>
                   </div>
                 </div>
-                <button type="button" id="btnNext" class="btn btn-primary btn-block" onclick="">Simpan data</button>
+                <button type="button" id="btnSimpanPetani" class="btn btn-primary btn-block" name="submit" >Simpan data petani</button>
               </form>
             </div>
           </div>
@@ -175,6 +179,91 @@ class Rdkk_add extends CI_Controller{
       </div>
     ';
     return $content_header.$content_1.$content_2.$content_footer.$content_dialogAddPetani;
+  }
 
+  public function loadScript(){
+    $scriptContent =
+    '
+      var arrayPetani = [];
+      var formAddPetani = $("#formAddPetani")[0];
+      var objPetani = function(id_petani, id_kelompok, nama_petani, luas, id_gpx){
+        var obj = {};
+        obj.id_petani = id_petani;
+        obj.id_kelompok = id_kelompok;
+        obj.nama_petani = nama_petani;
+        obj.luas = luas;
+        obj.id_gpx = id_gpx;
+        return obj;
+      }
+      function refreshData(){
+        tabelPetani = $("#tblPetani").DataTable();
+        tabelPetani.clear();
+        tabelPetani.rows.add(arrayPetani);
+        tabelPetani.draw();
+        console.log(arrayPetani);
+        return false;
+      }
+      $("#btnSimpanPetanis").on("click", function(){
+        form = $("#formAddPetani");
+        $.ajax({
+          type: "POST",
+          url: "'.site_url('Rdkk_add/addPetaniTemp/').'",
+          dataType: "text",
+          data: form.serialize()
+        });
+        return false;
+      });
+      $("#btnSimpanPetani").on("click", function(){
+        var petani = objPetani(
+          null,
+          null,
+          $("#namaPetani").val(),
+          0,
+          null
+        );
+        arrayPetani.push(petani);
+        refreshData();
+        formAddPetani.reset();
+        return false;
+      });
+      $("#tblPetani").DataTable({
+        bFilter: false,
+        bPaginate: false,
+        bSort: false,
+        bInfo: false,
+        data: arrayPetani,
+        columns : [
+          {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
+          {data: "nama_petani"},
+          {data: "luas"},
+          {data: "button", render: function(data, type, row, meta){return \'<button type="button" class="btn btn-danger btn-sm" name="hapus" >Hapus</button>\'}}
+        ]
+      });
+      $("#tblPetani").on("click", "button[name=\"hapus\"]", function(e){
+        var currentRow = $(this).closest("tr");
+        var currentRowData = currentRow.find("td").slice(1,2).text();
+        var index = arrayPetani.findIndex(function (item) {return item.nama_petani == currentRowData});
+        console.log(index);
+        arrayPetani.splice(index,1);
+        currentRow.remove();
+        console.log(arrayPetani);
+        refreshData();
+      });
+
+    ';
+    return $scriptContent;
+  }
+
+  public function addPetaniTemp(){
+    $petani = $this->petani_model;
+    //ADD VALIDATION
+    $addedData = $this->input->post();
+    $petani->nama_petani = $addedData["namaPetani"];
+    $arrayPetani = $this->arrayPetani;
+    $coba = $this->coba;
+    $coba ++;
+    $arrayPetani[] = $petani;
+    var_dump(json_encode($arrayPetani));
+    var_dump($coba);
   }
 }

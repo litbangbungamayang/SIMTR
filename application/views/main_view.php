@@ -36,11 +36,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             function rdkkLoad(){
               $('#grNamaPetani').hide();
             }
-            require(['jquery'], function () {
+            require(['jquery','datatables'], function () {
 
             	$(document).ready(function () {
-
-                //rdkkLoad();
+                <?
+                  if (isset($script)){
+                    echo $script;
+                  }
+                ?>
 
             		function setCookie(name,value,days) {
             			var expires = "";
