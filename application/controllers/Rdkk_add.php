@@ -10,6 +10,7 @@ class Rdkk_add extends CI_Controller{
     $this->load->model("varietas_model");
     $this->load->model("petani_model");
     $this->load->library('form_validation');
+    $this->load->library('upload');
     $this->load->helper('url');
     $arrayPetani = array();
   }
@@ -165,8 +166,8 @@ class Rdkk_add extends CI_Controller{
                     <div class="form-group" id="grUploadPeta">
                       <div class="form-label">File GPX area kebun</div>
                       <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="fileGpxKebun">
-                        <label class="custom-file-label">Pilih file</label>
+                        <input type="file" class="custom-file-input" name="fileGpxKebun" id="fileGpxKebun">
+                        <label class="custom-file-label" id="lblFileGpxKebun" name="lblFileGpxKebun">Pilih file</label>
                       </div>
                     </div>
                   </div>
@@ -179,6 +180,18 @@ class Rdkk_add extends CI_Controller{
       </div>
     ';
     return $content_header.$content_1.$content_2.$content_footer.$content_dialogAddPetani;
+  }
+
+  public function readGpxValue(){
+    include('./assets/geoPHP/geoPHP.inc');
+    $uploadedData = $_FILES['gpx']['tmp_name'];
+    var_dump($uploadedData);
+    $gpx = simplexml_load_file($uploadedData);
+    //var_dump($gpx);
+    $gpxValue = file_get_contents($uploadedData);
+    $geometry = geoPHP::load($gpxValue,'gpx');
+    var_dump($geometry->area());
+    echo json_encode("output OK");
   }
 
   public function loadScript(){
@@ -200,9 +213,10 @@ class Rdkk_add extends CI_Controller{
         tabelPetani.clear();
         tabelPetani.rows.add(arrayPetani);
         tabelPetani.draw();
-        console.log(arrayPetani);
+        //console.log(arrayPetani);
         return false;
       }
+
       $("#btnSimpanPetanis").on("click", function(){
         form = $("#formAddPetani");
         $.ajax({
@@ -213,19 +227,35 @@ class Rdkk_add extends CI_Controller{
         });
         return false;
       });
+
+      $("#fileGpxKebun").change(function(e){
+        var selectedFile = $(this)[0].files[0];
+        var lblGpxKebun = $("#lblFileGpxKebun");
+        lblGpxKebun.text(selectedFile.name + " (" + selectedFile.type + ")");
+        if (selectedFile.type != "application/gpx+xml"){
+          alert("Invalid format!");
+          lblGpxKebun.text("Pilih file");
+          $("#fileGpxKebun").value = "";
+        }
+      })
+
       $("#btnSimpanPetani").on("click", function(){
-        var petani = objPetani(
-          null,
-          null,
-          $("#namaPetani").val(),
-          0,
-          null
-        );
-        arrayPetani.push(petani);
-        refreshData();
-        formAddPetani.reset();
+        var selectedFile = $("#fileGpxKebun")[0].files[0];
+        var gpxFile = new FormData();
+        gpxFile.append("gpx", selectedFile);
+        $.ajax ({
+          type: "POST",
+          processData: false,
+          contentType: false,
+          url: "'.site_url('Rdkk_add/readGpxValue').'",
+          data: gpxFile,
+          success: function(){
+            console.log(gpxFile.get("gpx"));
+          }
+        });
         return false;
       });
+
       $("#tblPetani").DataTable({
         bFilter: false,
         bPaginate: false,
@@ -239,6 +269,7 @@ class Rdkk_add extends CI_Controller{
           {data: "button", render: function(data, type, row, meta){return \'<button type="button" class="btn btn-danger btn-sm" name="hapus" >Hapus</button>\'}}
         ]
       });
+
       $("#tblPetani").on("click", "button[name=\"hapus\"]", function(e){
         var currentRow = $(this).closest("tr");
         var currentRowData = currentRow.find("td").slice(1,2).text();
@@ -246,7 +277,7 @@ class Rdkk_add extends CI_Controller{
         console.log(index);
         arrayPetani.splice(index,1);
         currentRow.remove();
-        console.log(arrayPetani);
+        //console.log(arrayPetani);
         refreshData();
       });
 

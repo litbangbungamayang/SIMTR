@@ -1,0 +1,40 @@
+
+function readGpx(selectedFile, onLoadCallback){
+  var fileReader = new FileReader();
+  fileReader.onload = onLoadCallback;
+  fileReader.readAsText(selectedFile);
+}
+
+$("#coba").on("click", function(){
+  var selectedFile = $("#fileGpxKebun")[0].files[0];
+  var gpxValue = "";
+  function callback(){
+    console.log("GPX value = " + gpxValue);
+    var petani = objPetani(
+      null,
+      null,
+      $("#namaPetani").val(),
+      0,
+      0
+    );
+    $("#lblFileGpxKebun").text("Pilih file");
+    arrayPetani.push(petani);
+    refreshData();
+    console.log(arrayPetani);
+    formAddPetani.reset();
+  }
+  readGpx(selectedFile, function(e){
+    gpxContent = e.target.result;
+    var formData = new FormData();
+    formData.append("gpxFile", selectedFile);
+    $.ajax ({
+      type: "POST",
+      url: "'.site_url('Rdkk_add/readGpxValue').'",
+      data: formData,
+      success: function(msg){
+        alert(msg);
+      }
+    });
+  });
+  return false;
+});
