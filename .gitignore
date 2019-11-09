@@ -21,6 +21,8 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /nbproject/
 .idea/*
 
+geos-3.7.0beta1/*
+
 ## Sublime Text cache files
 *.tmlanguage.cache
 *.tmPreferences.cache

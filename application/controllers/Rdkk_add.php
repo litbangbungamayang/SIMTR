@@ -197,6 +197,44 @@ class Rdkk_add extends CI_Controller{
   public function loadScript(){
     $scriptContent =
     '
+      function readOpenLayers(gpxFile){
+        var reader = new FileReader();
+        reader.readAsText(gpxFile, "UTF-8");
+        reader.onload = function (evt){
+          var gpxFormat = new ol.format.GPX();
+          var gpxFeatures = gpxFormat.readFeature(evt.target.result, {
+            dataProjection: "EPSG:4326",
+            featureProjection: "EPSG:4326"
+          });
+          var sourceProjection = gpxFormat.readProjection(evt.target.result);
+          //console.log("Source proj. = " + sourceProjection.getCode());
+          var geom = gpxFeatures.getGeometry();
+          var poly = new ol.geom.Polygon(geom.getCoordinates());
+          //console.log("Geom type = " + geom.getType());
+          //console.log("Length = " + ol.sphere.getLength(geom));
+          //console.log("Area = " + ol.sphere.getArea(geom));
+          //console.log("Coordinates = " + geom.getCoordinates());
+          //console.log("Poly Area = " + poly.getArea(poly)*1000000 + " Ha.");
+          //console.log("Sphere Area = " + ol.sphere.getArea(poly, {projection: "EPSG:4326"})/10000 + " Ha.");
+          //console.log("Poly Length = " + ol.sphere.getLength(poly, {projection: "EPSG:4326"}) + " m.");
+          var luasLahan =  ol.sphere.getArea(poly, {
+            projection: "EPSG:4326"
+          });
+          var petani = objPetani(
+            null,
+            null,
+            $("#namaPetani").val(),
+            luasLahan/10000,
+            0
+          );
+          $("#lblFileGpxKebun").text("Pilih file");
+          arrayPetani.push(petani);
+          refreshData();
+          console.log(arrayPetani);
+          formAddPetani.reset();
+        }
+      }
+
       var arrayPetani = [];
       var formAddPetani = $("#formAddPetani")[0];
       var objPetani = function(id_petani, id_kelompok, nama_petani, luas, id_gpx){
@@ -208,6 +246,7 @@ class Rdkk_add extends CI_Controller{
         obj.id_gpx = id_gpx;
         return obj;
       }
+
       function refreshData(){
         tabelPetani = $("#tblPetani").DataTable();
         tabelPetani.clear();
@@ -216,17 +255,6 @@ class Rdkk_add extends CI_Controller{
         //console.log(arrayPetani);
         return false;
       }
-
-      $("#btnSimpanPetanis").on("click", function(){
-        form = $("#formAddPetani");
-        $.ajax({
-          type: "POST",
-          url: "'.site_url('Rdkk_add/addPetaniTemp/').'",
-          dataType: "text",
-          data: form.serialize()
-        });
-        return false;
-      });
 
       $("#fileGpxKebun").change(function(e){
         var selectedFile = $(this)[0].files[0];
@@ -241,19 +269,7 @@ class Rdkk_add extends CI_Controller{
 
       $("#btnSimpanPetani").on("click", function(){
         var selectedFile = $("#fileGpxKebun")[0].files[0];
-        var gpxFile = new FormData();
-        gpxFile.append("gpx", selectedFile);
-        $.ajax ({
-          type: "POST",
-          processData: false,
-          contentType: false,
-          url: "'.site_url('Rdkk_add/readGpxValue').'",
-          data: gpxFile,
-          success: function(){
-            console.log(gpxFile.get("gpx"));
-          }
-        });
-        return false;
+        readOpenLayers(selectedFile);
       });
 
       $("#tblPetani").DataTable({
@@ -265,7 +281,9 @@ class Rdkk_add extends CI_Controller{
         columns : [
           {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
           {data: "nama_petani"},
-          {data: "luas"},
+          {data: "luas", render: function(data, type, row, meta){
+              return data.toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha"
+          }},
           {data: "button", render: function(data, type, row, meta){return \'<button type="button" class="btn btn-danger btn-sm" name="hapus" >Hapus</button>\'}}
         ]
       });
