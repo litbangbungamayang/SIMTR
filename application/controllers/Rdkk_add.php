@@ -6,6 +6,8 @@ class Rdkk_add extends CI_Controller{
 
   public function __construct(){
     parent :: __construct();
+    $this->load->model("wilayah_model");
+    $this->load->model("kelompoktani_model");
     $this->load->model("masatanam_model");
     $this->load->model("varietas_model");
     $this->load->model("petani_model");
@@ -22,7 +24,35 @@ class Rdkk_add extends CI_Controller{
       $data['pageTitle'] = "Pendaftaran RDKK";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
+      $data['before_script'] = $this->loadBeforeScript();
       $this->load->view('main_view', $data);
+    }
+  }
+
+  public function cekModel(){
+    $wilayah = $this->wilayah_model;
+    echo $wilayah->getNamaKabupatenByIdDesa("120106AD");
+  }
+
+  public function getNamaDesa(){
+    $wilayah = $this->wilayah_model;
+    echo $wilayah->getAllDesa();
+  }
+
+  public function getNamaKabupaten(){
+    $wilayah = $this->wilayah_model;
+    if ($this->input->get('idDesa') !== NULL){
+      $idDesa = $this->input->get('idDesa');
+      echo $wilayah->getNamaKabupatenByIdDesa($idDesa);
+    }
+  }
+
+  public function tambahData(){
+    $kelompoktani = $this->kelompoktani_model;
+    $validation = $this->form_validation;
+    $validation->set_rules($kelompoktani->rules());
+    if ($validation->run()){
+      $kelompoktani->simpan();
     }
   }
 
@@ -58,11 +88,7 @@ class Rdkk_add extends CI_Controller{
                   </div>
                   <div class="form-group" id="grNamaDesa">
                     <label class="form-label">Nama Desa</label>
-                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select" placeholder="Pilih desa">
-                      <option value="">Pilih desa</option>
-                      <option value="1">Isorejo</option>
-                      <option value="4">Negara Tulang Bawang</option>
-                      <option value="3">Tanah Abang</option>
+                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select" placeholder="">
                     </select>
                   </div>
                   <div class="form-group" id="grMasaTanam">
@@ -130,6 +156,14 @@ class Rdkk_add extends CI_Controller{
                     </thead>
                     <tbody id="dataPetani">
                     </tbody>
+                    <tfoot id="footerPetani">
+                      <tr>
+                        <th class="w-1"></th>
+                        <th>Total luas</th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </div>
@@ -166,7 +200,7 @@ class Rdkk_add extends CI_Controller{
                     <div class="form-group" id="grUploadPeta">
                       <div class="form-label">File GPX area kebun</div>
                       <div class="custom-file">
-                        <input type="file" class="custom-file-input" name="fileGpxKebun" id="fileGpxKebun">
+                        <input type="file" accept=".gpx" class="custom-file-input" name="fileGpxKebun" id="fileGpxKebun">
                         <label class="custom-file-label" id="lblFileGpxKebun" name="lblFileGpxKebun">Pilih file</label>
                       </div>
                     </div>
@@ -194,9 +228,48 @@ class Rdkk_add extends CI_Controller{
     echo json_encode("output OK");
   }
 
+  public function loadBeforeScript(){
+    return
+    '
+    ';
+  }
+
   public function loadScript(){
     $scriptContent =
     '
+      $.ajax({
+        url: "Rdkk_add/getNamaDesa",
+        type: "GET",
+        dataType: "json",
+        success: function(response){
+          $("#namaDesa").selectize({
+            valueField: "id_wilayah",
+            labelField: "nama_wilayah",
+            sortField: "nama_wilayah",
+            searchField: "nama_wilayah",
+            maxItems: 1,
+            create: false,
+            placeholder: "Pilih nama desa",
+            options: response,
+            render: {
+              option: function (item, escape){
+                var namaKab = $.ajax({
+                  url: "Rdkk_add/getNamaKabupaten",
+                  type: "GET",
+                  data: "idDesa=" + escape(item.id_wilayah),
+                  success: function(data){
+                  }
+                });
+                return "<option value = escape(item.id_wilayah)>" + escape(item.nama_wilayah) + namaKab.nama_wilayah + "</option>";
+              }
+            },
+            onBlur: function(){
+              console.log($(this)[0].getValue());
+            }
+          });
+        }
+      });
+
       function readOpenLayers(gpxFile){
         var reader = new FileReader();
         reader.readAsText(gpxFile, "UTF-8");
@@ -225,9 +298,10 @@ class Rdkk_add extends CI_Controller{
             null,
             $("#namaPetani").val(),
             luasLahan/10000,
-            0
+            geom.getCoordinates()
           );
           $("#lblFileGpxKebun").text("Pilih file");
+          $("#fileGpxKebun").val("");
           arrayPetani.push(petani);
           refreshData();
           console.log(arrayPetani);
@@ -235,15 +309,20 @@ class Rdkk_add extends CI_Controller{
         }
       }
 
+      $("#dialogAddPetani").on("hide.bs.modal", function (e){
+        $("#lblFileGpxKebun").text("Pilih file");
+        $("#fileGpxKebun").val("");
+      })
+
       var arrayPetani = [];
       var formAddPetani = $("#formAddPetani")[0];
-      var objPetani = function(id_petani, id_kelompok, nama_petani, luas, id_gpx){
+      var objPetani = function(id_petani, id_kelompok, nama_petani, luas, arrayGPS){
         var obj = {};
         obj.id_petani = id_petani;
         obj.id_kelompok = id_kelompok;
         obj.nama_petani = nama_petani;
         obj.luas = luas;
-        obj.id_gpx = id_gpx;
+        obj.gps = arrayGPS;
         return obj;
       }
 
@@ -252,24 +331,25 @@ class Rdkk_add extends CI_Controller{
         tabelPetani.clear();
         tabelPetani.rows.add(arrayPetani);
         tabelPetani.draw();
-        //console.log(arrayPetani);
         return false;
       }
 
       $("#fileGpxKebun").change(function(e){
         var selectedFile = $(this)[0].files[0];
         var lblGpxKebun = $("#lblFileGpxKebun");
-        lblGpxKebun.text(selectedFile.name + " (" + selectedFile.type + ")");
+        lblGpxKebun.text(selectedFile.name);
         if (selectedFile.type != "application/gpx+xml"){
           alert("Invalid format!");
           lblGpxKebun.text("Pilih file");
-          $("#fileGpxKebun").value = "";
+          $("#fileGpxKebun").val("");
         }
       })
 
       $("#btnSimpanPetani").on("click", function(){
-        var selectedFile = $("#fileGpxKebun")[0].files[0];
-        readOpenLayers(selectedFile);
+        if ($("#fileGpxKebun").val() != ""){
+          var selectedFile = $("#fileGpxKebun")[0].files[0];
+          readOpenLayers(selectedFile);
+        }
       });
 
       $("#tblPetani").DataTable({
@@ -281,11 +361,24 @@ class Rdkk_add extends CI_Controller{
         columns : [
           {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
           {data: "nama_petani"},
-          {data: "luas", render: function(data, type, row, meta){
+          {data: "luas",
+            render: function(data, type, row, meta){
               return data.toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha"
-          }},
+            },
+            className: "text-right"
+          },
           {data: "button", render: function(data, type, row, meta){return \'<button type="button" class="btn btn-danger btn-sm" name="hapus" >Hapus</button>\'}}
-        ]
+        ],
+        "footerCallback": function (row, data, start, end, display){
+            var api = this.api(), data;
+            var getIntVal = function (i){
+              return typeof i === \'string\' ? i.replace(/Ha/g,\'\')*1 : typeof i === \'number\' ? i : 0;
+            };
+            total = api.column(2).data().reduce(function (a,b){
+              return getIntVal(a) + getIntVal(b);
+            },0);
+            $(api.column(2).footer()).html(total.toLocaleString(undefined, {maximumFractionDigits: 2}) + " Ha");
+        }
       });
 
       $("#tblPetani").on("click", "button[name=\"hapus\"]", function(e){

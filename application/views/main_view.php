@@ -12,6 +12,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <? $this->load->view("_partials/upper_banner.php") ?>
         <? $this->load->view("_partials/navbar.php") ?>
         <div class="my-3 my-md-5">
+          <script>
+            require(['jquery','datatables'], function() {
+              $(document).ready(function() {
+                <?
+                  if (isset($before_script)){
+                    echo $before_script;
+                  }
+                ?>
+              });
+            });
+          </script>
           <div class="container">
             <? $this->load->view("_partials/page_title.php") ?>
             <?
@@ -21,22 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             ?>
           </div>
           <script>
-            function rdkkNextStep(){
-              $('#grNamaDesa').hide();
-              $('#grNamaKelompok').hide();
-              $('#grMasaTanam').hide();
-              $('#btnNext').hide();
-              $('#grUploadKtp').hide();
-              $('#grUploadKk').hide();
-              $('#grUploadPernyataan').hide();
-              $('#grVarietas').hide();
-              $('#grNamaPetani').show();
-            }
-
-            function rdkkLoad(){
-              $('#grNamaPetani').hide();
-            }
-            require(['jquery','datatables'], function () {
+            require(['jquery','datatables', 'selectize'], function () {
 
             	$(document).ready(function () {
                 <?
@@ -80,7 +76,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             	});
             });
             require(['jquery', 'selectize'], function ($, selectize) {
-              $('#namaDesa').selectize({create: false, sortField: 'text'});
               $('#masaTanam').selectize({create: false, sortField: 'text'});
               $('#varietas').selectize({create: false, sortField: 'text'});
             });
