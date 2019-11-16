@@ -34,17 +34,19 @@ class Rdkk_add extends CI_Controller{
     echo $wilayah->getNamaKabupatenByIdDesa("120106AD");
   }
 
-  public function getNamaDesa(){
+  public function getDesaByKabupaten(){
     $wilayah = $this->wilayah_model;
-    echo $wilayah->getAllDesa();
+    echo $wilayah->getDesaByKabupaten($this->input->get("idKab"));
   }
 
-  public function getNamaKabupaten(){
+  public function getAllKabupaten(){
     $wilayah = $this->wilayah_model;
-    if ($this->input->get('idDesa') !== NULL){
-      $idDesa = $this->input->get('idDesa');
-      echo $wilayah->getNamaKabupatenByIdDesa($idDesa);
-    }
+    echo $wilayah->getAllKabupaten();
+  }
+
+  public function getKecByDesa(){
+    $wilayah = $this->wilayah_model;
+    echo $wilayah->getKecByDesa($this->input->get("idDesa"));
   }
 
   public function tambahData(){
@@ -86,9 +88,14 @@ class Rdkk_add extends CI_Controller{
                     <label class="form-label">Nama Kelompok</label>
                     <input type="text" class="form-control" id="namaKelompok" name="namaKelompok" placeholder="Nama Kelompok Tani">
                   </div>
+                  <div class="form-group" id="grKab">
+                    <label class="form-label">Kabupaten</label>
+                    <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="">
+                    </select>
+                  </div>
                   <div class="form-group" id="grNamaDesa">
-                    <label class="form-label">Nama Desa</label>
-                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select" placeholder="">
+                    <label class="form-label">Nama Desa<i id="iconLoading" style="margin-left: 10px" class="fa fa-spinner fa-spin"></i></label>
+                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select loading" placeholder="">
                     </select>
                   </div>
                   <div class="form-group" id="grMasaTanam">
@@ -237,38 +244,102 @@ class Rdkk_add extends CI_Controller{
   public function loadScript(){
     $scriptContent =
     '
+      $("#iconLoading").hide();
       $.ajax({
-        url: "Rdkk_add/getNamaDesa",
+        url: "Rdkk_add/getAllKabupaten",
         type: "GET",
         dataType: "json",
         success: function(response){
-          $("#namaDesa").selectize({
+          $namaDesa = $("#namaDesa").selectize();
+          namaDesa = $namaDesa[0].selectize;
+          $("#namaKab").selectize({
             valueField: "id_wilayah",
             labelField: "nama_wilayah",
             sortField: "nama_wilayah",
             searchField: "nama_wilayah",
             maxItems: 1,
             create: false,
-            placeholder: "Pilih nama desa",
+            placeholder: "Pilih kabupaten",
             options: response,
-            render: {
-              option: function (item, escape){
-                var namaKab = $.ajax({
-                  url: "Rdkk_add/getNamaKabupaten",
-                  type: "GET",
-                  data: "idDesa=" + escape(item.id_wilayah),
-                  success: function(data){
-                  }
-                });
-                return "<option value = escape(item.id_wilayah)>" + escape(item.nama_wilayah) + namaKab.nama_wilayah + "</option>";
-              }
-            },
-            onBlur: function(){
-              console.log($(this)[0].getValue());
+            onChange: function(value){
+              $("#iconLoading").show();
+              console.log(value);
+              namaDesa.disable();
+              namaDesa.clear();
+              namaDesa.clearOptions();
+              $.ajax({
+                url: "Rdkk_add/getDesaByKabupaten",
+                type: "GET",
+                dataType: "json",
+                data: "idKab=" + value,
+                success: function(response){
+                  //console.log(response);
+                  namaDesa.options = response;
+                  namaDesa.enable();
+                  namaDesa.clear();
+                  namaDesa.clearOptions();
+                  namaDesa.load(function (callback){
+                    callback(response);
+                    $("#iconLoading").hide();
+                  });
+                }
+              })
             }
           });
         }
       });
+
+      $("#namaDesa").selectize({
+        valueField: "id_wilayah",
+        labelField: "nama_wilayah",
+        sortField: "nama_wilayah",
+        searchField: "nama_wilayah",
+        maxItems: 1,
+        create: false,
+        placeholder: "Pilih desa",
+        options: [],
+        render: {
+          option: function(item, escape){
+            var namaKec = function (){
+              var namaKec = "";
+              $.ajax({
+                async: false,
+                url: "Rdkk_add/getKecByDesa",
+                data: "idDesa=" + escape(item.id_wilayah),
+                dataType: "json",
+                type: "GET",
+                success: function(response){
+                  namaKec = response[0].nama_wilayah;
+                }
+              });
+              return namaKec;
+            }();
+            return "<option value = escape(item.id_wilayah)>" + "DESA " + escape(item.nama_wilayah) + namaKec + "</option>";
+          },
+          item: function(item, escape){
+            var namaKec = function (){
+              var namaKec = "";
+              $.ajax({
+                async: false,
+                url: "Rdkk_add/getKecByDesa",
+                data: "idDesa=" + escape(item.id_wilayah),
+                dataType: "json",
+                type: "GET",
+                success: function(response){
+                  namaKec = response[0].nama_wilayah;
+                }
+              });
+              return namaKec;
+            }();
+            return "<option value = escape(item.id_wilayah)>" + "DESA " + escape(item.nama_wilayah) + namaKec + "</option>";
+          }
+        },
+        onChange: function(value){
+          console.log(value);
+        }
+      });
+
+      $("#namaDesa")[0].selectize.disable();
 
       function readOpenLayers(gpxFile){
         var reader = new FileReader();

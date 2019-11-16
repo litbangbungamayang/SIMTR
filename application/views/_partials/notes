@@ -38,3 +38,38 @@ $("#coba").on("click", function(){
   });
   return false;
 });
+
+
+$.ajax({
+  url: "Rdkk_add/getNamaDesa",
+  type: "GET",
+  dataType: "json",
+  success: function(response){
+    $("#namaDesa").selectize({
+      valueField: "id_wilayah",
+      labelField: "nama_wilayah",
+      sortField: "nama_wilayah",
+      searchField: "nama_wilayah",
+      maxItems: 1,
+      create: false,
+      placeholder: "Pilih nama desa",
+      options: response,
+      render: {
+        option: function (item, escape){
+          var namaKab = $.ajax({
+            url: "Rdkk_add/getNamaKabupaten",
+            type: "GET",
+            data: "idDesa=" + escape(item.id_wilayah),
+            success: function(data){
+            }
+          });
+          return "<option value = escape(item.id_wilayah)>" + escape(item.nama_wilayah) + namaKab.nama_wilayah + "</option>";
+        }
+      },
+      onBlur: function(){
+        console.log($(this)[0].getValue());
+      }
+    });
+    $("#namaDesa")[0].selectize.disable();
+  }
+});
