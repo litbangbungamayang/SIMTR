@@ -118,23 +118,32 @@ class Rdkk_add extends CI_Controller{
                   <div class="form-group" id="grUploadKtp">
                     <div class="form-label">Scan Image KTP</div>
                     <div class="custom-file">
-                      <input type="file" class="custom-file-input" name="scanKtp">
-                      <label class="custom-file-label">Pilih file</label>
+                      <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input" name="scanKtp">
+                      <label id="lblScanKtp" class="custom-file-label">Pilih file</label>
+                      <div style="display: none" class="invalid-feedback" id="fbScanKtp"></div>
                     </div>
                   </div>
                   <div class="form-group" id="grUploadKk">
                     <div class="form-label">Scan Image KK</div>
                     <div class="custom-file">
-                      <input type="file" class="custom-file-input" name="scanKk">
-                      <label class="custom-file-label">Pilih file</label>
+                      <input id="scanKk" type="file" class="custom-file-input" name="scanKk">
+                      <label class="custom-file-label" id="lblScanKk">Pilih file</label>
+                      <div style="display: none" class="invalid-feedback" id="fbScanKk"></div>
                     </div>
                   </div>
                   <div class="form-group" id="grUploadPernyataan">
                     <div class="form-label">Scan Image Surat Pernyataan</div>
                     <div class="custom-file">
-                      <input type="file" class="custom-file-input" name="scanPernyataan">
-                      <label class="custom-file-label">Pilih file</label>
+                      <input id="scanSurat" type="file" class="custom-file-input" name="scanPernyataan">
+                      <label class="custom-file-label" id="lblScanSurat">Pilih file</label>
+                      <div style="display: none" class="invalid-feedback" id="fbScanSurat"></div>
                     </div>
+                  </div>
+                  <div class="form-group" id="grWarning">
+                    <div class="alert alert-primary">File yang diterima berupa file .jpeg atau .jpg dengan ukuran <b>maks. 500kB</b></div>
+                  </div>
+                  <div class="form-group" id="grWarning">
+                    <div class="alert alert-danger"><b>Perhatikan penulisan nama kelompok / petani !</b> Tidak diperkenankan menggunakan tanda baca "." (titik) untuk menyingkat nama.</div>
                   </div>
                 </div>
               </div>
@@ -197,18 +206,22 @@ class Rdkk_add extends CI_Controller{
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
+              <div class="alert alert-danger" id="errMsg">
+              </div>
               <form id="formAddPetani" action="'.site_url('Rdkk_add/addPetaniTemp').'" method="POST" enctype="multipart/form-data">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaPetani">
                       <label class="form-label">Nama Petani</label>
                       <input type="text" class="form-control" id="namaPetani" name="namaPetani" placeholder="Nama Petani">
+                      <div class="invalid-feedback" id="fbNamaPetani">Nama petani belum diinput!</div>
                     </div>
                     <div class="form-group" id="grUploadPeta">
                       <div class="form-label">File GPX area kebun</div>
                       <div class="custom-file">
                         <input type="file" accept=".gpx" class="custom-file-input" name="fileGpxKebun" id="fileGpxKebun">
                         <label class="custom-file-label" id="lblFileGpxKebun" name="lblFileGpxKebun">Pilih file</label>
+                        <div class="invalid-feedback" id="fbFileGpx"></div>
                       </div>
                     </div>
                   </div>
@@ -242,241 +255,17 @@ class Rdkk_add extends CI_Controller{
   }
 
   public function loadScript(){
-    $scriptContent =
-    '
-      $("#iconLoading").hide();
-      $.ajax({
-        url: "Rdkk_add/getAllKabupaten",
-        type: "GET",
-        dataType: "json",
-        success: function(response){
-          $namaDesa = $("#namaDesa").selectize();
-          namaDesa = $namaDesa[0].selectize;
-          $("#namaKab").selectize({
-            valueField: "id_wilayah",
-            labelField: "nama_wilayah",
-            sortField: "nama_wilayah",
-            searchField: "nama_wilayah",
-            maxItems: 1,
-            create: false,
-            placeholder: "Pilih kabupaten",
-            options: response,
-            onChange: function(value){
-              $("#iconLoading").show();
-              console.log(value);
-              namaDesa.disable();
-              namaDesa.clear();
-              namaDesa.clearOptions();
-              $.ajax({
-                url: "Rdkk_add/getDesaByKabupaten",
-                type: "GET",
-                dataType: "json",
-                data: "idKab=" + value,
-                success: function(response){
-                  //console.log(response);
-                  namaDesa.options = response;
-                  namaDesa.enable();
-                  namaDesa.clear();
-                  namaDesa.clearOptions();
-                  namaDesa.load(function (callback){
-                    callback(response);
-                    $("#iconLoading").hide();
-                  });
-                }
-              })
-            }
-          });
-        }
-      });
-
-      $("#namaDesa").selectize({
-        valueField: "id_wilayah",
-        labelField: "nama_wilayah",
-        sortField: "nama_wilayah",
-        searchField: "nama_wilayah",
-        maxItems: 1,
-        create: false,
-        placeholder: "Pilih desa",
-        options: [],
-        render: {
-          option: function(item, escape){
-            var namaKec = function (){
-              var namaKec = "";
-              $.ajax({
-                async: false,
-                url: "Rdkk_add/getKecByDesa",
-                data: "idDesa=" + escape(item.id_wilayah),
-                dataType: "json",
-                type: "GET",
-                success: function(response){
-                  namaKec = response[0].nama_wilayah;
-                }
-              });
-              return namaKec;
-            }();
-            return "<option value = escape(item.id_wilayah)>" + "DESA " + escape(item.nama_wilayah) + namaKec + "</option>";
-          },
-          item: function(item, escape){
-            var namaKec = function (){
-              var namaKec = "";
-              $.ajax({
-                async: false,
-                url: "Rdkk_add/getKecByDesa",
-                data: "idDesa=" + escape(item.id_wilayah),
-                dataType: "json",
-                type: "GET",
-                success: function(response){
-                  namaKec = response[0].nama_wilayah;
-                }
-              });
-              return namaKec;
-            }();
-            return "<option value = escape(item.id_wilayah)>" + "DESA " + escape(item.nama_wilayah) + namaKec + "</option>";
-          }
-        },
-        onChange: function(value){
-          console.log(value);
-        }
-      });
-
-      $("#namaDesa")[0].selectize.disable();
-
-      function readOpenLayers(gpxFile){
-        var reader = new FileReader();
-        reader.readAsText(gpxFile, "UTF-8");
-        reader.onload = function (evt){
-          var gpxFormat = new ol.format.GPX();
-          var gpxFeatures = gpxFormat.readFeature(evt.target.result, {
-            dataProjection: "EPSG:4326",
-            featureProjection: "EPSG:4326"
-          });
-          var sourceProjection = gpxFormat.readProjection(evt.target.result);
-          //console.log("Source proj. = " + sourceProjection.getCode());
-          var geom = gpxFeatures.getGeometry();
-          var poly = new ol.geom.Polygon(geom.getCoordinates());
-          //console.log("Geom type = " + geom.getType());
-          //console.log("Length = " + ol.sphere.getLength(geom));
-          //console.log("Area = " + ol.sphere.getArea(geom));
-          //console.log("Coordinates = " + geom.getCoordinates());
-          //console.log("Poly Area = " + poly.getArea(poly)*1000000 + " Ha.");
-          //console.log("Sphere Area = " + ol.sphere.getArea(poly, {projection: "EPSG:4326"})/10000 + " Ha.");
-          //console.log("Poly Length = " + ol.sphere.getLength(poly, {projection: "EPSG:4326"}) + " m.");
-          var luasLahan =  ol.sphere.getArea(poly, {
-            projection: "EPSG:4326"
-          });
-          var petani = objPetani(
-            null,
-            null,
-            $("#namaPetani").val(),
-            luasLahan/10000,
-            geom.getCoordinates()
-          );
-          $("#lblFileGpxKebun").text("Pilih file");
-          $("#fileGpxKebun").val("");
-          arrayPetani.push(petani);
-          refreshData();
-          console.log(arrayPetani);
-          formAddPetani.reset();
-        }
-      }
-
-      $("#dialogAddPetani").on("hide.bs.modal", function (e){
-        $("#lblFileGpxKebun").text("Pilih file");
-        $("#fileGpxKebun").val("");
-      })
-
-      var arrayPetani = [];
-      var formAddPetani = $("#formAddPetani")[0];
-      var objPetani = function(id_petani, id_kelompok, nama_petani, luas, arrayGPS){
-        var obj = {};
-        obj.id_petani = id_petani;
-        obj.id_kelompok = id_kelompok;
-        obj.nama_petani = nama_petani;
-        obj.luas = luas;
-        obj.gps = arrayGPS;
-        return obj;
-      }
-
-      function refreshData(){
-        tabelPetani = $("#tblPetani").DataTable();
-        tabelPetani.clear();
-        tabelPetani.rows.add(arrayPetani);
-        tabelPetani.draw();
-        return false;
-      }
-
-      $("#fileGpxKebun").change(function(e){
-        var selectedFile = $(this)[0].files[0];
-        var lblGpxKebun = $("#lblFileGpxKebun");
-        lblGpxKebun.text(selectedFile.name);
-        if (selectedFile.type != "application/gpx+xml"){
-          alert("Invalid format!");
-          lblGpxKebun.text("Pilih file");
-          $("#fileGpxKebun").val("");
-        }
-      })
-
-      $("#btnSimpanPetani").on("click", function(){
-        if ($("#fileGpxKebun").val() != ""){
-          var selectedFile = $("#fileGpxKebun")[0].files[0];
-          readOpenLayers(selectedFile);
-        }
-      });
-
-      $("#tblPetani").DataTable({
-        bFilter: false,
-        bPaginate: false,
-        bSort: false,
-        bInfo: false,
-        data: arrayPetani,
-        columns : [
-          {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
-          {data: "nama_petani"},
-          {data: "luas",
-            render: function(data, type, row, meta){
-              return data.toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha"
-            },
-            className: "text-right"
-          },
-          {data: "button", render: function(data, type, row, meta){return \'<button type="button" class="btn btn-danger btn-sm" name="hapus" >Hapus</button>\'}}
-        ],
-        "footerCallback": function (row, data, start, end, display){
-            var api = this.api(), data;
-            var getIntVal = function (i){
-              return typeof i === \'string\' ? i.replace(/Ha/g,\'\')*1 : typeof i === \'number\' ? i : 0;
-            };
-            total = api.column(2).data().reduce(function (a,b){
-              return getIntVal(a) + getIntVal(b);
-            },0);
-            $(api.column(2).footer()).html(total.toLocaleString(undefined, {maximumFractionDigits: 2}) + " Ha");
-        }
-      });
-
-      $("#tblPetani").on("click", "button[name=\"hapus\"]", function(e){
-        var currentRow = $(this).closest("tr");
-        var currentRowData = currentRow.find("td").slice(1,2).text();
-        var index = arrayPetani.findIndex(function (item) {return item.nama_petani == currentRowData});
-        console.log(index);
-        arrayPetani.splice(index,1);
-        currentRow.remove();
-        //console.log(arrayPetani);
-        refreshData();
-      });
-
-    ';
-    return $scriptContent;
+    return '$.getScript("'.base_url("/assets/app_js/Rdkk_add.js").'");';
   }
 
   public function addPetaniTemp(){
     $petani = $this->petani_model;
+    //var_dump("Masuk");
     //ADD VALIDATION
-    $addedData = $this->input->post();
-    $petani->nama_petani = $addedData["namaPetani"];
-    $arrayPetani = $this->arrayPetani;
-    $coba = $this->coba;
-    $coba ++;
-    $arrayPetani[] = $petani;
-    var_dump(json_encode($arrayPetani));
-    var_dump($coba);
+    $validation = $this->form_validation;
+    $validation->set_rules($petani->rules_petani());
+    if ($validation->run()){
+
+    }
   }
 }

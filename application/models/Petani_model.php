@@ -12,6 +12,23 @@ class Petani_model extends CI_Model{
   public $luas;
   public $id_gpx;
 
+  public function rules_petani(){
+    return [
+      [
+        "field" => "namaPetani",
+        "label" => "Nama Petani",
+        "rules" => "required",
+        "errors" => ["required" => "Nama petani belum diinput"]
+      ],
+      [
+        "field" => "fileGpxKebun",
+        "label" => "Pilih file",
+        "rules" => "required",
+        "errors" => ["required" => "File gpx belum dipilih"]
+      ]
+    ];
+  }
+
   public function getAll(){
     return $this->db->get($this->_table)->result();
   }
