@@ -14,6 +14,8 @@ class Rdkk_add extends CI_Controller{
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
+    $this->load->helper('form');
+    $this->load->helper('html');
     $arrayPetani = array();
   }
 
@@ -24,7 +26,6 @@ class Rdkk_add extends CI_Controller{
       $data['pageTitle'] = "Pendaftaran RDKK";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
-      $data['before_script'] = $this->loadBeforeScript();
       $this->load->view('main_view', $data);
     }
   }
@@ -53,9 +54,19 @@ class Rdkk_add extends CI_Controller{
     $kelompoktani = $this->kelompoktani_model;
     $validation = $this->form_validation;
     $validation->set_rules($kelompoktani->rules());
+    if (empty($_FILES["scanKtp"]["name"])) $validation->set_rules("scanKtp", "Scan KTP", "required", ["required"=>"Scan KTP belum ada!"]);
+    if (empty($_FILES["scanKk"]["name"])) $validation->set_rules("scanKk", "Scan KK", "required", ["required"=>"Scan KK belum ada!"]);
+    if (empty($_FILES["scanSurat"]["name"])) $validation->set_rules("scanSurat", "Scan KTP", "required", ["required"=>"Scan Surat Pernyataan belum ada!"]);
     if ($validation->run()){
-      $kelompoktani->simpan();
+      if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"]) && !empty($_FILES["scanSurat"]["name"])) {
+        $config['allowed_types'] = 'jpg|jpeg';
+        $config['max_size'] = 500;
+
+      } else {
+        $this->index();
+      }
     }
+    $this->index();
   }
 
   public function loadContent(){
@@ -73,7 +84,7 @@ class Rdkk_add extends CI_Controller{
     '
       <div class="page">
         <div class="row">
-          <form action="" method="post" class="card">
+          <div class="card">
             <div class="card-header">
               <h3 class="card-title"> Data Kelompok Tani </h3>
             </div>
@@ -81,12 +92,14 @@ class Rdkk_add extends CI_Controller{
     ';
     $content_1 =
     '
+            <form action="'.site_url('Rdkk_add/tambahData').'" method="post" enctype="multipart/form-data">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6 col-lg-4">
                   <div class="form-group" id="grNamaKelompok">
                     <label class="form-label">Nama Kelompok</label>
-                    <input type="text" class="form-control" id="namaKelompok" name="namaKelompok" placeholder="Nama Kelompok Tani">
+                    <input type="text" style="text-transform: uppercase;" class="'.(form_error('namaKelompok') != NULL ? "form-control is-invalid" : "form-control").'" id="namaKelompok" name="namaKelompok" placeholder="Nama Kelompok Tani">
+                    <div class="invalid-feedback">'.form_error('namaKelompok').'</div>
                   </div>
                   <div class="form-group" id="grKab">
                     <label class="form-label">Kabupaten</label>
@@ -95,22 +108,24 @@ class Rdkk_add extends CI_Controller{
                   </div>
                   <div class="form-group" id="grNamaDesa">
                     <label class="form-label">Nama Desa<i id="iconLoading" style="margin-left: 10px" class="fa fa-spinner fa-spin"></i></label>
-                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select loading" placeholder="">
-                    </select>
+                    <select name="namaDesa" id="namaDesa" class="custom-control custom-select loading '.(form_error('namaDesa') != NULL ? "is-invalid" : "").'" placeholder=""></select>
+                    <div class="invalid-feedback">'.form_error('namaDesa').'</div>
                   </div>
                   <div class="form-group" id="grMasaTanam">
                     <label class="form-label">Masa Tanam</label>
-                    <select name="masaTanam" id="masaTanam" class="custom-control custom-select" placeholder="Pilih masa tanam">
+                    <select name="masaTanam" id="masaTanam" class="custom-control custom-select '.(form_error('masaTanam') != NULL ? "is-invalid" : "").'" placeholder="Pilih masa tanam">
                       <option value="">Pilih masa tanam</option>
                       '.$loadListMasaTanam.'
                     </select>
+                    <div class="invalid-feedback">'.form_error('masaTanam').'</div>
                   </div>
                   <div class="form-group" id="grVarietas">
                     <label class="form-label">Varietas</label>
-                    <select name="varietas" id="varietas" class="custom-control custom-select" placeholder="Pilih varietas">
+                    <select name="varietas" id="varietas" class="custom-control custom-select '.(form_error('varietas') != NULL ? "is-invalid" : "").'" placeholder="Pilih varietas">
                       <option value="">Pilih varietas</option>
                       '.$loadListVarietas.'
                     </select>
+                    <div class="invalid-feedback">'.form_error('varietas').'</div>
                   </div>
                 </div>
 
@@ -118,25 +133,25 @@ class Rdkk_add extends CI_Controller{
                   <div class="form-group" id="grUploadKtp">
                     <div class="form-label">Scan Image KTP</div>
                     <div class="custom-file">
-                      <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input" name="scanKtp">
+                      <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKtp') != NULL ? "is-invalid" : "").'" name="scanKtp">
                       <label id="lblScanKtp" class="custom-file-label">Pilih file</label>
-                      <div style="display: none" class="invalid-feedback" id="fbScanKtp"></div>
+                      <div style="" class="invalid-feedback" id="fbScanKtp">'.form_error('scanKtp').'</div>
                     </div>
                   </div>
                   <div class="form-group" id="grUploadKk">
                     <div class="form-label">Scan Image KK</div>
                     <div class="custom-file">
-                      <input id="scanKk" type="file" class="custom-file-input" name="scanKk">
+                      <input id="scanKk" type="file" class="custom-file-input '.(form_error('scanKk') != NULL ? "is-invalid" : "").'" name="scanKk">
                       <label class="custom-file-label" id="lblScanKk">Pilih file</label>
-                      <div style="display: none" class="invalid-feedback" id="fbScanKk"></div>
+                      <div style="" class="invalid-feedback" id="fbScanKk">'.form_error('scanKk').'</div>
                     </div>
                   </div>
                   <div class="form-group" id="grUploadPernyataan">
                     <div class="form-label">Scan Image Surat Pernyataan</div>
                     <div class="custom-file">
-                      <input id="scanSurat" type="file" class="custom-file-input" name="scanPernyataan">
+                      <input id="scanSurat" type="file" class="custom-file-input '.(form_error('scanSurat') != NULL ? "is-invalid" : "").'" name="scanSurat">
                       <label class="custom-file-label" id="lblScanSurat">Pilih file</label>
-                      <div style="display: none" class="invalid-feedback" id="fbScanSurat"></div>
+                      <div style="" class="invalid-feedback" id="fbScanSurat">'.form_error('scanSurat').'</div>
                     </div>
                   </div>
                   <div class="form-group" id="grWarning">
@@ -189,10 +204,10 @@ class Rdkk_add extends CI_Controller{
     '
             <div class="card-footer text-right">
               <div class="d-flex">
-                <button type="button" id="btnNext" class="btn btn-primary ml-auto" onclick="">Simpan data</button>
+                <button type="submit" id="btnSimpan" class="btn btn-primary ml-auto" onclick="" name="dataKelompok">Simpan data</button>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     ';
@@ -213,7 +228,7 @@ class Rdkk_add extends CI_Controller{
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaPetani">
                       <label class="form-label">Nama Petani</label>
-                      <input type="text" class="form-control" id="namaPetani" name="namaPetani" placeholder="Nama Petani">
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="namaPetani" name="namaPetani" placeholder="Nama Petani">
                       <div class="invalid-feedback" id="fbNamaPetani">Nama petani belum diinput!</div>
                     </div>
                     <div class="form-group" id="grUploadPeta">
@@ -246,12 +261,6 @@ class Rdkk_add extends CI_Controller{
     $geometry = geoPHP::load($gpxValue,'gpx');
     var_dump($geometry->area());
     echo json_encode("output OK");
-  }
-
-  public function loadBeforeScript(){
-    return
-    '
-    ';
   }
 
   public function loadScript(){

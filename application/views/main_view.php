@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <script>
             require(['jquery','datatables'], function() {
               $(document).ready(function() {
+                window.js_base_url = "<? echo base_url(); ?>" + "index.php/";
                 <?
                   if (isset($before_script)){
                     echo $before_script;

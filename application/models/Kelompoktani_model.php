@@ -21,37 +21,26 @@ class Kelompoktani_model extends CI_Model{
       [
         "field" => "namaKelompok",
         "label" => "Nama Kelompok",
-        "rules" => "required"
+        "rules" => "required",
+        "errors" => ["required" => "Nama kelompok belum diinput!"]
       ],
       [
-        "field" => "id_desa",
+        "field" => "namaDesa",
         "label" => "ID Desa",
-        "rules" => "required"
+        "rules" => "required",
+        "errors" => ["required" => "Desa belum dipilih!"]
       ],
       [
-        "field" => "mt",
+        "field" => "masaTanam",
         "label" => "Masa Tanam",
-        "rules" => "required"
+        "rules" => "required",
+        "errors" => ["required" => "Masa tanam belum dipilih!"]
       ],
       [
-        "field" => "id_varietas",
+        "field" => "varietas",
         "label" => "ID Varietas",
-        "rules" => "required"
-      ],
-      [
-        "field" => "scan_ktp",
-        "label" => "Scan KTP",
-        "rules" => "required"
-      ],
-      [
-        "field" => "scan_kk",
-        "label" => "Scan KK",
-        "rules" => "required"
-      ],
-      [
-        "field" => "scan_surat",
-        "label" => "Scan Surat",
-        "rules" => "required"
+        "rules" => "required",
+        "errors" => ["required" => "Varietas belum dipilih"]
       ]
     ];
   }
@@ -63,15 +52,14 @@ class Kelompoktani_model extends CI_Model{
   public function simpan(){
     $post = $this->input->post();
     $this->nama_kelompok = $post["namaKelompok"];
-    $this->no_kontrak = $post["no_kontrak"];
-    $this->id_desa = $post["id_desa"];
-    $this->mt = $post["mt"];
-    $this->id_varietas = $post["id_varietas"];
-    $this->scan_ktp = $post["scan_ktp"];
-    $this->scan_kk = $post["scan_kk"];
-    $this->scan_surat = $post["scan_surat"];
-    $this->db->insert($this->_table, $this);
-    return $this->db->insert_id();
+    $this->id_desa = $post["namaDesa"];
+    $this->mt = $post["masaTanam"];
+    $this->id_varietas = $post["varietas"];
+    $this->scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
+    $this->scan_kk = file_get_contents($_FILES["scanKk"]["tmp_name"]);
+    $this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
+    //$this->db->insert($this->_table, $this);
+    return var_dump($this);
   }
 
   public function ubah(){

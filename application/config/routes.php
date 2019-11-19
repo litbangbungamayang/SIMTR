@@ -51,5 +51,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $route['default_controller'] = 'landing';
 $route['login_process'] = 'login/logging_in';
+$route['kelompok_add'] = 'rdkk_add/cek_model';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

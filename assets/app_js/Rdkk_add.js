@@ -9,7 +9,7 @@ $("#namaPetani").bind("keyup blur", function(){
 });
 
 $.ajax({
-  url: "Rdkk_add/getAllKabupaten",
+  url: js_base_url + "Rdkk_add/getAllKabupaten",
   type: "GET",
   dataType: "json",
   success: function(response){
@@ -31,7 +31,7 @@ $.ajax({
         namaDesa.clear();
         namaDesa.clearOptions();
         $.ajax({
-          url: "Rdkk_add/getDesaByKabupaten",
+          url: js_base_url + "Rdkk_add/getDesaByKabupaten",
           type: "GET",
           dataType: "json",
           data: "idKab=" + value,
@@ -67,7 +67,7 @@ $("#namaDesa").selectize({
         var namaKec = "";
         $.ajax({
           async: false,
-          url: "Rdkk_add/getKecByDesa",
+          url: js_base_url + "Rdkk_add/getKecByDesa",
           data: "idDesa=" + escape(item.id_wilayah),
           dataType: "json",
           type: "GET",
@@ -84,7 +84,7 @@ $("#namaDesa").selectize({
         var namaKec = "";
         $.ajax({
           async: false,
-          url: "Rdkk_add/getKecByDesa",
+          url: js_base_url + "Rdkk_add/getKecByDesa",
           data: "idDesa=" + escape(item.id_wilayah),
           dataType: "json",
           type: "GET",
