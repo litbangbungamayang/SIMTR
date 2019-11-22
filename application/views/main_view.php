@@ -4,6 +4,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
+    <?
+      $arrayPetani = array();
+      $arrayPetani = $this->session->flashdata("arrayPetani");
+      //var_dump($arrayPetani[0]);
+    ?>
     <? $this->load->view("_partials/head.php")?>
   </head>
   <body class="">

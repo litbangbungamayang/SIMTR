@@ -244,6 +244,15 @@ $("#namaPetani").on("change", function(){
   $(this).removeClass("is-invalid");
 });
 
+$("#btnSimpan").on("click", function(){
+  $.ajax({
+    url: js_base_url + "Rdkk_add/getArrayPetani",
+    type: "POST",
+    dataType: "json",
+    data: "petani=" + JSON.stringify(arrayPetani)
+  });
+});
+
 $("#btnSimpanPetani").on("click", function(){
   var fileGpxKebun = $("#fileGpxKebun");
   var fbFileGpx = $("#fbFileGpx");

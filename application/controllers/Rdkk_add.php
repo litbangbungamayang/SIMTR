@@ -56,7 +56,18 @@ class Rdkk_add extends CI_Controller{
     echo $wilayah->getKecByDesa($this->input->get("idDesa"));
   }
 
+  public function getArrayPetani(){
+    $arrayPetani = json_decode($this->input->post("petani"));
+    $this->session->set_flashdata("arrayPetani", $arrayPetani);
+  }
+
   public function tambahData(){
+    $arrayPetani = $this->session->flashdata("arrayPetani");
+    //var_dump($arrayPetani[0]);
+    if (!is_array($arrayPetani) || empty($arrayPetani)){
+      $arrayPetani = array();
+    }
+    if (count($arrayPetani > 0)) var_dump($arrayPetani[0]->gps);
     $MAX_IMAGE_SIZE = 200; //in kB
     $kelompoktani = $this->kelompoktani_model;
     $validation = $this->form_validation;
