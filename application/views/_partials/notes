@@ -1,3 +1,23 @@
+Looping untuk field input name
+foreach($_FILES as $key=>$file){
+  //echo $_FILES[$key]["name"];
+}
+
+$config["upload_path"] = './uploads/';
+$config['allowed_types'] = 'jpg|jpeg';
+$config['max_size'] = '200';
+$config["encrypt_name"] = TRUE;
+
+
+
+if ($this->upload->do_upload("scanKtp")){
+  //echo "Uploaded. File name = ".$this->upload->data("file_name");
+} else {
+  $error = array('error' => $this->upload->display_errors());
+  echo "Failed = ".var_dump($error);
+}
+
+
 
 function readGpx(selectedFile, onLoadCallback){
   var fileReader = new FileReader();

@@ -6,6 +6,7 @@ class Login extends CI_Controller {
   public function __construct(){
     parent::__construct();
     $this->load->model("user_model");
+    $this->load->model("afd_model");
     $this->load->library('form_validation');
     $this->load->helper('url');
   }
@@ -16,6 +17,7 @@ class Login extends CI_Controller {
 
   public function logging_in(){
     $user = $this->user_model;
+    $afd = $this->afd_model;
     $validation = $this->form_validation;
     $validation->set_rules($user->login_rules());
     if ($validation->run()){
@@ -25,9 +27,11 @@ class Login extends CI_Controller {
       $hashedPwd = hash('sha256', $salted);
       $loggedUser = $user->login($uname,$hashedPwd);
       if ($loggedUser !== NULL){
+        $nama_afd = $afd->getAfdByIdUser($loggedUser->id_user)->nama_afd;
         $this->session->set_userdata((array) $loggedUser);
+        $this->session->set_userdata('afd',$nama_afd);
       } else {
-        
+
       }
       redirect('/');
     } else {

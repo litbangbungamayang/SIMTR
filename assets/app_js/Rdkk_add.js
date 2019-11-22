@@ -1,5 +1,10 @@
+$('#masaTanam').selectize({create: false, sortField: 'text'});
+$('#varietas').selectize({create: false, sortField: 'text'});
+$('#kategori').selectize({create: false, sortField: 'text'});
+
 $("#errMsg").hide();
 $("#iconLoading").hide();
+var MAX_IMAGE_SIZE = 200;
 
 $("#namaKelompok").bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^a-zA-Z ]/g,""));
@@ -138,7 +143,7 @@ function readOpenLayers(gpxFile){
     $("#fileGpxKebun").val("");
     arrayPetani.push(petani);
     refreshData();
-    console.log(arrayPetani);
+    console.log(petani);
     formAddPetani.reset();
   }
 }
@@ -197,7 +202,7 @@ function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedB
   var allowedType = $fileType;
   var feedbackLabel = $feedBackLabel;
   if (inputFile.val() != ""){
-    if (selectedFile.type == $fileType && selectedFile.size <= (500*1024)){
+    if (selectedFile.type == $fileType && selectedFile.size <= (MAX_IMAGE_SIZE*1024)){
       feedbackLabel.hide();
       inputFile.removeClass("is-invalid");
       labelInput.text(selectedFile.name);
@@ -211,7 +216,7 @@ function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedB
       } else {
         if (selectedFile.size > maxSize){
           feedbackLabel.show();
-          feedbackLabel.html("Ukuran file melebihi batas maksimal! (Maks. 500kB)");
+          feedbackLabel.html("Ukuran file melebihi batas maksimal! (Maks. 200kB)");
           inputFile.addClass("is-invalid");
           inputFile.val("");
           labelInput.text("Pilih file");
@@ -222,15 +227,15 @@ function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedB
 };
 
 $("#scanKtp").change(function (e){
-  validasiFile($(this), $("#lblScanKtp"), (500*1024), "image/jpeg", $("#fbScanKtp"));
+  validasiFile($(this), $("#lblScanKtp"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKtp"));
 })
 
 $("#scanKk").change(function (e){
-  validasiFile($(this), $("#lblScanKk"), (500*1024), "image/jpeg", $("#fbScanKk"));
+  validasiFile($(this), $("#lblScanKk"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKk"));
 });
 
 $("#scanSurat").change(function (e){
-  validasiFile($(this), $("#lblScanSurat"), (500*1024), "image/jpeg", $("#fbScanSurat"));
+  validasiFile($(this), $("#lblScanSurat"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanSurat"));
 });
 
 $("#namaPetani").on("change", function(){

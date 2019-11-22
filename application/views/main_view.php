@@ -76,10 +76,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             	});
             });
-            require(['jquery', 'selectize'], function ($, selectize) {
-              $('#masaTanam').selectize({create: false, sortField: 'text'});
-              $('#varietas').selectize({create: false, sortField: 'text'});
-            });
           </script>
         </div>
       </div>

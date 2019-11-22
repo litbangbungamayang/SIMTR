@@ -50,6 +50,7 @@
             <span class="ml-2 d-none d-lg-block">
               <span class="text-default"><? echo $loggedUser -> nama_user; ?></span>
               <small class="text-muted d-block mt-1"><? echo $loggedUser -> jabatan; ?></small>
+              <small class="text-muted d-block mt-1"><? echo (($loggedUser->afd) !== NULL ? 'Afdeling '.$loggedUser -> afd : ''); ?></small>
             </span>
           </a>
           <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">

@@ -23,6 +23,12 @@ class Rdkk_add extends CI_Controller{
     if ($this->session->userdata('id_user') == false){
 			redirect('login');
     } else {
+      if ($this->session->flashdata('error_message') == ''){
+        $this->session->set_flashdata('error_div', 'display: none');
+      }
+      if ($this->session->flashdata('notif_msg') == ''){
+        $this->session->set_flashdata('notif_div', 'display: none');
+      }
       $data['pageTitle'] = "Pendaftaran RDKK";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
@@ -51,6 +57,7 @@ class Rdkk_add extends CI_Controller{
   }
 
   public function tambahData(){
+    $MAX_IMAGE_SIZE = 200; //in kB
     $kelompoktani = $this->kelompoktani_model;
     $validation = $this->form_validation;
     $validation->set_rules($kelompoktani->rules());
@@ -59,11 +66,40 @@ class Rdkk_add extends CI_Controller{
     if (empty($_FILES["scanSurat"]["name"])) $validation->set_rules("scanSurat", "Scan KTP", "required", ["required"=>"Scan Surat Pernyataan belum ada!"]);
     if ($validation->run()){
       if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"]) && !empty($_FILES["scanSurat"]["name"])) {
-        $config['allowed_types'] = 'jpg|jpeg';
-        $config['max_size'] = 500;
-
-      } else {
-        $this->index();
+        $errSize = '';
+        $errType = '';
+        foreach($_FILES as $key=>$file){
+          $namaFile = '';
+          switch ($key){
+            case "scanKtp":
+              $namaFile = "Scan KTP";
+              break;
+            case "scanKk":
+              $namaFile = "Scan KK";
+              break;
+            case "scanSurat":
+              $namaFile = "Scan Surat Pernyataan";
+              break;
+          }
+          if (($_FILES[$key]["size"]) > $MAX_IMAGE_SIZE*1024){
+            //array_push($errArray, "Ukuran file ".$namaFile." tidak sesuai!");
+            var_dump(mime_content_type($_FILES[$key]["tmp_name"]));
+            $errSize .= "<div> File ".$namaFile." melebihi ukuran file maksimum (200kB)! </div>";
+          }
+          if (mime_content_type($_FILES[$key]["tmp_name"]) != "image/jpeg"){
+            $errType .= "<div> Format ".$namaFile." tidak sesuai! Format diinput : ".mime_content_type($_FILES[$key]["tmp_name"]) ."</div>";
+          }
+          $this->session->set_flashdata('error_message', $errType.$errSize);
+          $this->session->set_flashdata('error_div', '');
+        }
+        if ($errType.$errSize == ""){
+          if($kelompoktani->simpan()){
+            $successMsg = "<div> Data berhasil disimpan! </div>";
+            $this->session->set_flashdata('notif_msg', $successMsg);
+            $this->session->set_flashdata('notif_div', '');
+            redirect('/Rdkk_add');
+          }
+        }
       }
     }
     $this->index();
@@ -85,6 +121,12 @@ class Rdkk_add extends CI_Controller{
       <div class="page">
         <div class="row">
           <div class="card">
+            <div style="'.$this->session->flashdata('error_div').'" class="card-body">
+                <div class="alert alert-danger">'.$this->session->flashdata('error_message').'</div>
+            </div>
+            <div class="alert alert-success alert-dismissible" style="'.$this->session->flashdata('notif_div').'">'.$this->session->flashdata('notif_msg').'
+              <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
+            </div>
             <div class="card-header">
               <h3 class="card-title"> Data Kelompok Tani </h3>
             </div>
@@ -95,7 +137,7 @@ class Rdkk_add extends CI_Controller{
             <form action="'.site_url('Rdkk_add/tambahData').'" method="post" enctype="multipart/form-data">
             <div class="card-body">
               <div class="row">
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-5">
                   <div class="form-group" id="grNamaKelompok">
                     <label class="form-label">Nama Kelompok</label>
                     <input type="text" style="text-transform: uppercase;" class="'.(form_error('namaKelompok') != NULL ? "form-control is-invalid" : "form-control").'" id="namaKelompok" name="namaKelompok" placeholder="Nama Kelompok Tani">
@@ -127,6 +169,17 @@ class Rdkk_add extends CI_Controller{
                     </select>
                     <div class="invalid-feedback">'.form_error('varietas').'</div>
                   </div>
+                  <div class="form-group" id="grKategori">
+                    <label class="form-label">Kategori</label>
+                    <select name="kategori" id="kategori" class="custom-control custom-select '.(form_error('kategori') != NULL ? "is-invalid" : "").'" placeholder="Pilih kategori">
+                      <option value="">Pilih kategori</option>
+                      <option value="1">PC</option>
+                      <option value="2">Ratoon 1</option>
+                      <option value="3">Ratoon 2</option>
+                      <option value="4">Ratoon 3</option>
+                    </select>
+                    <div class="invalid-feedback">'.form_error('kategori').'</div>
+                  </div>
                 </div>
 
                 <div class="col-md-6 col-lg-4">
@@ -141,7 +194,7 @@ class Rdkk_add extends CI_Controller{
                   <div class="form-group" id="grUploadKk">
                     <div class="form-label">Scan Image KK</div>
                     <div class="custom-file">
-                      <input id="scanKk" type="file" class="custom-file-input '.(form_error('scanKk') != NULL ? "is-invalid" : "").'" name="scanKk">
+                      <input id="scanKk" type="file" accept=".jpeg,.jpg" class="custom-file-input '.(form_error('scanKk') != NULL ? "is-invalid" : "").'" name="scanKk">
                       <label class="custom-file-label" id="lblScanKk">Pilih file</label>
                       <div style="" class="invalid-feedback" id="fbScanKk">'.form_error('scanKk').'</div>
                     </div>
@@ -149,13 +202,13 @@ class Rdkk_add extends CI_Controller{
                   <div class="form-group" id="grUploadPernyataan">
                     <div class="form-label">Scan Image Surat Pernyataan</div>
                     <div class="custom-file">
-                      <input id="scanSurat" type="file" class="custom-file-input '.(form_error('scanSurat') != NULL ? "is-invalid" : "").'" name="scanSurat">
+                      <input id="scanSurat" type="file" accept=".jpeg,.jpg" class="custom-file-input '.(form_error('scanSurat') != NULL ? "is-invalid" : "").'" name="scanSurat">
                       <label class="custom-file-label" id="lblScanSurat">Pilih file</label>
                       <div style="" class="invalid-feedback" id="fbScanSurat">'.form_error('scanSurat').'</div>
                     </div>
                   </div>
                   <div class="form-group" id="grWarning">
-                    <div class="alert alert-primary">File yang diterima berupa file .jpeg atau .jpg dengan ukuran <b>maks. 500kB</b></div>
+                    <div class="alert alert-primary">File yang diterima berupa file .jpeg atau .jpg dengan ukuran <b>maks. 200kB</b></div>
                   </div>
                   <div class="form-group" id="grWarning">
                     <div class="alert alert-danger"><b>Perhatikan penulisan nama kelompok / petani !</b> Tidak diperkenankan menggunakan tanda baca "." (titik) untuk menyingkat nama.</div>
@@ -206,6 +259,7 @@ class Rdkk_add extends CI_Controller{
               <div class="d-flex">
                 <button type="submit" id="btnSimpan" class="btn btn-primary ml-auto" onclick="" name="dataKelompok">Simpan data</button>
               </div>
+              </form>
             </div>
           </div>
         </div>
