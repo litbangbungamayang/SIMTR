@@ -135,7 +135,7 @@ function readOpenLayers(gpxFile){
     var petani = objPetani(
       null,
       null,
-      $("#namaPetani").val(),
+      $("#namaPetani").val().toUpperCase(),
       luasLahan/10000,
       geom.getCoordinates()
     );

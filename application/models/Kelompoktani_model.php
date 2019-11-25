@@ -66,19 +66,13 @@ class Kelompoktani_model extends CI_Model{
     $this->scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
     $this->scan_kk = file_get_contents($_FILES["scanKk"]["tmp_name"]);
     $this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
-    $this->db->trans_begin();
+    //$this->db->trans_begin();
     $this->db->insert($this->_table, $this);
     $lastId = $this->db->insert_id();
     $afdeling = $this->session->userdata('afd');
     $noKontrak = $afdeling."-".$this->kategori."20-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
     $this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
-    if ($this->db->trans_status()){
-      $this->db->trans_commit();
-      return TRUE;
-    } else {
-      $this->db->trans_rollback();
-      return FALSE;
-    }
+    return $lastId;
   }
 
   public function ubah(){

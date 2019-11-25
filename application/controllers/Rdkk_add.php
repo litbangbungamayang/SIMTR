@@ -11,6 +11,7 @@ class Rdkk_add extends CI_Controller{
     $this->load->model("masatanam_model");
     $this->load->model("varietas_model");
     $this->load->model("petani_model");
+    $this->load->model("geocode_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -63,19 +64,25 @@ class Rdkk_add extends CI_Controller{
 
   public function tambahData(){
     $arrayPetani = $this->session->flashdata("arrayPetani");
-    //var_dump($arrayPetani[0]);
-    if (!is_array($arrayPetani) || empty($arrayPetani)){
-      $arrayPetani = array();
-    }
-    if (count($arrayPetani > 0)) var_dump($arrayPetani[0]->gps);
+    /*
+    [1]=> object(stdClass)#19 (5) {
+    ["id_petani"]=> NULL
+    ["id_kelompok"]=> NULL
+    ["nama_petani"]=> string(3) "bbb"
+    ["luas"]=> float(7.6164900333385)
+    ["gps"]=> array(1) {...}
+    */
+
     $MAX_IMAGE_SIZE = 200; //in kB
+    $petanimodel = $this->petani_model;
     $kelompoktani = $this->kelompoktani_model;
+    $geocode = $this->geocode_model;
     $validation = $this->form_validation;
     $validation->set_rules($kelompoktani->rules());
     if (empty($_FILES["scanKtp"]["name"])) $validation->set_rules("scanKtp", "Scan KTP", "required", ["required"=>"Scan KTP belum ada!"]);
     if (empty($_FILES["scanKk"]["name"])) $validation->set_rules("scanKk", "Scan KK", "required", ["required"=>"Scan KK belum ada!"]);
     if (empty($_FILES["scanSurat"]["name"])) $validation->set_rules("scanSurat", "Scan KTP", "required", ["required"=>"Scan Surat Pernyataan belum ada!"]);
-    if ($validation->run()){
+    if ($validation->run() && !empty($arrayPetani)){
       if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"]) && !empty($_FILES["scanSurat"]["name"])) {
         $errSize = '';
         $errType = '';
@@ -104,13 +111,30 @@ class Rdkk_add extends CI_Controller{
           $this->session->set_flashdata('error_div', '');
         }
         if ($errType.$errSize == ""){
-          if($kelompoktani->simpan()){
+          $this->db->trans_begin();
+          $idKelompok = $kelompoktani->simpan();
+          foreach($arrayPetani as $petani){
+            $idPetani = $petanimodel->simpan($petani, $idKelompok);
+            foreach($petani->gps[0] as $poin){
+              $geocode->simpan($poin[0], $poin[1], $idPetani);
+            }
+          }
+          if ($this->db->trans_status()){
+            $this->db->trans_commit();
             $successMsg = "<div> Data berhasil disimpan! </div>";
             $this->session->set_flashdata('notif_msg', $successMsg);
             $this->session->set_flashdata('notif_div', '');
             redirect('/Rdkk_add');
+          } else {
+            $this->db->trans_rollback();
           }
         }
+      }
+    } else {
+      if (empty($arrayPetani)){
+        $errMsg = "<div> Data petani belum diinput! </div>";
+        $this->session->set_flashdata("error_message", $errMsg);
+        $this->session->set_flashdata("error_div", "");
       }
     }
     $this->index();
