@@ -12,6 +12,9 @@ $("#namaKelompok").bind("keyup blur", function(){
 $("#namaPetani").bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^a-zA-Z ]/g,""));
 });
+$("#noKtp").bind("keyup blur", function(){
+  $(this).val($(this).val().replace(/[^0-9 ]/g,""));
+});
 
 $.ajax({
   url: js_base_url + "Rdkk_add/getAllKabupaten",

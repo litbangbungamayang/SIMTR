@@ -11,7 +11,7 @@ class Wilayah_model extends CI_Model{
   public $level;
 
   public function getAll(){
-    return $this->db->get($this->_table)->result();
+    return json_encode($this->db->get($this->_table)->result());
   }
 
   public function getAllDesa(){

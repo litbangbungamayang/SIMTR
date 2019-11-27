@@ -9,6 +9,7 @@ class Kelompoktani_model extends CI_Model{
   public $id_kelompok;
   public $nama_kelompok;
   public $no_kontrak;
+  public $no_ktp;
   public $id_desa;
   public $mt;
   public $kategori;
@@ -48,12 +49,18 @@ class Kelompoktani_model extends CI_Model{
         "label" => "ID Varietas",
         "rules" => "required",
         "errors" => ["required" => "Varietas belum dipilih"]
+      ],
+      [
+        "field" => "noKtp",
+        "label" => "No. KTP",
+        "rules" => "required",
+        "errors" => ["required" => "No. KTP belum diinput!"]
       ]
     ];
   }
 
   public function getAll(){
-    return $this->db->get($this->_table)->result();
+    return base64_encode($this->db->query("SELECT scan_ktp from tbl_simtr_kelompoktani")->row()->scan_ktp);
   }
 
   public function simpan(){
@@ -61,6 +68,7 @@ class Kelompoktani_model extends CI_Model{
     $this->nama_kelompok = strtoupper($post["namaKelompok"]);
     $this->id_desa = $post["namaDesa"];
     $this->mt = $post["masaTanam"];
+    $this->no_ktp = $post["noKtp"];
     $this->kategori = $post["kategori"];
     $this->id_varietas = $post["varietas"];
     $this->scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
@@ -73,6 +81,40 @@ class Kelompoktani_model extends CI_Model{
     $noKontrak = $afdeling."-".$this->kategori."20-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
     $this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
     return $lastId;
+  }
+
+  public function getAllKelompok(){
+    $afdeling = $this->session->userdata('afd');
+    if (empty($afdeling))$afdeling = "%";
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.no_kontrak LIKE '".$afdeling."-%'
+      GROUP BY KT.id_kelompok
+    ")->result());
+  }
+
+  public function getKelompokById($idKelompok){
+    return $this->db->query("
+    SELECT DISTINCT
+      KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+      VAR.nama_varietas, KT.scan_ktp, WIL.id_wilayah, KT.no_ktp
+    FROM tbl_simtr_kelompoktani KT
+      JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+      JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+      JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+      WHERE EXISTS
+       (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+      AND KT.id_kelompok = ".$idKelompok."
+    GROUP BY KT.id_kelompok
+    ")->row();
   }
 
   public function ubah(){

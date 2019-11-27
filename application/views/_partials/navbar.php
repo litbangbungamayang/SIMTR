@@ -10,8 +10,8 @@
           <li class="nav-item dropdown">
             <a href="javascript:void(0)" class="nav-link <? echo ($this->uri->segment(1) == 'dokumen')||($this->uri->segment(1) == 'dokumen_add') ? 'active' : '' ?>" data-toggle="dropdown"><i class="fe fe-book-open"></i> RDKK</a>
             <div class="dropdown-menu dropdown-menu-arrow">
-              <a href="<? echo site_url('/Rdkk_add')?>" class="dropdown-item "><i class="fe fe-search"></i> Pendaftaran RDKK</a>
-              <a href="<? echo site_url('/rdkk_list')?>" class="dropdown-item "><i class="fe fe-edit"></i> Penelusuran RDKK</a>
+              <a href="<? echo site_url('/rdkk_add')?>" class="dropdown-item "><i class="fe fe-search"></i> Pendaftaran RDKK</a>
+              <a href="<? echo site_url('/rdkk_all')?>" class="dropdown-item "><i class="fe fe-edit"></i> Penelusuran RDKK</a>
             </div>
           </li>
           <li class="nav-item dropdown">

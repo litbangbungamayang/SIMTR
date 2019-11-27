@@ -37,6 +37,11 @@ class Petani_model extends CI_Model{
   }
 
   public function getAll(){
-    return $this->db->get($this->_table)->result();
+    return json_encode($this->db->get($this->_table)->result());
   }
+
+  public function getPetaniByIdKelompok($idKelompok){
+    return json_encode($this->db->select("*")->from($this->_table)->where("id_kelompok", $idKelompok)->get()->result());
+  }
+
 }

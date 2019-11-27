@@ -39,7 +39,10 @@ class Rdkk_add extends CI_Controller{
 
   public function cekModel(){
     $wilayah = $this->wilayah_model;
-    echo $wilayah->getNamaKabupatenByIdDesa("120106AD");
+    $kelompoktani = $this->kelompoktani_model;
+    $petani = $this->petani_model;
+    //echo $wilayah->getNamaKabupatenByIdDesa("120106AD");
+    echo "<img src='data:image/jpeg;base64,'$kelompoktani->getAll().'>";
   }
 
   public function getDesaByKabupaten(){
@@ -178,6 +181,11 @@ class Rdkk_add extends CI_Controller{
                     <input type="text" style="text-transform: uppercase;" class="'.(form_error('namaKelompok') != NULL ? "form-control is-invalid" : "form-control").'" id="namaKelompok" name="namaKelompok" placeholder="Nama Kelompok Tani">
                     <div class="invalid-feedback">'.form_error('namaKelompok').'</div>
                   </div>
+                  <div class="form-group" id="grKtp">
+                    <label class="form-label">No. KTP</label>
+                    <input type="text" style="text-transform: uppercase;" class="'.(form_error('noKtp') != NULL ? "form-control is-invalid" : "form-control").'" id="noKtp" name="noKtp" placeholder="No. KTP">
+                    <div class="invalid-feedback">'.form_error('noKtp').'</div>
+                  </div>
                   <div class="form-group" id="grKab">
                     <label class="form-label">Kabupaten</label>
                     <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="">
@@ -204,6 +212,9 @@ class Rdkk_add extends CI_Controller{
                     </select>
                     <div class="invalid-feedback">'.form_error('varietas').'</div>
                   </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
                   <div class="form-group" id="grKategori">
                     <label class="form-label">Kategori</label>
                     <select name="kategori" id="kategori" class="custom-control custom-select '.(form_error('kategori') != NULL ? "is-invalid" : "").'" placeholder="Pilih kategori">
@@ -215,9 +226,6 @@ class Rdkk_add extends CI_Controller{
                     </select>
                     <div class="invalid-feedback">'.form_error('kategori').'</div>
                   </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
                   <div class="form-group" id="grUploadKtp">
                     <div class="form-label">Scan Image KTP</div>
                     <div class="custom-file">
