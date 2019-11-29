@@ -39,14 +39,30 @@ class Bahan_model extends CI_Model{
     return $this->db->insert_id();
   }
 
+  public function edit(){
+    $post = $this->input->post();
+    $this->nama_bahan = strtoupper($post["nama_bahan"]);
+    $this->jenis_bahan = $post["jenis_bahan"];
+    $this->satuan = $post["satuan"];
+    return $this->db->where("id_bahan", $post["id_bahan"])->update($this->_table, $this);
+  }
+
   public function getAllBahan(){
     return json_encode($this->db->query("
       SELECT * FROM tbl_simtr_bahan
     ")->result());
   }
 
-  public function hapus(){
-    return $this->db->delete($this->_table, array('id_kelompok' => $post["id_kelompok"]));
+  public function getBahanById(){
+    $id = $this->input->get("idBahan");
+    return json_encode($this->db->query("
+      SELECT * FROM tbl_simtr_bahan WHERE id_bahan = $id
+    ")->row());
+  }
+
+  public function hapus($id_bahan = null){
+    if (is_null($id_bahan)) $id_bahan = $this->input->post("id_bahan");
+    return $this->db->delete($this->_table, array('id_bahan' => $id_bahan));
   }
 
 }

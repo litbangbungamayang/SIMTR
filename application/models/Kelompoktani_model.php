@@ -133,7 +133,8 @@ class Kelompoktani_model extends CI_Model{
   }
 
   public function hapus(){
-    return $this->db->delete($this->_table, array('id_kelompok' => $post["id_kelompok"]));
+    //return $this->db->delete($this->_table, array('id_kelompok' => $post["id_kelompok"]));
+
   }
 
 }

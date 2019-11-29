@@ -4,6 +4,7 @@ class Admin_bahan extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     $this->load->model("bahan_model");
+    $this->load->model("persediaan_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -32,15 +33,47 @@ class Admin_bahan extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/Admin_bahan.js").'");';
   }
 
+  public function actions(){
+    echo($this->input->get("edit_data"));
+  }
+
   public function addBahan(){
-    $bahan = $this->bahan_model;
-    $bahan->simpan();
+    $this->bahan_model->simpan();
+  }
+
+  public function editBahan(){
+    $this->bahan_model->edit();
+  }
+
+  public function hapusBahan(){
+    $id_bahan = $this->input->post("id_bahan");
+    $transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan($id_bahan));
+    //var_dump(sizeof($transaksi));
+    if (sizeof($transaksi) == 0){
+      if ($this->bahan_model->hapus($id_bahan)) echo "Data bahan berhasil dihapus!";
+    } else {
+      echo "Terdapat transaksi dengan nama bahan yang akan dihapus. Proses menghapus dihentikan.";
+    }
+    //$transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan(26));
+    /*
+    echo "OKE";
+    echo $this->input->post('id_bahan');
+    echo $id_bahan;
+    $transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan());
+    if (is_null($transaksi)){
+      echo $this->bahan_model->hapus($id_bahan);
+    } else {
+      echo "Tidak dapat menghapus bahan. Terdapat transaksi dengan bahan tersebut";
+    }
+    */
   }
 
   public function getAllBahan(){
-    //if ($this->session->userdata('id_user') == false) redirect('login');
-    $bahan = $this->bahan_model;
-    echo $bahan->getAllBahan();
+    echo $this->bahan_model->getAllBahan();
+  }
+
+  public function getBahanById(){
+    echo $this->bahan_model->getBahanById();
   }
 
   public function loadContent(){
@@ -95,7 +128,7 @@ class Admin_bahan extends CI_Controller{
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-              <form id="formAddBahan" action="'.site_url('Admin_bahan/addBahan').'" method="POST" enctype="multipart/form-data">
+              <form id="formAddBahan">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaBahan">
@@ -125,7 +158,7 @@ class Admin_bahan extends CI_Controller{
                     </div>
                   </div>
                 </div>
-                <button type="button" id="btnSimpanBahan" class="btn btn-primary btn-block" name="submit" >Simpan data bahan</button>
+                <button type="button" id="btnSimpanBahan" class="btn btn-primary btn-block" name="" >Simpan data bahan</button>
               </form>
             </div>
           </div>
