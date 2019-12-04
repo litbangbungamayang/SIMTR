@@ -55,7 +55,7 @@ class Admin_vendor extends CI_Controller{
     if (sizeof($transaksi) == 0){
       if ($this->vendor_model->hapus($id_vendor)) echo "Data bahan berhasil dihapus!";
     } else {
-      echo "Terdapat transaksi dengan nama bahan yang akan dihapus. Proses menghapus dihentikan.";
+      echo "Terdapat transaksi dengan nama vendor yang akan dihapus. Proses menghapus dihentikan.";
     }
   }
 
