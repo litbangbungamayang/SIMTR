@@ -124,7 +124,7 @@ class Admin_bahan extends CI_Controller{
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Tambah Data Bahan</h4>
+              <h4 class="modal-title">Data Bahan Gudang</h4>
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">

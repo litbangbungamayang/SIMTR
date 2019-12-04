@@ -39,6 +39,8 @@
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-settings"></i> Administrasi Sistem </a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/admin_bahan')?>" class="dropdown-item "><i class="fe fe-shopping-bag"></i> Administrasi Bahan</a>
+              <a href="<? echo site_url('/admin_vendor')?>" class="dropdown-item "><i class="fe fe-users"></i> Administrasi Vendor</a>
+              <a href="<? echo site_url('/transaksi_bahan')?>" class="dropdown-item "><i class="fe fe-tag"></i> Transaksi Bahan</a>
             </div>
           </li>
         </ul>
