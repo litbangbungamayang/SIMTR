@@ -29,6 +29,14 @@ class Transaksi_bahan extends CI_Controller{
     }
   }
 
+  public function addTransaksi(){
+    echo $this->persediaan_model->simpan();
+  }
+
+  public function getTransaksiByKode(){
+    echo $this->persediaan_model->getTransaksiByKode();
+  }
+
   public function loadScript(){
     return '$.getScript("'.base_url("/assets/app_js/Transaksi_bahan.js").'");';
   }
@@ -54,18 +62,19 @@ class Transaksi_bahan extends CI_Controller{
               </div>
               <div class="row">
                 <div class="table-responsive col-md-12">
-                  <table id="tblBahan" class="table card-table table-vcenter text-nowrap datatable table-sm">
+                  <table id="tblTransaksi" class="table card-table table-vcenter text-nowrap datatable table-sm">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
-                        <th>Nama Bahan</th>
-                        <th>Kode</th>
-                        <th>Kuanta</th>
-                        <th>Satuan</th>
-                        <th>Rupiah</th>
-                        <th>Tanggal</th>
-                        <th>Tahun</th>
-                        <th class="text-center">Aksi</th>
+                        <th class="text-center">Nama Bahan</th>
+                        <th class="text-center">Nama Vendor</th>
+                        <th class="text-center">Nomor Kontrak</th>
+                        <th class="text-center">Kode</th>
+                        <th class="text-center">Kuanta</th>
+                        <th class="text-center">Nilai</th>
+                        <th class="text-center">Tanggal</th>
+                        <th class="text-center">Tahun Giling</th>
+                        <th class="text-center"></th>
                       </tr>
                     </thead>
                   </table>
@@ -79,6 +88,11 @@ class Transaksi_bahan extends CI_Controller{
         </div>
       </div>
     ';
+    $currYear = strval(date("Y"));
+    $optionText = "";
+    for ($x = $currYear; $x <= $currYear + 4; $x++){
+      $optionText .= '<option value="'.$x.'">'.$x.'</option>';
+    }
     $content_dialogAddTransaksi =
     '
       <div class="modal fade" id="dialogAddTransaksi">
@@ -96,17 +110,13 @@ class Transaksi_bahan extends CI_Controller{
                       <label class="form-label">Nama Bahan</label>
                       <select name="nama_bahan" id="nama_bahan" class="custom-control custom-select" placeholder="Pilih Bahan">
                       </select>
-                    </div>
-                    <div class="form-group" id="grNamaVendor">
-                      <label class="form-label">Nama Vendor</label>
-                      <select name="nama_vendor" id="nama_vendor" class="custom-control custom-select" placeholder="Pilih Vendor">
-                      </select>
+                      <div class="invalid-feedback">Nama bahan belum diisi!</div>
                     </div>
                     <div class="form-group" id="grKuanta">
                       <label class="form-label">Kuanta</label>
                       <div class="row">
                         <div class="col-md-12 col-lg-8">
-                          <input type="text" style="text-transform: uppercase;" class="form-control" id="kuanta_bahan" name="kuanta_bahan" placeholder="Kuanta bahan">
+                          <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="kuanta_bahan" name="kuanta_bahan" placeholder="Kuanta bahan">
                         </div>
                         <div class="col-md-12 col-lg-4">
                           <input type="text" style="text-transform: uppercase;" class="form-control" id="satuan_bahan" name="satuan_bahan" placeholder="Satuan" disabled>
@@ -114,9 +124,33 @@ class Transaksi_bahan extends CI_Controller{
                       </div>
                       <div class="invalid-feedback">Kuanta bahan belum diisi!</div>
                     </div>
+                    <div class="form-group" id="grTahunGiling">
+                      <label class="form-label">Tahun Giling</label>
+                      <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
+                      '.$optionText.'
+                      </select>
+                      <div class="invalid-feedback">Tahun giling belum dipilih!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grNamaVendor">
+                      <label class="form-label">Nama Vendor</label>
+                      <select name="nama_vendor" id="nama_vendor" class="custom-control custom-select" placeholder="Pilih Vendor">
+                      </select>
+                    </div>
+                    <div class="form-group" id="grRupiah">
+                      <label class="form-label">Nilai</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="rupiah_bahan" name="rupiah_bahan" placeholder="Nilai bahan">
+                      <div class="invalid-feedback">Rupiah bahan belum diisi!</div>
+                    </div>
+                    <div class="form-group" id="grNomor">
+                      <label class="form-label">Nomor Tanda Terima</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="catatan" name="catatan" placeholder="Nomor tanda terima bahan">
+                      <div class="invalid-feedback">Nomor tanda terima bahan belum diisi!</div>
+                    </div>
                   </div>
                 </div>
-                <button type="button" id="btnSimpanBahan" class="btn btn-primary btn-block" name="" >Simpan data bahan</button>
+                <button type="button" id="btnSimpanTransaksi" class="btn btn-primary btn-block" name="" ><i class="fe fe-save"></i> Simpan Data Transaksi</button>
               </form>
             </div>
           </div>

@@ -22,7 +22,7 @@ $("#tblList").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return '<form action="Rdkk_view" method="get"><button type="submit" class="btn btn-info btn-sm" name="idKelompok" value="'+row.id_kelompok+'" >Lihat Data</button></form>'
+        return '<form action="Rdkk_view" method="get"><button type="submit" class="btn btn-info btn-sm" name="idKelompok" value="'+row.id_kelompok+'" title="Lihat Data Kelompok"><i class="fe fe-external-link"></i></button></form>'
       }
     }
   ],

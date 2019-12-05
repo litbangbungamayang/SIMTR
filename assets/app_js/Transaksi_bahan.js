@@ -2,15 +2,94 @@
 loadNamaBahan();
 loadNamaVendor();
 $('#kode_transaksi').selectize({create: false, sortField: 'text'});
+$('#tahun_giling').selectize({create: false, sortField: 'text'});
 
 var txtKuantaBahan = $("#kuanta_bahan");
+var txtRupiahBahan = $("#rupiah_bahan");
 var lblSatuanBahan = $("#satuan_bahan");
 var cbxNamaBahan = $("#nama_bahan");
+var cbxNamaVendor = $("#nama_vendor");
+var cbxTahunGiling = $("#tahun_giling");
+var txtCatatan = $("#catatan");
+var btnSimpanTransaksi = $("#btnSimpanTransaksi");
+var dialogAddTransaksi = $("#dialogAddTransaksi");
+var tblTransaksi = $("#tblTransaksi");
 
 txtKuantaBahan.bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^0-9]/g,""));
   ($(this).val() != "") ? $(this).val(parseInt($(this).val()).toLocaleString()) : "";
 });
+
+txtRupiahBahan.bind("keyup blur", function(){
+  $(this).val($(this).val().replace(/[^0-9]/g,""));
+  ($(this).val() != "") ? $(this).val("Rp " + parseInt($(this).val()).toLocaleString()) : "";
+});
+
+btnSimpanTransaksi.on("click", function(){
+  if (validasiForm() != null){
+    var formValue = validasiForm();
+    formValue.kode_transaksi = 1;
+    formValue.id_kelompoktani = null;
+    $.ajax({
+      url: js_base_url + "Transaksi_bahan/addTransaksi",
+      dataType: "text",
+      type: "POST",
+      data: formValue,
+      success: function(data){
+        if (data != ""){
+          alert("Data telah tersimpan!");
+          dialogAddTransaksi.modal("toggle");
+          tblTransaksi.DataTable().ajax.reload();
+        }
+      }
+    });
+  }
+})
+
+function resetForm(){
+  cbxNamaBahan.selectize()[0].selectize.setValue("");
+  cbxNamaVendor.selectize()[0].selectize.setValue("");
+  txtKuantaBahan.val("");
+  txtRupiahBahan.val("");
+  txtCatatan.val("");
+}
+
+function resetFeedback(){
+  cbxNamaBahan.removeClass("is-invalid");
+  cbxNamaVendor.removeClass("is-invalid");
+  txtKuantaBahan.removeClass("is-invalid");
+  txtRupiahBahan.removeClass("is-invalid");
+  cbxTahunGiling.removeClass("is-invalid");
+  txtCatatan.removeClass("is-invalid");
+}
+
+dialogAddTransaksi.on("hide.bs.modal", function(){
+  resetForm();
+  resetFeedback();
+})
+
+function validasiForm(){
+  var idBahan = cbxNamaBahan.selectize()[0].selectize.getValue();
+  var idVendor = cbxNamaVendor.selectize()[0].selectize.getValue();
+  var kuanta = txtKuantaBahan.val().replace(/[^0-9]/g,"");
+  var rupiah = txtRupiahBahan.val().replace(/[^0-9]/g,"");
+  var tahunGiling = cbxTahunGiling.val();
+  var catatan = txtCatatan.val();
+  if (idBahan != "" && idVendor != "" && kuanta != "" && rupiah != ""
+    && tahunGiling != "" && catatan != ""){
+    var formValue = {id_bahan : idBahan, id_vendor : idVendor, kuanta_bahan : kuanta,
+      rupiah_bahan : rupiah, tahun_giling : tahunGiling, catatan : catatan};
+    return formValue;
+  } else {
+    (idBahan == "") ? cbxNamaBahan.addClass("is-invalid") : "";
+    (idVendor == "") ? cbxNamaVendor.addClass("is-invalid") : "";
+    (kuanta == "") ? txtKuantaBahan.addClass("is-invalid") : "";
+    (rupiah == "") ? txtRupiahBahan.addClass("is-invalid") : "";
+    (tahunGiling == "") ? cbxTahunGiling.addClass("is-invalid") : "";
+    (catatan == "") ? txtCatatan.addClass("is-invalid") : "";
+    return null;
+  }
+}
 
 function loadNamaBahan(){
   $.ajax({
@@ -28,8 +107,12 @@ function loadNamaBahan(){
         placeholder: "Pilih bahan",
         options: response,
         onChange: function(value){
-          var selCbxNamaBahan = cbxNamaBahan.selectize()[0].selectize;
-          lblSatuanBahan.val(selCbxNamaBahan.options[value]["satuan"]);
+          if (value != ""){
+            var selCbxNamaBahan = cbxNamaBahan.selectize()[0].selectize;
+            lblSatuanBahan.val(selCbxNamaBahan.options[value]["satuan"]);
+          } else {
+            lblSatuanBahan.val("");
+          }
         }
       });
     }
@@ -52,9 +135,71 @@ function loadNamaVendor(){
         placeholder: "Pilih vendor",
         options: response,
         onChange: function(value){
-          console.log(value);
+
         }
       });
     }
   })
 }
+
+tblTransaksi.DataTable({
+  bFilter: true,
+  bPaginate: true,
+  bSort: false,
+  bInfo: false,
+  ajax: {
+    url: js_base_url + "Transaksi_bahan/getTransaksiByKode?kode_transaksi=1",
+    dataSrc: ""
+  },
+  columns : [
+    {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
+    {data: "nama_bahan"},
+    {data: "nama_vendor"},
+    {data: "catatan"},
+    {
+      data: "kode_transaksi",
+      className: "text-center"
+    },
+    {
+      data: "kuanta_bahan",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2}) + " " + row.satuan
+      },
+      className: "text-right"
+    },
+    {
+      data: "rupiah_bahan",
+      render: function(data, type, row, meta){
+        return "Rp " + parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2})
+      },
+      className: "text-right"
+    },
+    {
+      data: "tgl_transaksi",
+      className: "text-center"
+    },
+    {
+      data: "tahun_giling",
+      className: "text-center"
+    },
+    {data: "button",
+      render: function(data, type, row, meta){
+        return '<button type="button" onclick="lihatData('+row.id_vendor+')" class="btn btn-primary btn-sm" name="lihat_data" title="Lihat Data"><i class="fe fe-external-link"></i></button>'
+      },
+      className: "text-center"
+    }
+  ],
+  initComplete: function(){
+    $(".dataTables_filter input[type=\"search\"]").css({
+      "width": "250px",
+      "display": "inline-block",
+      "margin": "10px"
+    }).attr("placeholder", "Cari");
+    $(".dataTables_filter").css({
+      "margin": "0px"
+    });
+  },
+  language: {
+    "search": ""
+  }
+})

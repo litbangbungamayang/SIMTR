@@ -18,7 +18,6 @@ function resetForm(){
   txtAlamatVendor2.val("");
   txtNamaKontak.val("");
   txtTelpKontak.val("");
-  btnSimpanVendor.show();
 }
 
 function resetFeedback(){
@@ -32,6 +31,10 @@ function resetFeedback(){
 dialogAddVendor.on("hide.bs.modal", function(){
   resetForm();
   resetFeedback();
+  edit = false;
+})
+dialogAddVendor.on("show.bs.modal", function(){
+  btnSimpanVendor.show();
 })
 
 btnSimpanVendor.on("click", function(){
@@ -156,9 +159,9 @@ tblVendor.DataTable({
     {data: "telp_kontak"},
     {data: "button",
       render: function(data, type, row, meta){
-        return '<button type="button" onclick="editData('+row.id_vendor+')" class="btn btn-warning btn-sm" id="btnEditVendor" name="edit_data">Ubah Data</button>  ' +
-        '<button type="button" onclick="hapusData('+row.id_vendor+')" class="btn btn-danger btn-sm" name="hapus_data">Hapus Data</button> ' +
-        '<button type="button" onclick="lihatData('+row.id_vendor+')" class="btn btn-primary btn-sm" name="lihat_data">Lihat Data</button>'
+        return '<button type="button" onclick="editData('+row.id_vendor+')" class="btn btn-warning btn-sm" id="btnEditVendor" name="edit_data" title="Ubah Data"><i class="fe fe-edit"></i></button>  ' +
+        '<button type="button" onclick="hapusData('+row.id_vendor+')" class="btn btn-danger btn-sm" name="hapus_data" title="Hapus Data"><i class="fe fe-trash-2"></i></button> ' +
+        '<button type="button" onclick="lihatData('+row.id_vendor+')" class="btn btn-primary btn-sm" name="lihat_data" title="Lihat Data"><i class="fe fe-external-link"></i></button>'
       },
       className: "text-center"
     }
