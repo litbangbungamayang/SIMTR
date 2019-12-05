@@ -93,3 +93,32 @@ $.ajax({
     $("#namaDesa")[0].selectize.disable();
   }
 });
+
+UI untuk dashboard
+
+<div class="row row-cards">
+  <div class="col-12 col-sm-12 col-lg-12">
+    <div class="card">
+      <div class="row">
+        <div class="col-4 col-sm-12 col-lg-4">
+          <div class="card-body p-3 text-center">
+            <div class="h1 m-0" id="total_luas"></div>
+            <div class="text-muted mb-4">Lahan terdaftar</div>
+          </div>
+        </div>
+        <div class="col-4 col-sm-12 col-lg-4">
+          <div class="card-body p-3 text-center">
+            <div class="h1 m-0" id="total_kelompok"></div>
+            <div class="text-muted mb-4">Jumlah Kelompok Tani</div>
+          </div>
+        </div>
+        <div class="col-4 col-sm-12 col-lg-4">
+          <div class="card-body p-3 text-center">
+            <div class="h1 m-0" id="total_petani"></div>
+            <div class="text-muted mb-4">Jumlah Petani</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
