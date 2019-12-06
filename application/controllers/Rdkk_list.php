@@ -5,6 +5,7 @@
 
     public function __construct(){
       parent:: __construct();
+      //if ($this->session->userdata('id_user') == false) redirect('login');
       $this->load->model("kelompoktani_model");
       $this->load->library('form_validation');
       $this->load->library('upload');
@@ -17,7 +18,7 @@
       if ($this->session->userdata('id_user') == false){
   			redirect('login');
       } else {
-        $data['pageTitle'] = "Penelusuran RDKK";
+        $data['pageTitle'] = "Penelusuran Data Kelompok Tani";
         $data['content'] = $this->loadContent();
         $data['script'] = $this->loadScript();
         $this->load->view('main_view', $data);
@@ -30,9 +31,12 @@
     }
 
     public function getAllKelompok(){
-      if ($this->session->userdata('id_user') == false) redirect('login');
       $kelompoktani = $this->kelompoktani_model;
       echo $kelompoktani->getAllKelompok();
+    }
+
+    public function getKelompokByTahun(){
+      echo $this->kelompoktani_model->getKelompokByTahun();
     }
 
     public function getKelompokById(){
@@ -49,14 +53,16 @@
     }
 
     function loadContent(){
+      $currYear = strval(date("Y"));
+      $optionYear = "";
+      for ($x = $currYear; $x <= $currYear + 4; $x++){
+        $optionYear .= '<option value="'.$x.'">'.$x.'</option>';
+      }
       $container =
       '
       <div class="page">
         <div class="row">
           <div class="card">
-            <div class="card-header">
-              <h3 class="card-title"> Data RDKK </h3>
-            </div>
             <div class="card-body">
               <div class="row">
                 <div class="table-responsive col-md-12">
@@ -66,6 +72,7 @@
                         <th class="w-1">No.</th>
                         <th>Nama Kelompok</th>
                         <th>No. Kontrak</th>
+                        <th>Tahun Giling</th>
                         <th>Desa</th>
                         <th>MT</th>
                         <th>Varietas</th>

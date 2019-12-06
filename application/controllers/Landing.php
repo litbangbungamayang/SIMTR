@@ -55,6 +55,7 @@ class Landing extends CI_Controller {
 			<div class="row row-cards">
 							<div class="col-4 col-sm-12 col-lg-4">
 								<div class="card">
+									<div class="card-status bg-red"></div>
 									<div class="card-body p-3 text-center">
 										<div class="h1 m-0" id="total_luas"></div>
 										<div class="text-muted mb-4">Lahan terdaftar</div>
@@ -63,6 +64,7 @@ class Landing extends CI_Controller {
 							</div>
 							<div class="col-4 col-sm-12 col-lg-4">
 								<div class="card">
+									<div class="card-status bg-red"></div>
 									<div class="card-body p-3 text-center">
 										<div class="h1 m-0" id="total_kelompok"></div>
 										<div class="text-muted mb-4">Jumlah Kelompok Tani</div>
@@ -71,6 +73,7 @@ class Landing extends CI_Controller {
 							</div>
 							<div class="col-4 col-sm-12 col-lg-4">
 								<div class="card">
+									<div class="card-status bg-red"></div>
 									<div class="card-body p-3 text-center">
 										<div class="h1 m-0" id="total_petani"></div>
 										<div class="text-muted mb-4">Jumlah Petani</div>
@@ -81,6 +84,7 @@ class Landing extends CI_Controller {
 			<div class="row row-cards">
 				<div class="col-12 col-sm-6 col-lg-4">
 					<div class="card">
+						<div class="card-status bg-blue"></div>
 						<div class="card-header">
 							<div class="card-title">Stok Barang Gudang (TR)</div>
 						</div>
@@ -92,6 +96,7 @@ class Landing extends CI_Controller {
 				</div>
 				<div class="col-12 col-sm-6 col-lg-4">
 					<div class="card">
+						<div class="card-status bg-blue"></div>
 						<div class="card-header">
 							<div class="card-title">Kemajuan Tebang</div>
 						</div>

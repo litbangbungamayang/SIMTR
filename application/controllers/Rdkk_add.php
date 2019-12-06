@@ -144,6 +144,11 @@ class Rdkk_add extends CI_Controller{
   }
 
   public function loadContent(){
+    $currYear = strval(date("Y"));
+    $optionYear = "";
+    for ($x = $currYear; $x <= $currYear + 4; $x++){
+      $optionYear .= '<option value="'.$x.'">'.$x.'</option>';
+    }
     $listMasaTanam = $this->masatanam_model->getAll();
     $listVarietas = $this->varietas_model->getAll();
     $loadListVarietas = '';
@@ -195,6 +200,14 @@ class Rdkk_add extends CI_Controller{
                     <label class="form-label">Nama Desa<i id="iconLoading" style="margin-left: 10px" class="fa fa-spinner fa-spin"></i></label>
                     <select name="namaDesa" id="namaDesa" class="custom-control custom-select loading '.(form_error('namaDesa') != NULL ? "is-invalid" : "").'" placeholder=""></select>
                     <div class="invalid-feedback">'.form_error('namaDesa').'</div>
+                  </div>
+                  <div class="form-group" id="grTahunGiling">
+                    <label class="form-label">Tahun Giling</label>
+                    <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select '.(form_error('tahun_giling') != NULL ? "is-invalid" : "").'" placeholder="Pilih tahun giling">
+                      <option value="">Pilih tahun giling</option>
+                      '.$optionYear.'
+                    </select>
+                    <div class="invalid-feedback">'.form_error('tahun_giling').'</div>
                   </div>
                   <div class="form-group" id="grMasaTanam">
                     <label class="form-label">Masa Tanam</label>

@@ -1,6 +1,7 @@
 $('#masaTanam').selectize({create: false, sortField: 'text'});
 $('#varietas').selectize({create: false, sortField: 'text'});
 $('#kategori').selectize({create: false, sortField: 'text'});
+$('#tahun_giling').selectize({create: false, sortField: 'text'});
 
 $("#errMsg").hide();
 $("#iconLoading").hide();

@@ -12,6 +12,7 @@ class Kelompoktani_model extends CI_Model{
   public $no_ktp;
   public $id_desa;
   public $mt;
+  public $tahun_giling;
   public $kategori;
   public $id_varietas;
   public $scan_ktp;
@@ -37,6 +38,12 @@ class Kelompoktani_model extends CI_Model{
         "label" => "Masa Tanam",
         "rules" => "required",
         "errors" => ["required" => "Masa tanam belum dipilih!"]
+      ],
+      [
+        "field" => "tahun_giling",
+        "label" => "Tahun Giling",
+        "rules" => "required",
+        "errors" => ["required" => "Tahun giling belum dipilih!"]
       ],
       [
         "field" => "kategori",
@@ -68,6 +75,7 @@ class Kelompoktani_model extends CI_Model{
     $this->nama_kelompok = strtoupper($post["namaKelompok"]);
     $this->id_desa = $post["namaDesa"];
     $this->mt = $post["masaTanam"];
+    $this->tahun_giling = $post["tahun_giling"];
     $this->no_ktp = $post["noKtp"];
     $this->kategori = $post["kategori"];
     $this->id_varietas = $post["varietas"];
@@ -78,7 +86,8 @@ class Kelompoktani_model extends CI_Model{
     $this->db->insert($this->_table, $this);
     $lastId = $this->db->insert_id();
     $afdeling = $this->session->userdata('afd');
-    $noKontrak = $afdeling."-".$this->kategori."20-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
+    $tahun_giling = substr($this->tahun_giling,2);
+    $noKontrak = $afdeling."-".$this->kategori.$tahun_giling."-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
     $this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
     return $lastId;
   }
@@ -89,7 +98,7 @@ class Kelompoktani_model extends CI_Model{
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
-        VAR.nama_varietas
+        VAR.nama_varietas, KT.tahun_giling
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
         JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
@@ -97,6 +106,25 @@ class Kelompoktani_model extends CI_Model{
         WHERE EXISTS
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
         AND KT.no_kontrak LIKE '".$afdeling."-%'
+      GROUP BY KT.id_kelompok
+    ")->result());
+  }
+
+  public function getKelompokByTahun(){
+    $afdeling = $this->session->userdata('afd');
+    if (empty($afdeling))$afdeling = "%";
+    $tahun_giling = $this->input->get("tahun_giling");
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.no_kontrak LIKE '".$afdeling."-%' AND KT.tahun_giling = $tahun_giling
       GROUP BY KT.id_kelompok
     ")->result());
   }

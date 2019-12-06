@@ -56,9 +56,9 @@ class Rdkk_view extends CI_Controller{
         <div class="container">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Data Kelompok Tani</h3>
               <div class="card-options">
-                <button type="button" class="btn btn-primary" onclick="javascript:window.print();"><i class="si si-printer"></i> Cetak </button>
+                <a href="rdkk_all" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                <a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>
               </div>
             </div>
             <div class="card-body">
