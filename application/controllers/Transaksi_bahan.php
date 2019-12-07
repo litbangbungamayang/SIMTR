@@ -58,7 +58,7 @@ class Transaksi_bahan extends CI_Controller{
     '
             <div class="card-body">
               <div class="row" style="margin-bottom: 10px; margin-left: 0px">
-                <button type="button" id="btnTambahTransaksi" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddTransaksi"> + Buat Transaksi Baru</button>
+                <button type="button" id="btnTambahTransaksi" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddTransaksi"> + Buat Transaksi Barang Masuk</button>
               </div>
               <div class="row">
                 <div class="table-responsive col-md-12">

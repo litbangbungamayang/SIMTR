@@ -14,9 +14,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <body class="">
     <div class="page">
       <div class="flex-fill">
-        <? $this->load->view("_partials/upper_banner.php") ?>
+        <? //$this->load->view("_partials/upper_banner.php") ?>
         <? $this->load->view("_partials/navbar.php") ?>
-        <div class="my-3 my-md-5">
+        <div class="my-3 my-md-3">
           <script>
             require(['jquery','datatables'], function() {
               $(document).ready(function() {

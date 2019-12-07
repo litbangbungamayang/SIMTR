@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /**
- * Dashboard UI
+ * Dashboard UI BAYU
  */
 /*!
  * Bootstrap v4.3.1 (https://getbootstrap.com/)
@@ -11729,7 +11729,7 @@ body.fixed-header .page {
   display: flex;
   -ms-flex-align: center;
   align-items: center;
-  margin: 1.5rem 0 1.5rem;
+  margin: .75rem 0 .75rem;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
 }
@@ -13203,7 +13203,7 @@ a.icon:hover {
   margin-bottom: -1px;
   transition: .3s border-color;
   font-weight: 400;
-  padding: 1rem 0;
+  padding: 0.4rem 0;
 }
 
 .nav-tabs .nav-link:hover:not(.disabled) {

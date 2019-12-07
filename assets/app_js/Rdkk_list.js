@@ -34,7 +34,7 @@ $("#tblList").DataTable({
   ],
   initComplete: function(){
     $(".dataTables_filter input[type=\"search\"]").css({
-      "width": "200px",
+      "width": "150px",
       "display": ""
     }).attr("placeholder", "Cari");
     $(".dataTables_filter").css({
@@ -47,8 +47,8 @@ $("#tblList").DataTable({
     for (i=0; i < 4; i++){
       optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
     }
-    $("div.cbxTahunGiling").html('<select style="width: 150px; margin: 0px;display: inline-block; vertical-align: top;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
-    $("div.labelTahunGiling").html('<label class="form-label" style="margin: 10px 15px 0px 20px;">Tahun Giling</label>');
+    $("div.cbxTahunGiling").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
+    $("div.labelTahunGiling").html('<label class="form-label" style="margin: 10px 15px 0px 0px;"></label>');
     //console.log($("#tahun_giling").selectize()[0].selectize.getValue());
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
@@ -63,11 +63,11 @@ $("#tblList").DataTable({
 
 function actionButtonView(id_kelompok){
   return  '<div class="dropdown"><button style="width: 80px" type="button" class="btn btn-secondary btn-sm btn-cyan dropdown-toggle" data-toggle="dropdown">' +
-          '<i class="fe fe-settings"></i> Opsi' +
+          '<i class="fe fe-settings mr-2"></i> Opsi' +
           '</button>' +
-          '<div class="dropdown-menu">' +
-          '<a class="dropdown-item" href="Rdkk_view?idKelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
-          '<a class="dropdown-item" href="#"><i class="fe fe-sunset"></i> Permintaan Pupuk</a>' +
-          '<a class="dropdown-item" href="#"><i class="fe fe-feather"></i> Permintaan Perawatan</a>' +
+          '<div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">' +
+            '<a class="dropdown-item" href="Rdkk_view?idKelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
+            '<a class="dropdown-item" href="#"><i class="fe fe-sunset"></i> Permintaan Pupuk</a>' +
+            '<a class="dropdown-item" href="#"><i class="fe fe-feather"></i> Permintaan Perawatan</a>' +
           '</div></div>';
 }
