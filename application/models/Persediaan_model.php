@@ -43,7 +43,7 @@ class Persediaan_model extends CI_Model{
     "select
 	     INV.id_transaksi, BAHAN.nama_bahan, INV.kode_transaksi, INV.kuanta_bahan, BAHAN.satuan,
        INV.rupiah_bahan, INV.tgl_transaksi, INV.tahun_giling, VENDOR.nama_vendor, INV.catatan
-    from bcn.tbl_simtr_persediaan INV
+    from tbl_simtr_persediaan INV
     join tbl_simtr_vendor VENDOR on VENDOR.id_vendor = INV.id_vendor
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
     where INV.kode_transaksi = ".$kode_transaksi;

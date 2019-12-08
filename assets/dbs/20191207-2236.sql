@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `bcn` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE `bcn`;
+
+USE `bumacima_simtr`;
 -- MariaDB dump 10.17  Distrib 10.4.8-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: bcn

@@ -1827,6 +1827,9 @@ pre code {
   .table-responsive-md > .table-bordered, .text-wrap .table-responsive-md > table {
     border: 0;
   }
+  .h1, .text-muted {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 991.98px) {
@@ -1838,6 +1841,9 @@ pre code {
   }
   .table-responsive-lg > .table-bordered, .text-wrap .table-responsive-lg > table {
     border: 0;
+  }
+  .h1, .text-muted {
+    font-size: 14px;
   }
 }
 

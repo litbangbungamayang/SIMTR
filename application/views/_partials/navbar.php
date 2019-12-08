@@ -47,10 +47,10 @@
           </li>
         </ul>
       </div>
-      <div class="col-3 text-right">
+      <div class="col-3 text-right ">
         <? $loggedUser = (object) $this->session->all_userdata(); ?>
         <div class="nav-item dropdown">
-          <a href="#" class="nav-link pr-0" data-toggle="dropdown"><i class="fe fe-user"></i></a>
+          <a href="#" class="nav-link pr-0" data-toggle="dropdown"><i class="fe fe-user mr-2"></i> Akun</a>
           <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
             <div class="dropdown-header text-default"><? echo $loggedUser -> nama_user; ?></div>
             <div class="dropdown-header text-muted" style="margin-top: -10px;"><? echo $loggedUser -> jabatan; ?></div>
