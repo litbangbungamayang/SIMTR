@@ -4,7 +4,7 @@ class Admin_bahan extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     $this->load->model("bahan_model");
-    $this->load->model("persediaan_model");
+    $this->load->model("transaksi_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -47,7 +47,7 @@ class Admin_bahan extends CI_Controller{
 
   public function hapusBahan(){
     $id_bahan = $this->input->post("id_bahan");
-    $transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan($id_bahan));
+    $transaksi = json_decode($this->transaksi_model->getTransaksiByIdBahan($id_bahan));
     //var_dump(sizeof($transaksi));
     if (sizeof($transaksi) == 0){
       if ($this->bahan_model->hapus($id_bahan)) echo "Data bahan berhasil dihapus!";

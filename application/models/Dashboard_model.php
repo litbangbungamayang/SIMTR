@@ -17,12 +17,12 @@ class Dashboard_model extends CI_Model{
   }
 
   public function loadDataGudang(){
-    $tahun_giling = "2020";
+    $tahun_giling = "2020"; //GANTI DENGAN VARIABEL
     $query =
     "select
-	     INV.id_bahan, BAHAN.nama_bahan, sum(case kode_transaksi when 1 then kuanta_bahan when 2 then -kuanta_bahan end) as total_kuanta,
+	     INV.id_bahan, BAHAN.nama_bahan, sum(case kode_transaksi when 1 then kuanta when 2 then -kuanta end) as total_kuanta,
        BAHAN.satuan, BAHAN.jenis_bahan
-    from tbl_simtr_persediaan INV
+    from tbl_simtr_transaksi INV
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
     where INV.tahun_giling = $tahun_giling
     group by id_bahan";

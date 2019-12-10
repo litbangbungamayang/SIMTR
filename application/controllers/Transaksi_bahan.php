@@ -4,7 +4,7 @@ class Transaksi_bahan extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     $this->load->model("bahan_model");
-    $this->load->model("persediaan_model");
+    $this->load->model("transaksi_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -30,11 +30,11 @@ class Transaksi_bahan extends CI_Controller{
   }
 
   public function addTransaksi(){
-    echo $this->persediaan_model->simpan();
+    echo $this->transaksi_model->simpan();
   }
 
   public function getTransaksiByKode(){
-    echo $this->persediaan_model->getTransaksiByKode();
+    echo $this->transaksi_model->getTransaksiByKode();
   }
 
   public function loadScript(){

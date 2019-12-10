@@ -34,7 +34,7 @@ $("#tblList").DataTable({
   ],
   initComplete: function(){
     $(".dataTables_filter input[type=\"search\"]").css({
-      "width": "150px",
+      "width": "200px",
       "display": ""
     }).attr("placeholder", "Cari");
     $(".dataTables_filter").css({

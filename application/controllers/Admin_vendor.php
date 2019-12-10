@@ -4,7 +4,7 @@ class Admin_vendor extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     $this->load->model("vendor_model");
-    $this->load->model("persediaan_model");
+    $this->load->model("transaksi_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -51,7 +51,7 @@ class Admin_vendor extends CI_Controller{
 
   public function hapusVendor(){
     $id_vendor = $this->input->post("id_vendor");
-    $transaksi = json_decode($this->persediaan_model->getTransaksiByIdVendor($id_vendor));
+    $transaksi = json_decode($this->transaksi_model->getTransaksiByIdVendor($id_vendor));
     if (sizeof($transaksi) == 0){
       if ($this->vendor_model->hapus($id_vendor)) echo "Data bahan berhasil dihapus!";
     } else {

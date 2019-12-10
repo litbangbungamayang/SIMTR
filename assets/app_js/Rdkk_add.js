@@ -75,7 +75,7 @@ $("#namaDesa").selectize({
       var namaKec = function (){
         var namaKec = "";
         $.ajax({
-          async: false,
+          async: true,
           url: js_base_url + "Rdkk_add/getKecByDesa",
           data: "idDesa=" + escape(item.id_wilayah),
           dataType: "json",

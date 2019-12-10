@@ -98,7 +98,7 @@ class Landing extends CI_Controller {
 					<div class="card">
 						<div class="card-status bg-blue"></div>
 						<div class="card-header">
-							<div class="card-title">Kemajuan Tebang</div>
+							<div class="card-title">Kemajuan Tebang <sup class="text-danger">(contoh)</sup></div>
 						</div>
 						<table class="table card-table">
 						<tbody id="tblTebang">

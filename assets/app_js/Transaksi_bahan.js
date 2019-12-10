@@ -147,6 +147,7 @@ tblTransaksi.DataTable({
   bPaginate: true,
   bSort: false,
   bInfo: false,
+  order: {7: "asc"},
   ajax: {
     url: js_base_url + "Transaksi_bahan/getTransaksiByKode?kode_transaksi=1",
     dataSrc: ""
@@ -161,14 +162,14 @@ tblTransaksi.DataTable({
       className: "text-center"
     },
     {
-      data: "kuanta_bahan",
+      data: "kuanta",
       render: function(data, type, row, meta){
         return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2}) + " " + row.satuan
       },
       className: "text-right"
     },
     {
-      data: "rupiah_bahan",
+      data: "rupiah",
       render: function(data, type, row, meta){
         return "Rp " + parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2})
       },
