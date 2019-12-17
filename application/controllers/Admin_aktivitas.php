@@ -3,7 +3,7 @@
 class Admin_aktivitas extends CI_Controller{
   public function __construct(){
     parent :: __construct();
-    //if ($this->session->userdata('id_user') == false) redirect('login');
+    if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("bahan_model");
     $this->load->model("transaksi_model");
     $this->load->model("dosis_model");

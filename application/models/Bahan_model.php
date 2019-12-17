@@ -60,6 +60,11 @@ class Bahan_model extends CI_Model{
     ")->row());
   }
 
+  public function getBahanByJenis(){
+    $jenis_bahan = $this->input->get("jenis_bahan");
+    return json_encode($this->db->from("tbl_simtr_bahan")->where("jenis_bahan", $jenis_bahan)->get()->result());
+  }
+
   public function hapus($id_bahan = null){
     if (is_null($id_bahan)) $id_bahan = $this->input->post("id_bahan");
     return $this->db->delete($this->_table, array('id_bahan' => $id_bahan));

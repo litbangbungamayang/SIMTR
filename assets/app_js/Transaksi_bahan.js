@@ -1,4 +1,3 @@
-
 loadNamaBahan();
 loadNamaVendor();
 $('#kode_transaksi').selectize({create: false, sortField: 'text'});
@@ -148,6 +147,7 @@ tblTransaksi.DataTable({
   bSort: false,
   bInfo: false,
   order: {7: "asc"},
+  dom: '<"row"<"spacer"><"cbxTahunGilingList">f>tpl',
   ajax: {
     url: js_base_url + "Transaksi_bahan/getTransaksiByKode?kode_transaksi=1",
     dataSrc: ""
@@ -159,6 +159,16 @@ tblTransaksi.DataTable({
     {data: "catatan"},
     {
       data: "kode_transaksi",
+      render: function(data, type, row, meta){
+        switch(row.kode_transaksi){
+          case "1" :
+            return "MASUK";
+            break;
+          case "2" :
+            return "KELUAR";
+            break;
+        }
+      },
       className: "text-center"
     },
     {
@@ -194,10 +204,24 @@ tblTransaksi.DataTable({
     $(".dataTables_filter input[type=\"search\"]").css({
       "width": "250px",
       "display": "inline-block",
-      "margin": "10px"
+      "margin-left": "10px"
     }).attr("placeholder", "Cari");
     $(".dataTables_filter").css({
       "margin": "0px"
+    });
+    var currYear = parseInt(new Date().getFullYear());
+    var i;
+    var optionTahun = '<option value="0">Pilih tahun giling</option>';
+    for (i=0; i < 4; i++){
+      optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
+    }
+    $("div.cbxTahunGilingList").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
+    $("div.spacer").html('<label class="form-label" style="margin: 0px 10px 0px 0px;"></label>');
+    //console.log($("#tahun_giling").selectize()[0].selectize.getValue());
+    $('#tahun_giling').selectize({create: false, sortField: 'value'});
+    $("#tahun_giling").on("change", function(){
+      tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+      $("#tblTransaksi").DataTable().ajax.url(js_base_url + "Transaksi_bahan/getTransaksiMasukByTahunGiling?tahun_giling=" + tahun_giling).load();
     });
   },
   language: {

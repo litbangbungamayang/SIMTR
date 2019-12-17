@@ -3,6 +3,7 @@
 class Admin_bahan extends CI_Controller{
   public function __construct(){
     parent :: __construct();
+    //if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("bahan_model");
     $this->load->model("transaksi_model");
     $this->load->library('form_validation');
@@ -74,6 +75,10 @@ class Admin_bahan extends CI_Controller{
 
   public function getBahanById(){
     echo $this->bahan_model->getBahanById();
+  }
+
+  public function getBahanByJenis(){
+    echo $this->bahan_model->getBahanByJenis();
   }
 
   public function loadContent(){

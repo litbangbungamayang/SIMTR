@@ -129,20 +129,21 @@ class Kelompoktani_model extends CI_Model{
     ")->result());
   }
 
-  public function getKelompokById($idKelompok){
-    return $this->db->query("
-    SELECT DISTINCT
-      KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
-      VAR.nama_varietas, KT.scan_ktp, WIL.id_wilayah, KT.no_ktp
-    FROM tbl_simtr_kelompoktani KT
-      JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
-      JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
-      JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
-      WHERE EXISTS
-       (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
-      AND KT.id_kelompok = ".$idKelompok."
-    GROUP BY KT.id_kelompok
-    ")->row();
+  public function getKelompokById(){
+    $id_kelompok = $this->input->get("id_kelompok");
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.id_kelompok = $id_kelompok
+      GROUP BY KT.id_kelompok
+    ")->result());
   }
 
   public function ubah(){

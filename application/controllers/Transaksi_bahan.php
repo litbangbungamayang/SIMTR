@@ -41,6 +41,14 @@ class Transaksi_bahan extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/Transaksi_bahan.js").'");';
   }
 
+  public function getTransaksiMasukByTahunGiling(){
+    echo $this->transaksi_model->getTransaksiMasukByTahunGiling();
+  }
+
+  public function getTransaksiKeluarByIdKelompok(){
+    echo $this->transaksi_model->getTransaksiKeluarByIdKelompok();
+  }
+
   public function loadContent(){
     $content_header =
     '
@@ -69,7 +77,7 @@ class Transaksi_bahan extends CI_Controller{
                         <th class="text-center">Nama Bahan</th>
                         <th class="text-center">Nama Vendor</th>
                         <th class="text-center">Nomor Kontrak</th>
-                        <th class="text-center">Kode</th>
+                        <th class="text-center">Transaksi</th>
                         <th class="text-center">Kuanta</th>
                         <th class="text-center">Nilai</th>
                         <th class="text-center">Tanggal</th>
