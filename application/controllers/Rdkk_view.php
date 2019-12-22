@@ -16,8 +16,7 @@ class Rdkk_view extends CI_Controller{
       redirect('login');
     } else {
       $kelompoktani = $this->kelompoktani_model;
-      $idKelompok = $this->input->get('idKelompok');
-      $dataKelompok = $kelompoktani->getKelompokById($idKelompok);
+      $dataKelompok = json_decode($kelompoktani->getKelompokById());
       $data['pageTitle'] = "";
       $data['content'] = $this->loadContent($dataKelompok);
       $this->load->view('main_view', $data);
@@ -74,7 +73,7 @@ class Rdkk_view extends CI_Controller{
                   </p>
                 </div>
                 <div class="col-6 text-right">
-                  <img src="data:image/jpg;base64,'.base64_encode($dataKelompok->scan_ktp).'" height="150px"/>
+                  <img src="data:image/jpg;base64,'.$dataKelompok->scan_ktp.'" height="150px"/>
                 </div>
               </div>
               <div class="row">

@@ -7,6 +7,7 @@
       parent:: __construct();
       //if ($this->session->userdata('id_user') == false) redirect('login');
       $this->load->model("kelompoktani_model");
+      $this->load->model("transaksi_model");
       $this->load->library('form_validation');
       $this->load->library('upload');
       $this->load->helper('url');
@@ -42,6 +43,39 @@
 
     public function getKelompokById(){
       echo $this->kelompoktani_model->getKelompokById();
+    }
+
+    public function addTransaksiPupuk(){
+      echo $this->transaksi_model->simpan();
+    }
+
+    public function getHargaSatuan(){
+      echo $this->transaksi_model->getHargaSatuanByIdBahan();
+    }
+
+    public function getArrayPermintaanPupuk(){
+      $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
+      date_default_timezone_set('Asia/Jakarta');
+      $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->id_bahan."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
+      $this->db->trans_begin();
+      foreach($arrayPermintaanPupuk as $permintaanPupuk){
+        $postData = array(
+          "id_bahan" => $permintaanPupuk->id_bahan,
+          "id_kelompoktani" => $permintaanPupuk->id_kelompok,
+          "id_vendor" => 0,
+          "kode_transaksi" => $permintaanPupuk->kode_transaksi,
+          "kuanta_bahan" => $permintaanPupuk->kuanta,
+          "rupiah_bahan" => $permintaanPupuk->rupiah,
+          "no_transaksi" => $no_transaksi,
+          "tahun_giling" => $permintaanPupuk->tahun_giling,
+          "catatan" => NULL
+        );
+        $this->transaksi_model->simpan($postData);
+      }
+      if ($this->db->trans_status()){
+        $this->db->trans_commit();
+        echo "Data pengajuan telah tersimpan!";
+      }
     }
 
     function loadScript(){
@@ -94,18 +128,28 @@
               <form id="formAddPermintaanPupuk">
                 <div class="row">
                   <div class="col-md-12 col-lg-12">
-                    <label class="form-label">Daftar Transaksi Pupuk Kelompok</label>
-                    <table id="tblPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
-                      <thead>
-                        <tr>
-                          <th class="w-1">No.</th>
-                          <th>No. Transaksi</th>
-                          <th>Tgl. Transaksi</th>
-                          <th>Jenis Pupuk</th>
-                          <th>Kuanta</th>
-                        </tr>
-                      </thead>
-                    </table>
+                    <div class="card card-collapsed" id="card_tblTransaksi">
+                      <div class="card-header">
+                        <div class="card-title">Daftar Permintaan Pupuk</div>
+                        <div class="card-options">
+                          <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <table id="tblPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
+                          <thead>
+                            <tr>
+                              <th class="w-1">No.</th>
+                              <th>No. Transaksi</th>
+                              <th>Tgl. Transaksi</th>
+                              <th>Jenis Pupuk</th>
+                              <th>Kuanta</th>
+                              <th>AU58</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="row">
@@ -130,16 +174,18 @@
                     <div class="form-group" id="grLuasDiminta"">
                       <label class="form-label">Luas aplikasi pupuk</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="luas_aplikasi">
+                      <div class="invalid-feedback">Luas aplikasi pupuk belum diisi!</div>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
-                    <div><button type="button" id="btnTambahTransaksi" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddTransaksi"> + Tambahkan Permintaan</button></div>
+                    <div style="margin-bottom: 20px;"><button type="button" id="btnTambahPupuk" class="btn btn-outline-primary btn-sm" > + Tambahkan Permintaan</button></div>
+                    <label class="form-label">Draft Permintaan Pupuk</label>
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-md-12 col-lg-12">
+                  <div class="col-md-12 col-lg-12" style="margin-bottom: 20px">
                     <table id="tblPermintaanPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
                       <thead>
                         <tr>
@@ -148,10 +194,15 @@
                           <th>Luas Aplikasi</th>
                           <th>Kuanta</th>
                           <th>Kuanta Pembulatan</th>
+                          <th>Nilai Rupiah</th>
+                          <th></th>
                         </tr>
                       </thead>
                     </table>
                   </div>
+                </div>
+                <div class="row">
+                    <button type="button" id="btnSimpanPermintaanPupuk" class="btn btn-primary btn-block" name="submit" ><i class="fe fe-save"></i> Ajukan Permintaan</button>
                 </div>
               </form>
             </div>

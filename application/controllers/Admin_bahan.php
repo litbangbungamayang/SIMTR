@@ -55,18 +55,6 @@ class Admin_bahan extends CI_Controller{
     } else {
       echo "Terdapat transaksi dengan nama bahan yang akan dihapus. Proses menghapus dihentikan.";
     }
-    //$transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan(26));
-    /*
-    echo "OKE";
-    echo $this->input->post('id_bahan');
-    echo $id_bahan;
-    $transaksi = json_decode($this->persediaan_model->getTransaksiByIdBahan());
-    if (is_null($transaksi)){
-      echo $this->bahan_model->hapus($id_bahan);
-    } else {
-      echo "Tidak dapat menghapus bahan. Terdapat transaksi dengan bahan tersebut";
-    }
-    */
   }
 
   public function getAllBahan(){
@@ -79,6 +67,14 @@ class Admin_bahan extends CI_Controller{
 
   public function getBahanByJenis(){
     echo $this->bahan_model->getBahanByJenis();
+  }
+
+  public function getBahanByJenisTahunGiling(){
+    echo $this->bahan_model->getBahanByJenisTahunGiling();
+  }
+
+  public function getBahanByTahunGiling(){
+    echo $this->bahan_model->getBahanByTahunGiling();
   }
 
   public function loadContent(){
@@ -109,6 +105,8 @@ class Admin_bahan extends CI_Controller{
                         <th>Nama Bahan</th>
                         <th>Jenis Bahan</th>
                         <th>Satuan</th>
+                        <th>Dosis per Ha.</th>
+                        <th>Tahun Giling</th>
                         <th class="text-center">Aksi</th>
                       </tr>
                     </thead>
@@ -123,6 +121,11 @@ class Admin_bahan extends CI_Controller{
         </div>
       </div>
     ';
+    $currYear = strval(date("Y"));
+    $optionText = "";
+    for ($x = $currYear; $x <= $currYear + 4; $x++){
+      $optionText .= '<option value="'.$x.'">'.$x.'</option>';
+    }
     $content_dialogAddBahan =
     '
       <div class="modal fade" id="dialogAddBahan">
@@ -141,6 +144,24 @@ class Admin_bahan extends CI_Controller{
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="nama_bahan" name="nama_bahan" placeholder="Nama Bahan">
                       <div class="invalid-feedback" id="fbNamaBahan">Nama bahan belum diinput!</div>
                     </div>
+                    <div class="form-group" id="grSatuan">
+                      <label class="form-label">Satuan</label>
+                      <select name="satuan" id="satuan" class="custom-control custom-select" placeholder="Pilih satuan">
+                        <option value="">Pilih satuan</option>
+                        <option value="LITER">Liter</option>
+                        <option value="KG">Kg</option>
+                      </select>
+                      <div class="invalid-feedback">Satuan belum dipilih!</div>
+                    </div>
+                    <div class="form-group" id="grTahunGiling">
+                      <label class="form-label">Tahun Giling</label>
+                      <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
+                      '.$optionText.'
+                      </select>
+                      <div class="invalid-feedback">Tahun giling belum dipilih!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grJenisBahan">
                       <label class="form-label">Jenis Bahan</label>
                       <select name="jenis_bahan" id="jenis_bahan" class="custom-control custom-select" placeholder="Pilih jenis bahan">
@@ -152,14 +173,10 @@ class Admin_bahan extends CI_Controller{
                       </select>
                       <div class="invalid-feedback">Jenis bahan belum dipilih!</div>
                     </div>
-                    <div class="form-group" id="grSatuan">
-                      <label class="form-label">Satuan</label>
-                      <select name="satuan" id="satuan" class="custom-control custom-select" placeholder="Pilih satuan">
-                        <option value="">Pilih satuan</option>
-                        <option value="LITER">Liter</option>
-                        <option value="KG">Kg</option>
-                      </select>
-                      <div class="invalid-feedback">Satuan belum dipilih!</div>
+                    <div class="form-group" id="grDosis">
+                      <label class="form-label">Dosis per Ha.</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="dosis" name="dosis" placeholder="Dosis Bahan">
+                      <div class="invalid-feedback" id="fbNamaBahan">Dosis bahan belum diinput!</div>
                     </div>
                   </div>
                 </div>

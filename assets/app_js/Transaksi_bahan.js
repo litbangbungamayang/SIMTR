@@ -1,7 +1,5 @@
-loadNamaBahan();
 loadNamaVendor();
 $('#kode_transaksi').selectize({create: false, sortField: 'text'});
-$('#tahun_giling').selectize({create: false, sortField: 'text'});
 
 var txtKuantaBahan = $("#kuanta_bahan");
 var txtRupiahBahan = $("#rupiah_bahan");
@@ -22,6 +20,47 @@ txtKuantaBahan.bind("keyup blur", function(){
 txtRupiahBahan.bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^0-9]/g,""));
   ($(this).val() != "") ? $(this).val("Rp " + parseInt($(this).val()).toLocaleString()) : "";
+});
+
+cbxTahunGiling.selectize({
+  onChange: function(value){
+    if (value != ""){
+      $.ajax({
+        url: js_base_url + "Admin_bahan/getBahanByTahunGiling",
+        type: "GET",
+        dataType: "json",
+        data: {tahun_giling: value},
+        success: function(response){
+          $listNamaBahan = $("#nama_bahan").selectize();
+          listNamaBahan = $listNamaBahan[0].selectize;
+          listNamaBahan.clear();
+          listNamaBahan.clearOptions();
+          listNamaBahan.load(function (callback){
+            callback(response);
+          })
+        }
+      });
+    }
+  }
+})
+
+$("#nama_bahan").selectize({
+  valueField: "id_bahan",
+  labelField: "nama_bahan",
+  sortField: "nama_bahan",
+  searchField: "nama_bahan",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih bahan",
+  options: [],
+  onChange: function(value){
+    if (value != ""){
+      var selCbxNamaBahan = cbxNamaBahan.selectize()[0].selectize;
+      lblSatuanBahan.val(selCbxNamaBahan.options[value]["satuan"]);
+    } else {
+      lblSatuanBahan.val("");
+    }
+  }
 });
 
 btnSimpanTransaksi.on("click", function(){
@@ -88,34 +127,6 @@ function validasiForm(){
     (catatan == "") ? txtCatatan.addClass("is-invalid") : "";
     return null;
   }
-}
-
-function loadNamaBahan(){
-  $.ajax({
-    url: js_base_url + "Admin_bahan/getAllBahan",
-    type: "GET",
-    dataType: "json",
-    success: function(response){
-      cbxNamaBahan.selectize({
-        valueField: "id_bahan",
-        labelField: "nama_bahan",
-        sortField: "nama_bahan",
-        searchField: "nama_bahan",
-        maxItems: 1,
-        create: false,
-        placeholder: "Pilih bahan",
-        options: response,
-        onChange: function(value){
-          if (value != ""){
-            var selCbxNamaBahan = cbxNamaBahan.selectize()[0].selectize;
-            lblSatuanBahan.val(selCbxNamaBahan.options[value]["satuan"]);
-          } else {
-            lblSatuanBahan.val("");
-          }
-        }
-      });
-    }
-  })
 }
 
 function loadNamaVendor(){

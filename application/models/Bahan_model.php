@@ -6,6 +6,8 @@ class Bahan_model extends CI_Model{
   public $nama_bahan;
   public $jenis_bahan;
   public $satuan;
+  public $dosis_per_ha;
+  public $tahun_giling;
 
   public function rules(){
     return [
@@ -35,6 +37,8 @@ class Bahan_model extends CI_Model{
     $this->nama_bahan = strtoupper($post["nama_bahan"]);
     $this->jenis_bahan = $post["jenis_bahan"];
     $this->satuan = $post["satuan"];
+    $this->dosis_per_ha = $post["dosis"];
+    $this->tahun_giling = $post["tahun_giling"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -44,6 +48,8 @@ class Bahan_model extends CI_Model{
     $this->nama_bahan = strtoupper($post["nama_bahan"]);
     $this->jenis_bahan = $post["jenis_bahan"];
     $this->satuan = $post["satuan"];
+    $this->dosis_per_ha = $post["dosis"];
+    $this->tahun_giling = $post["tahun_giling"];
     return $this->db->where("id_bahan", $post["id_bahan"])->update($this->_table, $this);
   }
 
@@ -51,6 +57,18 @@ class Bahan_model extends CI_Model{
     return json_encode($this->db->query("
       SELECT * FROM tbl_simtr_bahan
     ")->result());
+  }
+
+  public function getBahanByTahunGiling(){
+    $tahun_giling = $this->input->get("tahun_giling");
+    return json_encode($this->db->from("tbl_simtr_bahan")->where("tahun_giling", $tahun_giling)->get()->result());
+  }
+
+  public function getBahanByJenisTahunGiling(){
+    $tahun_giling = $this->input->get("tahun_giling");
+    $jenis_bahan = $this->input->get("jenis_bahan");
+    return json_encode($this->db->from("tbl_simtr_bahan")->where("tahun_giling",
+      $tahun_giling)->where("jenis_bahan", $jenis_bahan)->get()->result());
   }
 
   public function getBahanById(){

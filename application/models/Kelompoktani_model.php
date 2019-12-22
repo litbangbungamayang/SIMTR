@@ -97,7 +97,7 @@ class Kelompoktani_model extends CI_Model{
     if (empty($afdeling))$afdeling = "%";
     return json_encode($this->db->query("
       SELECT DISTINCT
-        KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
         VAR.nama_varietas, KT.tahun_giling
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
@@ -133,7 +133,7 @@ class Kelompoktani_model extends CI_Model{
     $id_kelompok = $this->input->get("id_kelompok");
     return json_encode($this->db->query("
       SELECT DISTINCT
-        KT.id_kelompok, KT.nama_kelompok, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, TO_BASE64(KT.scan_ktp) as scan_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.id_wilayah, WIL.nama_wilayah, SUM(PT.luas) as luas,
         VAR.nama_varietas, KT.tahun_giling
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
@@ -143,7 +143,7 @@ class Kelompoktani_model extends CI_Model{
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
         AND KT.id_kelompok = $id_kelompok
       GROUP BY KT.id_kelompok
-    ")->result());
+    ")->row());
   }
 
   public function ubah(){

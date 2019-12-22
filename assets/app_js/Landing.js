@@ -7,8 +7,6 @@ function loadDashboardData(){
     dataType:"json",
     type: "GET",
     success: function(response){
-      //document.getElementById("total_luas").innerHTML = response[0].luas;
-      console.log(response);
       $("#total_luas").html(parseFloat(response.total_luas).toLocaleString() + " ha");
       $("#total_kelompok").html(response.total_kelompok);
       $("#total_petani").html(response.total_petani);
@@ -19,7 +17,6 @@ function loadDashboardData(){
     dataType: "json",
     type: "GET",
     success: function(response){
-      console.log(response);
       $.each(response, function(i, item){
         var $tr = $("<tr>").append(
           $("<td>").text(item.jenis_bahan + " " + item.nama_bahan),

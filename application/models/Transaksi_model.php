@@ -46,7 +46,7 @@ class Transaksi_model extends CI_Model{
     $query =
     "
     select
-      TRANS.id_transaksi, TRANS.id_kelompoktani, BAHAN.nama_bahan, BAHAN.satuan, TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi
+      TRANS.id_transaksi, TRANS.id_kelompoktani, BAHAN.id_bahan, BAHAN.nama_bahan, BAHAN.satuan, TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi
     from tbl_simtr_transaksi TRANS
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
     where TRANS.id_kelompoktani = $id_kelompok and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK'
@@ -54,18 +54,34 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query)->result());
   }
 
-  public function simpan(){
-    $post = $this->input->post();
+  public function simpan($data_transaksi = null){
+    if (is_null($data_transaksi)){
+      $post = $this->input->post();
+    } else {
+      $post = $data_transaksi;
+    }
     $this->id_bahan = $post["id_bahan"];
     $this->id_kelompoktani = $post["id_kelompoktani"];
     $this->id_vendor = $post["id_vendor"];
     $this->kode_transaksi = $post["kode_transaksi"];
+    $this->no_transaksi = $post["no_transaksi"];
     $this->kuanta = $post["kuanta_bahan"];
     $this->rupiah = $post["rupiah_bahan"];
     $this->catatan = strtoupper($post["catatan"]);
     $this->tahun_giling = $post["tahun_giling"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
+  }
+
+  public function getHargaSatuanByIdBahan($id_bahan = null){
+    if (is_null($id_bahan)) $id_bahan = $this->input->get("id_bahan");
+    $query =
+    "
+    select (jml_rupiah/jml_kuanta) as harga_unit from
+      (select sum(kuanta) as jml_kuanta, sum(rupiah) as jml_rupiah from tbl_simtr_transaksi
+        where kode_transaksi = 1 and id_bahan = $id_bahan) total
+    ";
+    return json_encode($this->db->query($query)->result());
   }
 
   public function getTransaksiByKode($kode_transaksi = null){

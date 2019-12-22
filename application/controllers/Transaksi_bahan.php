@@ -114,6 +114,13 @@ class Transaksi_bahan extends CI_Controller{
               <form id="formAddBahan">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grTahunGiling">
+                      <label class="form-label">Tahun Giling</label>
+                      <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
+                      '.$optionText.'
+                      </select>
+                      <div class="invalid-feedback">Tahun giling belum dipilih!</div>
+                    </div>
                     <div class="form-group" id="grNamaBahan">
                       <label class="form-label">Nama Bahan</label>
                       <select name="nama_bahan" id="nama_bahan" class="custom-control custom-select" placeholder="Pilih Bahan">
@@ -125,6 +132,7 @@ class Transaksi_bahan extends CI_Controller{
                       <div class="row">
                         <div class="col-md-12 col-lg-8">
                           <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="kuanta_bahan" name="kuanta_bahan" placeholder="Kuanta bahan">
+                          <div class="invalid-feedback">Kuanta bahan belum diisi!</div>
                         </div>
                         <div class="col-md-12 col-lg-4">
                           <input type="text" style="text-transform: uppercase;" class="form-control" id="satuan_bahan" name="satuan_bahan" placeholder="Satuan" disabled>
@@ -132,19 +140,14 @@ class Transaksi_bahan extends CI_Controller{
                       </div>
                       <div class="invalid-feedback">Kuanta bahan belum diisi!</div>
                     </div>
-                    <div class="form-group" id="grTahunGiling">
-                      <label class="form-label">Tahun Giling</label>
-                      <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
-                      '.$optionText.'
-                      </select>
-                      <div class="invalid-feedback">Tahun giling belum dipilih!</div>
-                    </div>
+
                   </div>
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaVendor">
                       <label class="form-label">Nama Vendor</label>
                       <select name="nama_vendor" id="nama_vendor" class="custom-control custom-select" placeholder="Pilih Vendor">
                       </select>
+                      <div class="invalid-feedback">Nama vendor belum dipilih!</div>
                     </div>
                     <div class="form-group" id="grRupiah">
                       <label class="form-label">Nilai</label>
