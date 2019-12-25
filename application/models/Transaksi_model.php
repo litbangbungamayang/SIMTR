@@ -41,6 +41,44 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query)->result());
   }
 
+  public function getAu58ByNoTransaksi(){
+    $no_transaksi = $this->input->get("no_transaksi");
+    $id_kelompok = $this->input->get("id_kelompok");
+    $query = "select
+      	KT.nama_kelompok, KT.no_kontrak,
+          (case when KT.kategori = 1 then 'PC' when KT.kategori = 2 then 'RT1'
+      		when KT.kategori = 3 then 'RT2'
+              when KT.kategori = 4 then 'RT3' end) as kategori,
+      	PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi, BAHAN.jenis_bahan, BAHAN.nama_bahan, TRANS.kuanta, BAHAN.satuan
+      from tbl_simtr_kelompoktani KT
+      join
+      	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
+      		join tbl_simtr_kelompoktani KT on KT.id_kelompok = PT.id_kelompok
+              where KT.id_kelompok = $id_kelompok) PT on PT.id_kelompok = KT.id_kelompok
+      join tbl_simtr_transaksi TRANS on TRANS.id_kelompoktani = KT.id_kelompok
+      join tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+      join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
+      where TRANS.no_transaksi = '$no_transaksi'
+      group by TRANS.id_transaksi";
+      return json_encode($this->db->query($query)->result());
+  }
+
+  public function cekStokBahanByIdBahan($id_bahan = null){
+    if (is_null($id_bahan)) $id_bahan = $this->input->get("id_bahan");
+    $query =
+    "
+      select
+         INV.id_bahan, BAHAN.nama_bahan, sum(case kode_transaksi when 1 then kuanta when 2 then -kuanta end) as total_kuanta,
+         BAHAN.satuan, BAHAN.jenis_bahan
+      from tbl_simtr_transaksi INV
+      join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
+      join tbl_simtr_umum UMUM on UMUM.tahun_giling = INV.tahun_giling
+      where INV.id_bahan = $id_bahan
+      group by id_bahan
+    ";
+    return json_encode($this->db->query($query)->result());
+  }
+
   public function getTransaksiKeluarByIdKelompok(){
     $id_kelompok = $this->input->get("id_kelompok");
     $query =
@@ -52,6 +90,20 @@ class Transaksi_model extends CI_Model{
     where TRANS.id_kelompoktani = $id_kelompok and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK'
     ";
     return json_encode($this->db->query($query)->result());
+  }
+
+  public function getTransaksiByIdKelompokIdBahan($id_kelompok = null, $id_bahan = null){
+    if (is_null($id_kelompok) || is_null($id_bahan)){
+      $id_kelompok = $this->input->get("id_kelompok");
+      $id_bahan = $this->input->get("id_bahan");
+    }
+    $query =
+    "
+      select sum(TRANS.kuanta) as kuanta
+      from tbl_simtr_transaksi TRANS
+      where TRANS.id_kelompoktani = $id_kelompok and TRANS.id_bahan = $id_bahan
+    ";
+    return json_encode($this->db->query($query)->row());
   }
 
   public function simpan($data_transaksi = null){

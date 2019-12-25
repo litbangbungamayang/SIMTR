@@ -236,10 +236,14 @@ btnTambahPupuk.on("click", function(){
       selectedKelompok.tahun_giling, bahanSelected.nama_bahan, kuanta_req, luasValue, bahanSelected.satuan, hargaSatuan);
     var indexBahan = arrayPermintaanPupukMaks.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
     var indexStokBahan = arrayStokBahan.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
+    /*
     console.log("ID Permintaan Baru = " + permintaanBaru.id_bahan);
     console.log("Array Stok Bahan = ");
     console.log(arrayStokBahan);
-    if (indexStokBahan > -1){
+    console.log("Limit Permintaan = ");
+    console.log(arrayPermintaanPupukMaks[indexBahan].maks);
+    */
+    if (indexStokBahan != -1){
       if (permintaanBaru.kuanta <= arrayStokBahan[indexStokBahan].total_kuanta){
         if (permintaanBaru.kuanta <= arrayPermintaanPupukMaks[indexBahan].maks){
           arrayPermintaanPupukMaks[indexBahan].maks = arrayPermintaanPupukMaks[indexBahan].maks - permintaanBaru.kuanta;
@@ -247,7 +251,6 @@ btnTambahPupuk.on("click", function(){
           cbxJenisBahan.selectize()[0].selectize.setValue("");
           luasAplikasi.val("");
           refreshTablePermintaan();
-          console.log(permintaanBaru);
         } else {
           alert("Permintaan bahan " + permintaanBaru.nama_bahan + " tidak bisa melebihi " +
             parseInt(arrayPermintaanPupukMaks[indexBahan].maks).toLocaleString({maximumFractionDigits:2}) + " kg atau " +
@@ -287,6 +290,7 @@ function actionButtonView(id_kelompok){
           '</button>' +
           '<div class="dropdown-menu dropdown-menu-right">' +
             '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
+            '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Semua Transaksi</a>' +
             '<div class="dropdown-divider"></div>' +
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
@@ -323,7 +327,7 @@ $("#tblPupuk").DataTable({
     {
       data: "button",
       render: function(data, type, row, meta){
-        return '<div class="btn btn-outline-primary btn-sm" name="hapus" id="cetakAu58" onclick=""><i class="fe fe-printer"></i></div>'
+        return '<a class="btn btn-outline-primary btn-sm" name="hapus" id="cetakAu58" href="Transaksi_AU58?no_transaksi='+row.no_transaksi+'&id_kelompok='+row.id_kelompoktani+'"><i class="fe fe-printer"></i></a>'
       },
       className: "text-center"
     }

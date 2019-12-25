@@ -129,8 +129,8 @@ class Kelompoktani_model extends CI_Model{
     ")->result());
   }
 
-  public function getKelompokById(){
-    $id_kelompok = $this->input->get("id_kelompok");
+  public function getKelompokById($id_kelompok = null){
+    if (is_null($id_kelompok)) $id_kelompok = $this->input->get("id_kelompok");
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, TO_BASE64(KT.scan_ktp) as scan_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.id_wilayah, WIL.nama_wilayah, SUM(PT.luas) as luas,

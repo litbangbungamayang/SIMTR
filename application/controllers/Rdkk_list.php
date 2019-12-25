@@ -8,6 +8,7 @@
       //if ($this->session->userdata('id_user') == false) redirect('login');
       $this->load->model("kelompoktani_model");
       $this->load->model("transaksi_model");
+      $this->load->model("bahan_model");
       $this->load->library('form_validation');
       $this->load->library('upload');
       $this->load->helper('url');
@@ -57,7 +58,7 @@
       $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
       date_default_timezone_set('Asia/Jakarta');
       $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->id_bahan."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
-      $this->db->trans_begin();
+      $transPostData = array();
       foreach($arrayPermintaanPupuk as $permintaanPupuk){
         $postData = array(
           "id_bahan" => $permintaanPupuk->id_bahan,
@@ -70,11 +71,34 @@
           "tahun_giling" => $permintaanPupuk->tahun_giling,
           "catatan" => NULL
         );
+        $stokBahan = json_decode($this->transaksi_model->cekStokBahanByIdBahan($permintaanPupuk->id_bahan));
+        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPupuk->id_kelompok));
+        $bahan = json_decode($this->bahan_model->getBahanById($permintaanPupuk->id_bahan));
+        $maksRequest = round(($bahan->dosis_per_ha * $kelompok->luas)/50)*50;
+        $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokIdBahan($permintaanPupuk->id_kelompok, $permintaanPupuk->id_bahan))->kuanta;
+        if ($stokBahan[0]->total_kuanta >= $permintaanPupuk->kuanta){
+          if ($permintaanPupuk->kuanta <= ($maksRequest - $transaksiYll)){
+              $transPostData[] = $postData;
+          } else {
+            echo "Permintaan pupuk sudah melebihi dosis yang ditetapkan! \r\nDiminta : ".number_format($permintaanPupuk->kuanta, 0, ".", ",")." ".$permintaanPupuk->satuan
+            ."\r\nTransaksi sebelumnya : ".number_format($transaksiYll, 0, ".", ",")." ".$permintaanPupuk->satuan
+            ."\r\nBatas permintaan : ".number_format($maksRequest, 0, ".", ",")." ".$permintaanPupuk->satuan;
+          }
+        } else {
+          echo "Stok gudang tidak mencukupi untuk melayani permintaan ini. \r\nStok tersedia untuk bahan ".
+          $permintaanPupuk->nama_bahan." sebanyak ".number_format($stokBahan[0]->total_kuanta, 0, ".", ",")." ".$permintaanPupuk->satuan;
+        }
+      }
+      $this->db->trans_begin();
+      foreach($transPostData as $postData){
         $this->transaksi_model->simpan($postData);
       }
-      if ($this->db->trans_status()){
+      if($this->db->trans_status()){
         $this->db->trans_commit();
-        echo "Data pengajuan telah tersimpan!";
+        echo "Transaksi berhasil.";
+      } else {
+        echo "Terdapat error transaksi mysql! Method getArrayPermintaanPupuk.";
+        $this->db->trans_rollback();
       }
     }
 
@@ -130,7 +154,7 @@
                   <div class="col-md-12 col-lg-12">
                     <div class="card card-collapsed" id="card_tblTransaksi">
                       <div class="card-header">
-                        <div class="card-title">Daftar Permintaan Pupuk</div>
+                        <div class="card-title">Transaksi Permintaan Pupuk</div>
                         <div class="card-options">
                           <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
                         </div>

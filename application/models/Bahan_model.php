@@ -71,10 +71,10 @@ class Bahan_model extends CI_Model{
       $tahun_giling)->where("jenis_bahan", $jenis_bahan)->get()->result());
   }
 
-  public function getBahanById(){
-    $id = $this->input->get("idBahan");
+  public function getBahanById($id_bahan = null){
+    if (is_null($id_bahan)) $id_bahan = $this->input->get("idBahan");
     return json_encode($this->db->query("
-      SELECT * FROM tbl_simtr_bahan WHERE id_bahan = $id
+      SELECT * FROM tbl_simtr_bahan WHERE id_bahan = $id_bahan
     ")->row());
   }
 
