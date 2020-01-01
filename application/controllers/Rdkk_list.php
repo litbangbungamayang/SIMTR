@@ -5,9 +5,10 @@
 
     public function __construct(){
       parent:: __construct();
-      //if ($this->session->userdata('id_user') == false) redirect('login');
+      if ($this->session->userdata('id_user') == false) redirect('login');
       $this->load->model("kelompoktani_model");
       $this->load->model("transaksi_model");
+      $this->load->model("aktivitas_model");
       $this->load->model("bahan_model");
       $this->load->library('form_validation');
       $this->load->library('upload');
@@ -54,6 +55,54 @@
       echo $this->transaksi_model->getHargaSatuanByIdBahan();
     }
 
+    public function getArrayPermintaanPerawatan(){
+      $arrayErrorMsg = array();
+      $arrayPermintaanPerawatan = json_decode($this->input->post("perawatan"));
+      date_default_timezone_set("Asia/Jakarta");
+      $no_transaksi = "TR"."-".$arrayPermintaanPerawatan[0]->id_kelompok."-".$arrayPermintaanPerawatan[0]->tahun_giling."-".date("YmdHis");
+      $transPostData = array();
+      foreach($arrayPermintaanPerawatan as $permintaanPerawatan){
+        $postData = array(
+          "id_bahan" => $permintaanPerawatan->id_bahan,
+          "id_aktivitas" => $permintaanPerawatan->id_aktivitas,
+          "id_kelompoktani" => $permintaanPerawatan->id_kelompok,
+          "id_vendor" => 0,
+          "kode_transaksi" => $permintaanPerawatan->kode_transaksi,
+          "kuanta_bahan" => $permintaanPerawatan->kuanta,
+          "rupiah_bahan" => $permintaanPerawatan->rupiah,
+          "no_transaksi" => $no_transaksi,
+          "tahun_giling" => $permintaanPerawatan->tahun_giling,
+          "catatan" => NULL
+        );
+        $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokIdAktivitas($permintaanPerawatan->id_kelompok, $permintaanPerawatan->id_aktivitas))->kuanta;
+        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPerawatan->id_kelompok));
+        $aktivitas = json_decode($this->aktivitas_model->getAktivitasById($permintaanPerawatan->id_aktivitas));
+        if(($transaksiYll + $permintaanPerawatan->kuanta) <= $kelompok->luas){
+          $transPostData[] = $postData;
+          $msg = "Transaksi perawatan ".$aktivitas->nama_aktivitas." berhasil ditambahkan.";
+          $arrayErrorMsg[] = $msg;
+        } else {
+          $msg =  "Transaksi perawatan ".$aktivitas->nama_aktivitas." tidak dapat dilakukan karena total luas yang diminta melebihi luas terdaftar.\r\n".
+          "Permintaan sebelumnya = ".$transaksiYll." Ha, diminta = ".$permintaanPerawatan->kuanta." Ha, luas terdaftar = ".$kelompok->luas." Ha.";
+          $arrayErrorMsg[] = $msg;
+        }
+      }
+      if(sizeof($transPostData) > 0){
+        $this->db->trans_begin();
+        foreach($transPostData as $postData){
+          $this->transaksi_model->simpan($postData);
+        }
+        if($this->db->trans_status()){
+          $this->db->trans_commit();
+        } else {
+          $msg =  "Terdapat error transaksi mysql! Method getArrayPermintaanPerawatan.";
+          $arrayErrorMsg[] = $msg;
+          $this->db->trans_rollback();
+        }
+      }
+      echo json_encode($arrayErrorMsg);
+    }
+
     public function getArrayPermintaanPupuk(){
       $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
       date_default_timezone_set('Asia/Jakarta');
@@ -62,6 +111,7 @@
       foreach($arrayPermintaanPupuk as $permintaanPupuk){
         $postData = array(
           "id_bahan" => $permintaanPupuk->id_bahan,
+          "id_aktivitas" => 0,
           "id_kelompoktani" => $permintaanPupuk->id_kelompok,
           "id_vendor" => 0,
           "kode_transaksi" => $permintaanPupuk->kode_transaksi,
@@ -80,7 +130,7 @@
           if ($permintaanPupuk->kuanta <= ($maksRequest - $transaksiYll)){
               $transPostData[] = $postData;
           } else {
-            echo "Permintaan pupuk sudah melebihi dosis yang ditetapkan! \r\nDiminta : ".number_format($permintaanPupuk->kuanta, 0, ".", ",")." ".$permintaanPupuk->satuan
+            echo "Permintaan pupuk $permintaanPupuk->nama_bahan sudah melebihi dosis yang ditetapkan! \r\nDiminta : ".number_format($permintaanPupuk->kuanta, 0, ".", ",")." ".$permintaanPupuk->satuan
             ."\r\nTransaksi sebelumnya : ".number_format($transaksiYll, 0, ".", ",")." ".$permintaanPupuk->satuan
             ."\r\nBatas permintaan : ".number_format($maksRequest, 0, ".", ",")." ".$permintaanPupuk->satuan;
           }
@@ -153,14 +203,15 @@
                 <div class="row">
                   <div class="col-md-12 col-lg-12">
                     <div class="card card-collapsed" id="card_tblTransaksi">
+                      <div class="card-status bg-green"></div>
                       <div class="card-header">
-                        <div class="card-title">Transaksi Permintaan Pupuk</div>
+                        <div>Transaksi yang lalu</div>
                         <div class="card-options">
                           <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
                         </div>
                       </div>
                       <div class="card-body">
-                        <table id="tblPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
+                        <table id="tblPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%;">
                           <thead>
                             <tr>
                               <th class="w-1">No.</th>
@@ -210,14 +261,13 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12 col-lg-12" style="margin-bottom: 20px">
-                    <table id="tblPermintaanPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
+                    <table id="tblPermintaanPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%;">
                       <thead>
                         <tr>
                           <th class="w-1">No.</th>
                           <th>Jenis Pupuk</th>
                           <th>Luas Aplikasi</th>
                           <th>Kuanta</th>
-                          <th>Kuanta Pembulatan</th>
                           <th>Nilai Rupiah</th>
                           <th></th>
                         </tr>
@@ -234,7 +284,121 @@
         </div>
       </div>
       ';
-      return $container.$content_dialogAddPermintaanPupuk;
+      $content_dialogAddPerawatan =
+      '
+      <div class="modal fade" id="dialogAddPerawatan">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Permintaan Perawatan Kebun</h4>
+              <button class="close" data-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+              <form id="formAddPermintaanPerawatan">
+                <div class="row">
+                  <div class="col-md-12 col-lg-12">
+                    <div class="card card-collapsed" id="card_tblPerawatan">
+                      <div class="card-status bg-green"></div>
+                      <div class="card-header">
+                        <div>Transaksi yang lalu</div>
+                        <div class="card-options">
+                          <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <table id="tblPerawatan" class="table card-table table-vcenter text-nowrap datatable table-xl" style="width: 100%;">
+                          <thead>
+                            <tr>
+                              <th class="w-1">No.</th>
+                              <th>No. Transaksi</th>
+                              <th>Tgl. Transaksi</th>
+                              <th>Jenis Aktivitas</th>
+                              <th>Kuanta</th>
+                              <th>Rupiah</th>
+                              <th>Bon Perawatan</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grNamaKelompok" style="margin-top: 25px;">
+                      <label class="form-label">Nama Kelompok</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="perawatan_namaKelompok" disabled>
+                    </div>
+                    <div class="form-group" id="grJenisAktivitas">
+                      <label class="form-label">Perawatan kebun yang diminta</label>
+                      <select name="jenis_aktivitas" id="jenis_aktivitas" class="custom-control custom-select" placeholder="Pilih jenis aktivitas">
+                        <option value="">Pilih jenis aktivitas</option>
+                      </select>
+                      <div class="invalid-feedback">Jenis aktivitas belum dipilih!</div>
+                    </div>
+                    <div class="form-group" id="grLuasDiminta"">
+                      <label class="form-label">Luas perawatan yang diminta</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="perawatan_luasDiminta">
+                      <div class="invalid-feedback">Luas perawatan belum diisi!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grLuas" style="margin-top: 25px;">
+                      <label class="form-label">Luas Area</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="perawatan_luas" disabled>
+                    </div>
+                    <div class="form-group" id="grBiayaPerHa"">
+                      <label class="form-label">Biaya per hektar</label>
+                      <input type="text" style="" class="form-control" id="perawatan_biaya" disabled>
+                    </div>
+                    <div class="form-group" id="grBiayaPerHa"">
+                      <label class="form-label">Jumlah biaya</label>
+                      <input type="text" style="" class="form-control" id="perawatan_jmlBiaya" disabled>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-6">
+                    <div style="margin-bottom: 20px;"><button type="button" id="btnTambahPerawatan" class="btn btn-outline-primary btn-sm" > + Tambahkan Permintaan</button></div>
+                    <label class="form-label">Draft Permintaan Perawatan Kebun</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-12" style="margin-bottom: 20px">
+                    <table id="tblPermintaanPerawatan" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%;">
+                      <thead>
+                        <tr>
+                          <th class="w-1">No.</th>
+                          <th>Jenis Aktivitas</th>
+                          <th>Luas Aplikasi</th>
+                          <th>Biaya per Ha.</th>
+                          <th>Jml. Biaya</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th class="w-1"></th>
+                          <th></th>
+                          <th></th>
+                          <th>Total Biaya</th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+                <div class="row">
+                    <button type="button" id="btnSimpanPermintaanPerawatan" class="btn btn-primary btn-block" name="submit" ><i class="fe fe-save"></i> Ajukan Permintaan</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      ';
+      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan;
     }
 
   }

@@ -14,6 +14,7 @@ class Aktivitas_model extends CI_Model{
     $this->tstr = $post["tstr"];
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya = $post["biaya"];
+    $this->kategori = $post["kategori"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -24,6 +25,7 @@ class Aktivitas_model extends CI_Model{
     $this->tstr = $post["tstr"];
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya = $post["biaya"];
+    $this->kategori = $post["kategori"];
     return $this->db->where("id_aktivitas", $post["id_aktivitas"])->update($this->_table, $this);
   }
 
@@ -32,8 +34,8 @@ class Aktivitas_model extends CI_Model{
     return $this->db->delete($this->_table, array('id_aktivitas' => $id_aktivitas));
   }
 
-  public function getAktivitasById(){
-    $id_aktivitas = $this->input->get("id_aktivitas");
+  public function getAktivitasById($id_aktivitas = null){
+    if (is_null($id_aktivitas))$id_aktivitas = $this->input->get("id_aktivitas");
     $query = $this->db->select("*")->from($this->_table)->where("id_aktivitas", $id_aktivitas)->get();
     return json_encode($query->row());
   }
@@ -46,9 +48,12 @@ class Aktivitas_model extends CI_Model{
 
   public function getAktivitasByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
+    $kategori = $this->input->get("kategori");
+    ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
     $tstr = "TR";
     //return json_encode($this->db->query("select * from tbl_aktivitas where tahun_giling = $tahun_giling and tstr = '".$tstr."'")->result());
-    $query = $this->db->select("*")->from($this->_table)->where("tstr", $tstr)->where("tahun_giling", $tahun_giling)->get();
+    //$query = $this->db->select("*")->from($this->_table)->where("tstr", $tstr)->where("tahun_giling", $tahun_giling)->get();
+    $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = $tahun_giling and tstr = '$tstr' and (kategori = 'ALL' or kategori = '$kategori')");
     return json_encode($query->result());
   }
 

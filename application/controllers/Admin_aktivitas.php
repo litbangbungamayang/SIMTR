@@ -124,17 +124,28 @@ class Admin_aktivitas extends CI_Controller{
               <form id="formAddAktivitas">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
-                    <div class="form-group" id="grNamaAktivitas">
-                      <label class="form-label">Nama Aktivitas</label>
-                      <input type="text" style="text-transform: uppercase;" class="form-control" id="nama_aktivitas" name="nama_aktivitas" placeholder="Nama Aktivitas">
-                      <div class="invalid-feedback" id="fbNamaAktivitas">Nama aktivitas belum diinput!</div>
-                    </div>
                     <div class="form-group" id="grTahunGiling">
                       <label class="form-label">Tahun Giling</label>
                       <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
                       '.$optionText.'
                       </select>
                       <div class="invalid-feedback">Tahun giling belum dipilih!</div>
+                    </div>
+                    <div class="form-group" id="grNamaAktivitas">
+                      <label class="form-label">Nama Aktivitas</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="nama_aktivitas" name="nama_aktivitas" placeholder="Nama Aktivitas">
+                      <div class="invalid-feedback" id="fbNamaAktivitas">Nama aktivitas belum diinput!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grKategori">
+                      <label class="form-label">Kategori khusus</label>
+                      <select name="kategori" id="kategori" class="custom-control custom-select" placeholder="Pilih kategori">
+                        <option value="PC">PC</option>
+                        <option value="RT">Ratoon</option>
+                        <option value="ALL">Semua</option>
+                      </select>
+                      <div class="invalid-feedback">Kategori belum dipilih!</div>
                     </div>
                     <div class="form-group" id="grBiaya">
                       <label class="form-label">Biaya per Hektar</label>
