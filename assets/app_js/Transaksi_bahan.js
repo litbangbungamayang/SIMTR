@@ -203,12 +203,6 @@ tblTransaksi.DataTable({
     {
       data: "tahun_giling",
       className: "text-center"
-    },
-    {data: "button",
-      render: function(data, type, row, meta){
-        return '<button type="button" onclick="lihatData('+row.id_vendor+')" class="btn btn-primary btn-sm" name="lihat_data" title="Lihat Data"><i class="fe fe-external-link"></i></button>'
-      },
-      className: "text-center"
     }
   ],
   initComplete: function(){

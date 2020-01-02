@@ -28,6 +28,27 @@ $("#tblTransPupuk").DataTable({
       className: "text-right"
     },
     {
+      data: "rupiah",
+      render: function(data, type, row, meta){
+        return "Rp " + parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
+      className: "text-right"
+    },
+    {
+      data: "biaya_muat",
+      render: function(data, type, row, meta){
+        return "Rp " + parseInt(row.kuanta*row.biaya_muat).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
+      className: "text-right"
+    },
+    {
+      data: "biaya_angkut",
+      render: function(data, type, row, meta){
+        return "Rp " + parseInt(row.kuanta*row.biaya_angkut).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
+      className: "text-right"
+    },
+    {
       data: "button",
       render: function(data, type, row, meta){
         return '<a class="btn btn-outline-primary btn-sm" id="cetakAu58" href="Transaksi_AU58?no_transaksi='+row.no_transaksi+'&id_kelompok='+row.id_kelompoktani+'"><i class="fe fe-printer"></i></a>'

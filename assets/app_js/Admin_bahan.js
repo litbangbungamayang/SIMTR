@@ -1,17 +1,45 @@
 $('#jenis_bahan').selectize({create: false, sortField: ''});
 $('#satuan').selectize({create: false, sortField: 'text'});
-$('#tahun_giling').selectize({create: false, sortField: 'text'});
 
 var namaBahan = $("#nama_bahan");
 var jenisBahan = $("#jenis_bahan");
 var dosisBahan = $("#dosis");
 var tahunGiling = $("#tahun_giling");
+var cbxRelasiAktivitas =$("#relasi_aktivitas");
 var satuan = $("#satuan");
 var tblBahan = $("#tblBahan");
 var formAddBahan = $("#formAddBahan");
 var dialogAddBahan = $("#dialogAddBahan");
 var btnTambahBahan = $("#btnTambahBahan");
 var edit = false;
+
+/*
+tahunGiling.on("change", function(){
+  if($(this).val() != ""){
+    console.log($(this).val());
+    loadAktivitas($(this).val());
+  }
+});
+*/
+
+function loadAktivitas(tahun_giling){
+  $.ajax({
+    url: js_base_url + "Admin_aktivitas/getAktivitasByTahunGiling",
+    type: "GET",
+    dataType: "json",
+    data: {
+      tahun_giling: tahun_giling
+    },
+    success: function(response){
+      $("#relasi_aktivitas").selectize();
+      $("#relasi_aktivitas").selectize()[0].selectize.clear();
+      $("#relasi_aktivitas").selectize()[0].selectize.clearOptions();
+      $("#relasi_aktivitas").selectize()[0].selectize.load(function(callback){
+        callback(response);
+      });
+    }
+  });
+}
 
 btnTambahBahan.on("click", function(){
     tahunGiling[0].selectize.enable();
@@ -181,6 +209,28 @@ $("#tblBahan").DataTable({
       }
     },
     {
+      data: "biaya_muat",
+      className: "text-right",
+      render: function(data, type, row, meta){
+        if(row.biaya_muat != null){
+          return "Rp " + parseInt(row.biaya_muat).toLocaleString({maximumFractionDigits: 0});
+        } else {
+          return "-";
+        }
+      }
+    },
+    {
+      data: "biaya_angkut",
+      className: "text-right",
+      render: function(data, type, row, meta){
+        if(row.biaya_angkut != null){
+          return "Rp " + parseInt(row.biaya_angkut).toLocaleString({maximumFractionDigits: 0});
+        } else {
+          return "-";
+        }
+      }
+    },
+    {
       data: "tahun_giling",
       className: "text-center"
     },
@@ -219,4 +269,21 @@ $("#tblBahan").DataTable({
   language: {
     "search": ""
   }
-})
+});
+
+$("#relasi_aktivitas").selectize({
+  valueField: "id_aktivitas",
+  labelField: "nama_aktivitas",
+  sortField: "nama_aktivitas",
+  searchField: "nama_aktivitas",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih jenis aktivitas",
+  options: []
+});
+
+$("#tahun_giling").selectize({
+  sortField: "text",
+  maxItems: 1,
+  create: false
+});

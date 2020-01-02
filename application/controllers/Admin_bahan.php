@@ -106,6 +106,8 @@ class Admin_bahan extends CI_Controller{
                         <th>Jenis Bahan</th>
                         <th>Satuan</th>
                         <th>Dosis per Ha.</th>
+                        <th>Biaya Muat</th>
+                        <th>Biaya Angkut</th>
                         <th>Tahun Giling</th>
                         <th class="text-center">Aksi</th>
                       </tr>
@@ -177,6 +179,20 @@ class Admin_bahan extends CI_Controller{
                       <label class="form-label">Dosis per Ha.</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="dosis" name="dosis" placeholder="Dosis Bahan">
                       <div class="invalid-feedback" id="fbNamaBahan">Dosis bahan belum diinput!</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group" id="grBiayaMuat">
+                      <label class="form-label">Biaya Muat-Bongkar (Rp per satuan)</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="biaya_muat" name="biaya_muat" placeholder="Biaya muat">
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group" id="grBiayaAngkut">
+                      <label class="form-label">Biaya Angkut (Rp per satuan)</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="biaya_angkut" name="biaya_angkut" placeholder="Biaya angkut">
                     </div>
                   </div>
                 </div>

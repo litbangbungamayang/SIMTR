@@ -57,13 +57,13 @@ class Transaksi_list extends CI_Controller{
         <div class="card">
           <div class="card-header">
             KELOMPOK '.$this->kelompok->nama_kelompok.'<br>'.$this->kelompok->no_kontrak.'<br>'.$kategori.' / '.$this->kelompok->mt.'
-            <br>'.$this->kelompok->nama_varietas.'<br>'.number_format($this->kelompok->luas, 2, ".", ",").' Ha
+            <br>'.$this->kelompok->nama_varietas.'<br>'.number_format($this->kelompok->luas, 2, ".", ",").' Ha / Desa '.$this->kelompok->nama_wilayah.'
           </div>
           <div class="card-body">
             <div class="col-md-12 col-lg-12">
               <div class="card card-collapsed" id="card_transPupuk">
                 <div class="card-status bg-green"></div>
-                <div class="card-header">
+                <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
                   <div class="card-title">Transaksi Permintaan Pupuk</div>
                   <div class="card-options">
                     <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
@@ -79,6 +79,9 @@ class Transaksi_list extends CI_Controller{
                           <th>Tgl. Transaksi</th>
                           <th>Jenis Pupuk</th>
                           <th>Kuanta</th>
+                          <th>Rupiah</th>
+                          <th>Biaya Muat</th>
+                          <th>Biaya Angkut</th>
                           <th>AU58</th>
                         </tr>
                       </thead>
@@ -90,7 +93,7 @@ class Transaksi_list extends CI_Controller{
             <div class="col-md-12 col-lg-12">
               <div class="card card-collapsed" id="card_tblTransaksi">
                 <div class="card-status bg-blue"></div>
-                <div class="card-header">
+                <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
                   <div class="card-title">Transaksi Perawatan</div>
                   <div class="card-options">
                     <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>

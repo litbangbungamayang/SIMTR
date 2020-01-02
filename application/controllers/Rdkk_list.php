@@ -299,7 +299,7 @@
                   <div class="col-md-12 col-lg-12">
                     <div class="card card-collapsed" id="card_tblPerawatan">
                       <div class="card-status bg-green"></div>
-                      <div class="card-header">
+                      <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
                         <div>Transaksi yang lalu</div>
                         <div class="card-options">
                           <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>

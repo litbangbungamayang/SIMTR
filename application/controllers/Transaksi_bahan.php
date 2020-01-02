@@ -86,7 +86,6 @@ class Transaksi_bahan extends CI_Controller{
                         <th class="text-center">Nilai</th>
                         <th class="text-center">Tanggal</th>
                         <th class="text-center">Tahun Giling</th>
-                        <th class="text-center"></th>
                       </tr>
                     </thead>
                   </table>
@@ -121,6 +120,7 @@ class Transaksi_bahan extends CI_Controller{
                     <div class="form-group" id="grTahunGiling">
                       <label class="form-label">Tahun Giling</label>
                       <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
+                        <option value="">Pilih tahun giling</option>
                       '.$optionText.'
                       </select>
                       <div class="invalid-feedback">Tahun giling belum dipilih!</div>

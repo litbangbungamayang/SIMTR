@@ -80,6 +80,8 @@ btnSimpanPermintaanPupuk.on("click", function(){
             arrayPermintaanPupukExisting = callback;
           });
           arrayPermintaanPupuk = [];
+          arrayPermintaanPupukMaks = [];
+          arrayPermintaanPupukExisting = [];
           refreshTablePermintaan();
           resetFeedbackAddPupuk();
         }
