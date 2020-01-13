@@ -106,9 +106,14 @@
     public function getArrayPermintaanPupuk(){
       $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
       date_default_timezone_set('Asia/Jakarta');
-      $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->id_bahan."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
+      $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
       $transPostData = array();
+      $biayaAngkutData = array();
+      $biayaMuatData = array();
       foreach($arrayPermintaanPupuk as $permintaanPupuk){
+        $stokBahan = json_decode($this->transaksi_model->cekStokBahanByIdBahan($permintaanPupuk->id_bahan));
+        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPupuk->id_kelompok));
+        $bahan = json_decode($this->bahan_model->getBahanById($permintaanPupuk->id_bahan));
         $postData = array(
           "id_bahan" => $permintaanPupuk->id_bahan,
           "id_aktivitas" => 0,
@@ -121,14 +126,37 @@
           "tahun_giling" => $permintaanPupuk->tahun_giling,
           "catatan" => NULL
         );
-        $stokBahan = json_decode($this->transaksi_model->cekStokBahanByIdBahan($permintaanPupuk->id_bahan));
-        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPupuk->id_kelompok));
-        $bahan = json_decode($this->bahan_model->getBahanById($permintaanPupuk->id_bahan));
+        $biayaAngkut = array(
+          "id_bahan" => $permintaanPupuk->id_bahan,
+          "id_aktivitas" => 0,
+          "id_kelompoktani" => $permintaanPupuk->id_kelompok,
+          "id_vendor" => 0,
+          "kode_transaksi" => $permintaanPupuk->kode_transaksi,
+          "kuanta_bahan" => 0,
+          "rupiah_bahan" => $permintaanPupuk->kuanta * $bahan->biaya_angkut,
+          "no_transaksi" => $no_transaksi,
+          "tahun_giling" => $permintaanPupuk->tahun_giling,
+          "catatan" => "BIAYA ANGKUT TRANSAKSI NOMOR $no_transaksi"
+        );
+        $biayaMuat = array(
+          "id_bahan" => $permintaanPupuk->id_bahan,
+          "id_aktivitas" => 0,
+          "id_kelompoktani" => $permintaanPupuk->id_kelompok,
+          "id_vendor" => 0,
+          "kode_transaksi" => $permintaanPupuk->kode_transaksi,
+          "kuanta_bahan" => 0,
+          "rupiah_bahan" => $permintaanPupuk->kuanta * $bahan->biaya_muat,
+          "no_transaksi" => $no_transaksi,
+          "tahun_giling" => $permintaanPupuk->tahun_giling,
+          "catatan" => "BIAYA MUAT TRANSAKSI NOMOR $no_transaksi"
+        );
         $maksRequest = round(($bahan->dosis_per_ha * $kelompok->luas)/50)*50;
         $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokIdBahan($permintaanPupuk->id_kelompok, $permintaanPupuk->id_bahan))->kuanta;
         if ($stokBahan[0]->total_kuanta >= $permintaanPupuk->kuanta){
           if ($permintaanPupuk->kuanta <= ($maksRequest - $transaksiYll)){
               $transPostData[] = $postData;
+              $biayaAngkutData[] = $biayaAngkut;
+              $biayaMuatData[] = $biayaMuat;
           } else {
             echo "Permintaan pupuk $permintaanPupuk->nama_bahan sudah melebihi dosis yang ditetapkan! \r\nDiminta : ".number_format($permintaanPupuk->kuanta, 0, ".", ",")." ".$permintaanPupuk->satuan
             ."\r\nTransaksi sebelumnya : ".number_format($transaksiYll, 0, ".", ",")." ".$permintaanPupuk->satuan
@@ -142,6 +170,12 @@
       $this->db->trans_begin();
       foreach($transPostData as $postData){
         $this->transaksi_model->simpan($postData);
+      }
+      foreach($biayaAngkutData as $biayaAngkut){
+        $this->transaksi_model->simpan($biayaAngkut);
+      }
+      foreach($biayaMuatData as $biayaMuat){
+        $this->transaksi_model->simpan($biayaMuat);
       }
       if($this->db->trans_status()){
         $this->db->trans_commit();

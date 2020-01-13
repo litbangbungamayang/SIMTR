@@ -9,7 +9,7 @@
             <a href="<? echo base_url('') ?>" class="nav-link <? echo $this->uri->segment(1) == '' ? 'active' : '' ?>"><i class="fe fe-home"></i> Home</a>
           </li>
           <li class="nav-item dropdown" style="display: ">
-            <a href="javascript:void(0)" class="nav-link <? echo ($this->uri->segment(1) == 'rdkk_add')||($this->uri->segment(1) == 'rdkk_all') ? 'active' : '' ?>" data-toggle="dropdown"><i class="fe fe-book-open"></i> Petak Kebun</a>
+            <a href="javascript:void(0)" class="nav-link <? echo ($this->uri->segment(1) == 'rdkk_add')||($this->uri->segment(1) == 'rdkk_all') ? 'active' : '' ?>" data-toggle="dropdown"><i class="fe fe-book-open"></i> Data Kelompok Tani</a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/rdkk_add')?>" class="dropdown-item " style="<? echo ($this->session->userdata('afd') == '') ? 'display:none' : ''; ?>"><i class="fe fe-search"></i> Pendaftaran RDKK</a>
               <a href="<? echo site_url('/rdkk_all')?>" class="dropdown-item "><i class="fe fe-edit"></i> Penelusuran Data</a>

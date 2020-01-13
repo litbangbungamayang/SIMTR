@@ -58,7 +58,7 @@ class Transaksi_model extends CI_Model{
       join tbl_simtr_transaksi TRANS on TRANS.id_kelompoktani = KT.id_kelompok
       join tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
       join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
-      where TRANS.no_transaksi = '$no_transaksi'
+      where TRANS.no_transaksi = '$no_transaksi' and TRANS.kuanta > 0
       group by TRANS.id_transaksi";
       return json_encode($this->db->query($query)->result());
   }
@@ -113,7 +113,7 @@ class Transaksi_model extends CI_Model{
       TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, BAHAN.biaya_muat, BAHAN.biaya_angkut
     from tbl_simtr_transaksi TRANS
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
-    where TRANS.id_kelompoktani = $id_kelompok and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK'
+    where TRANS.id_kelompoktani = $id_kelompok and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK' and TRANS.kuanta > 0
     ";
     return json_encode($this->db->query($query)->result());
   }

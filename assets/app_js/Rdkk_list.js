@@ -76,12 +76,11 @@ btnSimpanPermintaanPupuk.on("click", function(){
       success: function(response){
         alert(response);
         if (response = "Data pengajuan telah tersimpan!"){
-          $("#tblPupuk").DataTable().ajax.url(js_base_url + "Transaksi_bahan/getTransaksiKeluarByIdKelompok?id_kelompok=" + selectedKelompok.id_kelompok).load(function(callback){
-            arrayPermintaanPupukExisting = callback;
-          });
+          $("#tblPupuk").DataTable().ajax.url(js_base_url + "Transaksi_bahan/getTransaksiKeluarByIdKelompok?id_kelompok=" + selectedKelompok.id_kelompok).load();
           arrayPermintaanPupuk = [];
           arrayPermintaanPupukMaks = [];
-          arrayPermintaanPupukExisting = [];
+          console.log("Limit After insert :");
+          console.log(arrayPermintaanPupukMaks);
           refreshTablePermintaan();
           resetFeedbackAddPupuk();
         }
