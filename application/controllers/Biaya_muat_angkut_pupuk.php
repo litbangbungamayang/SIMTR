@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Pemakaian_pupuk extends CI_Controller{
+class Biaya_muat_angkut_pupuk extends CI_Controller{
   public function __construct(){
     parent:: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
@@ -18,7 +18,7 @@ class Pemakaian_pupuk extends CI_Controller{
     if ($this->session->userdata('id_user') == false){
       redirect('login');
     } else {
-      $data['pageTitle'] = "Rekap Pemakaian Pupuk Kelompok Tani";
+      $data['pageTitle'] = "Pengajuan Biaya Muat & Angkut";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
@@ -26,11 +26,15 @@ class Pemakaian_pupuk extends CI_Controller{
   }
 
   public function loadScript(){
-    return '$.getScript("'.base_url("/assets/app_js/Rekap_pupuk.js").'");';
+    return '$.getScript("'.base_url("/assets/app_js/Biaya_muat_angkut_pupuk.js").'");';
   }
 
   public function getAllData(){
-    
+    $this->transaksi_model->getAllTransaksi();
+  }
+
+  public function getTransaksiBahanByIdKelompokNamaBahanPeriode(){
+    echo $this->transaksi_model->getTransaksiBahanByIdKelompokNamaBahanPeriode();
   }
 
   public function loadContent(){

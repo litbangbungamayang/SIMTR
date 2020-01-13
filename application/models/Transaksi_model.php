@@ -175,6 +175,7 @@ class Transaksi_model extends CI_Model{
     $this->rupiah = $post["rupiah_bahan"];
     $this->catatan = strtoupper($post["catatan"]);
     $this->tahun_giling = $post["tahun_giling"];
+    $this->id_user = $this->session->userdata('id_user');
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -187,6 +188,24 @@ class Transaksi_model extends CI_Model{
       (select sum(kuanta) as jml_kuanta, sum(rupiah) as jml_rupiah from tbl_simtr_transaksi
         where kode_transaksi = 1 and id_bahan = $id_bahan) total
     ";
+    return json_encode($this->db->query($query)->result());
+  }
+
+  public function getTransaksiBahanByIdKelompokNamaBahanPeriode($id_kelompok = null, $nama_bahan = null){
+    if(is_null($id_kelompok) || is_null($nama_bahan)){
+      $id_kelompok = $this->input->get("id_kelompok");
+      $nama_bahan = $this->input->get("nama_bahan");
+    }
+    $query =
+    "select
+      TRANS.id_transaksi, TRANS.id_bahan, TRANS.id_kelompoktani, TRANS.no_transaksi,
+      TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, TRANS.tahun_giling, BHN.tahun_giling,
+      BHN.satuan
+    from tbl_simtr_transaksi TRANS
+    join tbl_simtr_bahan BHN on BHN.id_bahan = TRANS.id_bahan
+    where BHN.nama_bahan = '".$nama_bahan."' and BHN.tahun_giling = TRANS.tahun_giling and
+      TRANS.id_kelompoktani = $id_kelompok and TRANS.tgl_transaksi >= '2020-01-01' and
+    	TRANS.tgl_transaksi <= '2020-01-15'";
     return json_encode($this->db->query($query)->result());
   }
 
