@@ -28,6 +28,15 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->select("*")->from($this->_table)->where("id_aktivitas", $id_aktivitas)->get()->result());
   }
 
+  public function postPbma($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
+    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
+      $query =
+      "update tbl_simtr_transaksi set id_pbma=? where tgl_transaksi >= ? and tgl_transaksi <= ?
+      and kode_transaksi = 2 and kuanta = 0 and id_bahan <> 0 and rupiah <> 0 and catatan like 'BIAYA%'";
+      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
+    }
+  }
+
   public function getTransaksiMasukByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
     $query =
@@ -200,12 +209,59 @@ class Transaksi_model extends CI_Model{
     "select
       TRANS.id_transaksi, TRANS.id_bahan, TRANS.id_kelompoktani, TRANS.no_transaksi,
       TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, TRANS.tahun_giling, BHN.tahun_giling,
-      BHN.satuan
+      BHN.satuan, BHN.biaya_muat, BHN.biaya_angkut
     from tbl_simtr_transaksi TRANS
     join tbl_simtr_bahan BHN on BHN.id_bahan = TRANS.id_bahan
     where BHN.nama_bahan = '".$nama_bahan."' and BHN.tahun_giling = TRANS.tahun_giling and
       TRANS.id_kelompoktani = $id_kelompok and TRANS.tgl_transaksi >= '2020-01-01' and
     	TRANS.tgl_transaksi <= '2020-01-15'";
+    return json_encode($this->db->query($query)->result());
+  }
+
+  public function getRekapMuatAngkutPupuk($tgl_awal = null, $tgl_akhir = null, $tahun_giling = null){
+    if(is_null($tgl_awal) || is_null($tgl_akhir) || is_null($tahun_giling)){
+      $tgl_awal = $this->input->get("tgl_awal");
+      $tgl_akhir = $this->input->get("tgl_akhir");
+      $tahun_giling = $this->input->get("tahun_giling");
+    }
+    $query =
+    "
+    select
+    	TRANS.id_transaksi, TRANS.id_bahan, TRANS.id_kelompoktani, TRANS.no_transaksi,
+    	sum(TRANS.kuanta) as total_pupuk, TRANS.rupiah, TRANS.tgl_transaksi, TRANS.tahun_giling,
+    	BHN.satuan,
+      TRANS.kuanta*BHN.biaya_muat as biaya_muat,
+      TRANS.kuanta*BHN.biaya_angkut as biaya_angkut
+    from tbl_simtr_transaksi TRANS
+    join tbl_simtr_bahan BHN on BHN.id_bahan = TRANS.id_bahan
+    where BHN.tahun_giling = TRANS.tahun_giling and
+    	TRANS.tgl_transaksi >= '$tgl_awal' and
+    	TRANS.tgl_transaksi <= '$tgl_akhir' and
+      TRANS.tahun_giling like '%$tahun_giling%' and TRANS.kuanta > 0
+    group by TRANS.id_kelompoktani
+    ";
+    return json_encode($this->db->query($query)->result());
+  }
+
+  public function getRekapPupukByNamaBahan($tgl_awal = null, $tgl_akhir = null, $nama_bahan = null, $id_kelompok = null){
+    if(is_null($id_kelompok) || is_null($tgl_awal) || is_null($tgl_akhir) || is_null($nama_bahan)){
+      $id_kelompok = $this->input->get("id_kelompok");
+      $tgl_awal = $this->input->get("tgl_awal");
+      $tgl_akhir = $this->input->get("tgl_akhir");
+      $nama_bahan = $this->input->get("nama_bahan");
+    }
+    $query =
+    "select
+      TRANS.id_transaksi, TRANS.id_bahan, TRANS.id_kelompoktani, TRANS.no_transaksi,
+      TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, TRANS.tahun_giling, BHN.tahun_giling,
+      BHN.satuan, BHN.biaya_muat, BHN.biaya_angkut
+    from tbl_simtr_transaksi TRANS
+    join tbl_simtr_bahan BHN on BHN.id_bahan = TRANS.id_bahan
+    where BHN.nama_bahan = '".$nama_bahan."' and
+      TRANS.id_kelompoktani = $id_kelompok and
+      TRANS.tgl_transaksi >= '$tgl_awal' and
+    	TRANS.tgl_transaksi <= '$tgl_akhir'
+    ";
     return json_encode($this->db->query($query)->result());
   }
 
@@ -219,6 +275,82 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_vendor VENDOR on VENDOR.id_vendor = INV.id_vendor
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
     where INV.kode_transaksi = ".$kode_transaksi;
+    return json_encode($this->db->query($query)->result());
+  }
+
+  public function getRekapBiayaMuatAngkutPupuk($tgl_awal = null, $tgl_akhir = null, $tahun_giling = null){
+    $afdeling = $this->session->userdata('afd');
+    if(is_null($tgl_awal) || is_null($tgl_akhir) || is_null($tahun_giling)){
+      $tgl_awal = $this->input->get("tgl_awal");
+      $tgl_akhir = $this->input->get("tgl_akhir");
+      $tahun_giling = $this->input->get("tahun_giling");
+    }
+    $query =
+    "
+    select
+    	trans.id_kelompoktani,
+      if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
+      kt.no_kontrak,
+      kt.tahun_giling,
+      wil.nama_wilayah,
+      date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
+      ( select
+  			SUM(PT.luas) as luas
+  		FROM tbl_simtr_kelompoktani kt
+  			JOIN tbl_simtr_petani PT on PT.id_kelompok = kt.id_kelompok
+  		WHERE EXISTS
+    			(SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+    		and kt.id_kelompok = trans.id_kelompoktani
+    		group by kt.id_kelompok
+    	) as luas,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'UREA'
+    	) as urea,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'KCL'
+    	) as kcl,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'TSP'
+    	) as tsp,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and trans_2.kuanta > 0
+    	) as jml,
+        ( select sum(rupiah) as rupiah
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA MUAT%'
+    	) as biaya_muat,
+      ( select sum(rupiah) as rupiah
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA ANGKUT%'
+    	) as biaya_angkut,
+      ( select sum(rupiah) as total_biaya
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA%'
+    	) as total_biaya
+    from tbl_simtr_transaksi trans
+    join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
+    join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    where trans.kode_transaksi = 2 and trans.tgl_transaksi >= '$tgl_awal'
+    and trans.tgl_transaksi <= '$tgl_akhir' and trans.tahun_giling like '%$tahun_giling%'
+    and trans.id_pbma is null and kt.no_kontrak like '$afdeling-%' and trans.id_bahan <> 0
+	  and kuanta = 0
+    group by wil.nama_wilayah, trans.id_kelompoktani
+    ";
     return json_encode($this->db->query($query)->result());
   }
 

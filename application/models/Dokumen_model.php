@@ -9,20 +9,9 @@ class Dokumen_model extends CI_Model{
   public $id_dokumen;
   public $no_dokumen;
   public $tipe_dokumen;
-  public $id_bagian;
-  public $id_subbagian;
-  public $tgl_dokumen;
-  public $kode_rekening;
   public $id_user;
   public $tgl_buat;
   public $tgl_validasi_bagian;
-  public $tgl_validasi_tuk;
-  public $tbl_validasi_gm;
-  public $tgl_terima_tuk;
-  public $tgl_terima_gm;
-  public $tgl_reject_tuk;
-  public $tgl_reject_gm;
-  public $keterangan;
 
   public function rules(){
     return [
@@ -60,19 +49,18 @@ class Dokumen_model extends CI_Model{
     return $this->db->get_where($this->_table, ["id_subbagian" => $id_subbagian])->row();
   }
 
-  public function simpan(){
-    $post = $this->input->post();
-    $this->no_dokumen = $post["no_dokumen"];
-    $this->tipe_dokumen = $post["tipe_dokumen"];
-    $this->id_bagian = $post["id_bagian"];
-    $this->id_subbagian = $post["id_subbagian"];
-    $this->tgl_dokumen = $post["tgl_dokumen"];
-    $this->kode_rekening = $post["kode_rekening"];
-    $this->id_user = $post["id_user"];
-    $this->tgl_buat = date('Y-m-d H:i:s');
-    $this->keterangan = $post["keterangan"];
+  public function simpan($tipe_dokumen = null){
+    if(is_null($tipe_dokumen)){
+      $post = $this->input->post();
+      $tipe_dokumen = $post["tipe_dokumen"];
+    }
+    $this->tipe_dokumen = $tipe_dokumen;
+    $this->id_user = $this->session->userdata('id_user');
     $this->db->insert($this->_table, $this);
-    return $this->db->insert_id();
+    $last_id = $this->db->insert_id();
+    $nomor_dokumen = $tipe_dokumen."-".$last_id;
+    $this->db->set('no_dokumen', $nomor_dokumen)->where('id_dokumen', $last_id)->update($this->_table);
+    return $last_id;
   }
 
   public function update(){

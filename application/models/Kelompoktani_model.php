@@ -110,6 +110,24 @@ class Kelompoktani_model extends CI_Model{
     ")->result());
   }
 
+  public function getAllKelompokOrderDesa(){
+    $afdeling = $this->session->userdata('afd');
+    if (empty($afdeling))$afdeling = "%";
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.no_kontrak LIKE '".$afdeling."-%'
+      GROUP BY KT.id_kelompok, WIL.nama_wilayah
+    ")->result());
+  }
+
   public function getKelompokByTahun(){
     $afdeling = $this->session->userdata('afd');
     if (empty($afdeling))$afdeling = "%";

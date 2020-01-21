@@ -39,6 +39,8 @@ class Bahan_model extends CI_Model{
     $this->satuan = $post["satuan"];
     $this->dosis_per_ha = $post["dosis"];
     $this->tahun_giling = $post["tahun_giling"];
+    $this->biaya_muat = $post["biaya_muat"];
+    $this->biaya_angkut = $post["biaya_angkut"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }

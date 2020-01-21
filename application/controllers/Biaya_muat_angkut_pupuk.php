@@ -8,6 +8,7 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
     $this->load->model("transaksi_model");
     $this->load->model("aktivitas_model");
     $this->load->model("bahan_model");
+    $this->load->model("dokumen_model");
     $this->load->helper('url');
     $this->load->helper('form');
     $this->load->helper('html');
@@ -18,7 +19,7 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
     if ($this->session->userdata('id_user') == false){
       redirect('login');
     } else {
-      $data['pageTitle'] = "Pengajuan Biaya Muat & Angkut";
+      $data['pageTitle'] = "Pengajuan Biaya Muat & Angkut Pupuk";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
@@ -29,6 +30,15 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/Biaya_muat_angkut_pupuk.js").'");';
   }
 
+  public function buatPbma(){
+    $post = $this->input->post();
+    $tgl_awal = $post["tgl_awal"];
+    $tgl_akhir = $post["tgl_akhir"];
+    $tipe_dokumen = $post["tipe_dokumen"];
+    $id_dokumen =  $this->dokumen_model->simpan($tipe_dokumen);
+    echo $this->transaksi_model->postPbma($id_dokumen, $tgl_awal, $tgl_akhir);
+  }
+
   public function getAllData(){
     $this->transaksi_model->getAllTransaksi();
   }
@@ -37,7 +47,12 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
     echo $this->transaksi_model->getTransaksiBahanByIdKelompokNamaBahanPeriode();
   }
 
+  public function getRekapBiayaMuatAngkutPupuk(){
+    echo $this->transaksi_model->getRekapBiayaMuatAngkutPupuk();
+  }
+
   public function loadContent(){
+    // <table id="tblListPupuk" class="table card-table table-vcenter text-nowrap datatable table-sm">
     $container =
     '
     <div class="page">
@@ -45,26 +60,50 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
         <div class="card">
           <div class="card-body">
             <div class="row">
-              <div class="table-responsive col-md-12">
-                <table id="tblListPupuk" class="table card-table table-vcenter text-nowrap datatable table-lg">
+              <div class="table-responsive col-12">
+                <table id="tblListPupuk" class="table table-responsive table-striped table-sm text-nowrap compact">
                   <thead>
                     <tr>
                       <th class="w-1">No.</th>
                       <th>Nama Kelompok</th>
                       <th>No. Kontrak</th>
-                      <th>Tahun Giling</th>
                       <th>Desa</th>
-                      <th>MT</th>
-                      <th>Varietas</th>
+                      <th>Tgl. Transaksi</th>
                       <th>Luas</th>
-                      <th>Pupuk Urea</th>
-                      <th>Pupuk TSP</th>
-                      <th>Pupuk KCL</th>
+                      <th>Urea</th>
+                      <th>TSP</th>
+                      <th>KCL</th>
+                      <th>Jml. Pupuk</th>
+                      <th>Biaya Muat</th>
+                      <th>Biaya Angkut</th>
+                      <th>Total Biaya</th>
                     </tr>
                   </thead>
                   <tbody>
                   </tbody>
+                  <tfoot class="bg-dark">
+                    <tr>
+                      <th class="w-1"></th>
+                      <th><font color="white" size="3">TOTAL</font></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </tfoot>
                 </table>
+              </div>
+              <div class="col-12">
+                <div class="text-right">
+                    <button id="btnBuatPBMA" type="button" style="margin-right: 30px; width: 200px;" class="btn btn-outline-primary">Buat Pengajuan Biaya</button>
+                </div>
               </div>
             </div>
           </div>

@@ -5,6 +5,8 @@ var namaBahan = $("#nama_bahan");
 var jenisBahan = $("#jenis_bahan");
 var dosisBahan = $("#dosis");
 var tahunGiling = $("#tahun_giling");
+var biaya_angkut = $("#biaya_angkut");
+var biaya_muat = $("#biaya_muat");
 var cbxRelasiAktivitas =$("#relasi_aktivitas");
 var satuan = $("#satuan");
 var tblBahan = $("#tblBahan");
@@ -127,7 +129,9 @@ function simpanEditData(id){
         jenis_bahan: jenisBahan.val(),
         satuan: satuan.val(),
         dosis: dosisBahan.val(),
-        tahun_giling: tahunGiling.val()
+        tahun_giling: tahunGiling.val(),
+        biaya_angkut: biaya_angkut.val(),
+        biaya_muat: biaya_muat.val()
       },
       success: function(data){
         namaBahan.val("");
@@ -135,6 +139,8 @@ function simpanEditData(id){
         satuan[0].selectize.clear();
         tahunGiling[0].selectize.clear();
         dosisBahan.val("");
+        biaya_angkut.val("");
+        biaya_muat.val("");
         tblBahan.DataTable().ajax.reload();
         edit = false;
         dialogAddBahan.modal("toggle");
@@ -171,6 +177,8 @@ $("#btnSimpanBahan").on("click", function(){
         satuan[0].selectize.clear();
         tahunGiling[0].selectize.clear();
         dosisBahan.val("");
+        biaya_angkut.val("");
+        biaya_muat.val("");
         tblBahan.DataTable().ajax.reload();
       },
       error: function(textStatus){

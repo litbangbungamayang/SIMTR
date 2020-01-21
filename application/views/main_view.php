@@ -38,7 +38,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             ?>
           </div>
           <script>
-            require(['jquery','datatables', 'selectize'], function () {
+            require(['jquery','datatables', 'selectize', 'datepicker'], function () {
 
             	$(document).ready(function () {
                 <?
