@@ -53,7 +53,8 @@ class Aktivitas_model extends CI_Model{
     $tstr = "TR";
     //return json_encode($this->db->query("select * from tbl_aktivitas where tahun_giling = $tahun_giling and tstr = '".$tstr."'")->result());
     //$query = $this->db->select("*")->from($this->_table)->where("tstr", $tstr)->where("tahun_giling", $tahun_giling)->get();
-    $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = $tahun_giling and tstr = '$tstr' and (kategori = 'ALL' or kategori = '$kategori')");
+    $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = ?
+      and tstr = ? and (kategori = 'ALL' or kategori = ?)", array($tahun_giling, $tstr, $kategori));
     return json_encode($query->result());
   }
 

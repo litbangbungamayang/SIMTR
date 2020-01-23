@@ -12,6 +12,7 @@ class Dokumen_model extends CI_Model{
   public $id_user;
   public $tgl_buat;
   public $tgl_validasi_bagian;
+  public $catatan;
 
   public function rules(){
     return [
@@ -49,12 +50,14 @@ class Dokumen_model extends CI_Model{
     return $this->db->get_where($this->_table, ["id_subbagian" => $id_subbagian])->row();
   }
 
-  public function simpan($tipe_dokumen = null){
-    if(is_null($tipe_dokumen)){
+  public function simpan($tipe_dokumen = null, $catatan = null){
+    if(is_null($tipe_dokumen) || is_null($catatan)){
       $post = $this->input->post();
       $tipe_dokumen = $post["tipe_dokumen"];
+      $catatan = $post["catatan"];
     }
     $this->tipe_dokumen = $tipe_dokumen;
+    $this->catatan = $catatan;
     $this->id_user = $this->session->userdata('id_user');
     $this->db->insert($this->_table, $this);
     $last_id = $this->db->insert_id();

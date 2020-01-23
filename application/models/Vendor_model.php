@@ -39,7 +39,7 @@ class Vendor_model extends CI_Model{
 
   public function getVendorById(){
     $id = $this->input->get("id_vendor");
-    return json_encode($this->db->query("select * from tbl_simtr_vendor where id_vendor = $id")->row());
+    return json_encode($this->db->query("select * from tbl_simtr_vendor where id_vendor = ?", array($id))->row());
   }
 
   public function hapus($id_vendor = null){

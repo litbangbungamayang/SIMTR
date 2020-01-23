@@ -18,6 +18,8 @@ class Kelompoktani_model extends CI_Model{
   public $scan_ktp;
   public $scan_kk;
   public $scan_surat;
+  public $id_user;
+  public $id_afd;
 
   public function rules(){
     return [
@@ -82,10 +84,13 @@ class Kelompoktani_model extends CI_Model{
     $this->scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
     $this->scan_kk = file_get_contents($_FILES["scanKk"]["tmp_name"]);
     $this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
+    $afdeling = $this->session->userdata('afd');
+    $id_user = $this->session->userdata('id_user');
+    $this->id_user = $id_user;
+    $this->id_afd = $afdeling;
     //$this->db->trans_begin();
     $this->db->insert($this->_table, $this);
     $lastId = $this->db->insert_id();
-    $afdeling = $this->session->userdata('afd');
     $tahun_giling = substr($this->tahun_giling,2);
     $noKontrak = $afdeling."-".$this->kategori.$tahun_giling."-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
     $this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
@@ -105,9 +110,9 @@ class Kelompoktani_model extends CI_Model{
         JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
         WHERE EXISTS
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
-        AND KT.no_kontrak LIKE '".$afdeling."-%'
+        AND KT.no_kontrak LIKE CONCAT(?,'-%')
       GROUP BY KT.id_kelompok
-    ")->result());
+    ", array($afdeling))->result());
   }
 
   public function getAllKelompokOrderDesa(){
@@ -123,9 +128,9 @@ class Kelompoktani_model extends CI_Model{
         JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
         WHERE EXISTS
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
-        AND KT.no_kontrak LIKE '".$afdeling."-%'
+        AND KT.no_kontrak LIKE CONCAT(?,'-%')
       GROUP BY KT.id_kelompok, WIL.nama_wilayah
-    ")->result());
+    ", array($afdeling))->result());
   }
 
   public function getKelompokByTahun(){
@@ -142,9 +147,9 @@ class Kelompoktani_model extends CI_Model{
         JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
         WHERE EXISTS
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
-        AND KT.no_kontrak LIKE '".$afdeling."-%' AND KT.tahun_giling = $tahun_giling
+        AND KT.no_kontrak LIKE CONCAT(?,'-%') AND KT.tahun_giling = ?
       GROUP BY KT.id_kelompok
-    ")->result());
+    ", array($afdeling, $tahun_giling))->result());
   }
 
   public function getKelompokById($id_kelompok = null){
@@ -159,9 +164,9 @@ class Kelompoktani_model extends CI_Model{
         JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
         WHERE EXISTS
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
-        AND KT.id_kelompok = $id_kelompok
+        AND KT.id_kelompok = ?
       GROUP BY KT.id_kelompok
-    ")->row());
+    ", array($id_kelompok))->row());
   }
 
   public function ubah(){
@@ -178,10 +183,4 @@ class Kelompoktani_model extends CI_Model{
     $this->scan_surat = $post["scan_surat"];
     $this->db->update($this->_table, array('id_kelompok' => $post["id_kelompok"]));
   }
-
-  public function hapus(){
-    //return $this->db->delete($this->_table, array('id_kelompok' => $post["id_kelompok"]));
-
-  }
-
 }

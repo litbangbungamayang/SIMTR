@@ -18,7 +18,8 @@
           <li class="nav-item dropdown">
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-sunset"></i> Pupuk</a>
             <div class="dropdown-menu dropdown-menu-arrow">
-              <a href="<? echo site_url('/biaya_muat_angkut_pupuk')?>" class="dropdown-item "><i class="fe fe-sunset"></i> Pengajuan Biaya Muat & Angkut</a>
+              <a href="<? echo site_url('/biaya_muat_angkut_pupuk')?>" class="dropdown-item "><i class="fe fe-sunset"></i> Pengajuan Biaya Muat & Angkut Pupuk</a>
+              <a href="<? echo site_url('/list_pbma')?>" class="dropdown-item "><i class="fe fe-sunset"></i> Penelusuran BMA-P</a>
             </div>
           </li>
           <li class="nav-item dropdown">

@@ -76,8 +76,8 @@ class Bahan_model extends CI_Model{
   public function getBahanById($id_bahan = null){
     if (is_null($id_bahan)) $id_bahan = $this->input->get("idBahan");
     return json_encode($this->db->query("
-      SELECT * FROM tbl_simtr_bahan WHERE id_bahan = $id_bahan
-    ")->row());
+      SELECT * FROM tbl_simtr_bahan WHERE id_bahan = ?
+    ", array($id_bahan))->row());
   }
 
   public function getBahanByJenis(){

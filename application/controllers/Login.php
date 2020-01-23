@@ -28,8 +28,10 @@ class Login extends CI_Controller {
       $loggedUser = $user->login($uname,$hashedPwd);
       if ($loggedUser !== NULL){
         $nama_afd = $afd->getAfdByIdUser($loggedUser->id_user)->nama_afd;
+        $id_afd = $this->afd_model->getAfdByIdUser($loggedUser->id_user)->id_afd;
         $this->session->set_userdata((array) $loggedUser);
         $this->session->set_userdata('afd',$nama_afd);
+        $this->session->set_userdata('id_afd', $id_afd);
       } else {
 
       }
