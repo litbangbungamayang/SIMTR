@@ -1,4 +1,39 @@
 
+function approve(id_dokumen){
+  $.ajax({
+    url: js_base_url + "List_pbma/validasiDokumen",
+    dataType: "text",
+    type: "POST",
+    data: "id_dokumen=" + id_dokumen,
+    success: function(response){
+      if (response = "SUCCESS"){
+        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+        $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+        alert("Dokumen berhasil divalidasi!");
+      }
+    }
+  });
+}
+
+function cancel(id_dokumen){
+  if(confirm("Anda yakin akan membatalkan dokumen ini?")){
+    $.ajax({
+      url: js_base_url + "List_pbma/batalkanDokumen",
+      dataType: "text",
+      type: "POST",
+      data: "id_dokumen=" + id_dokumen,
+      success: function(response){
+        if (response = "SUCCESS"){
+          tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+          $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+          alert("Dokumen berhasil dibatalkan!");
+        }
+      }
+    });
+  }
+}
+
+
 $("#tblListPbma").DataTable({
   bFilter: false,
   bPaginate: false,
@@ -47,9 +82,9 @@ $("#tblListPbma").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<button style="width: 80px" type="button" class="btn btn-sm btn-gray">Lihat Detail</button> ';
-        var buttonApproval = '<button style="width: 80px" type="button" class="btn btn-sm btn-primary">Setuju</button> ' +
-        '<button style="width: 80px" type="button" class="btn btn-sm btn-red">Batal</button>';
+        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbma?id_pbma=' + row.id_dokumen + '">Lihat Detail</a> ';
+        var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ' +
+        '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
         if(row.priv_level == "Asisten Bagian"){
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;

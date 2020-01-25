@@ -79,7 +79,7 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
                       <th>Total Biaya</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="h6 small">
                   </tbody>
                   <tfoot class="bg-dark">
                     <tr>

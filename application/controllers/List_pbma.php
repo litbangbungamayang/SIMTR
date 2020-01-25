@@ -34,6 +34,18 @@ class List_pbma extends CI_Controller{
     echo $this->transaksi_model->getAllPbma();
   }
 
+  public function getDesaByIdPbma($id_pbma = null){
+      echo $this->transaksi_model->getDesaByIdPbma($id_pbma);
+  }
+
+  public function validasiDokumen(){
+    $this->dokumen_model->validasi();
+  }
+
+  public function batalkanDokumen(){
+    $this->dokumen_model->batalkan();
+  }
+
   public function loadContent(){
     // <table id="tblListPupuk" class="table card-table table-vcenter text-nowrap datatable table-sm">
     $container =

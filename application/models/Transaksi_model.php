@@ -355,6 +355,80 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($tgl_awal, $tgl_akhir, $tahun_giling, $afdeling))->result());
   }
 
+  public function detailPbma(){
+    $id_pbma = $this->input->get("id_pbma");
+    $query =
+    "
+    select
+      dok.no_dokumen,
+      dok.tgl_buat,
+      dok.tgl_validasi_bagian,
+      dok.catatan,
+      trans.id_pbma,
+    	trans.id_kelompoktani,
+      if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
+      kt.no_kontrak,
+      kt.tahun_giling,
+      wil.nama_wilayah,
+      date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
+      ( select
+  			SUM(PT.luas) as luas
+  		FROM tbl_simtr_kelompoktani kt
+  			JOIN tbl_simtr_petani PT on PT.id_kelompok = kt.id_kelompok
+  		WHERE EXISTS
+    			(SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+    		and kt.id_kelompok = trans.id_kelompoktani
+    		group by kt.id_kelompok
+    	) as luas,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'UREA'
+    	) as urea,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'KCL'
+    	) as kcl,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and bhn.nama_bahan = 'TSP'
+    	) as tsp,
+      ( select sum(kuanta)
+    		from tbl_simtr_transaksi trans_2
+            join tbl_simtr_bahan bhn on trans_2.id_bahan = bhn.id_bahan
+            where trans_2.id_kelompoktani = trans.id_kelompoktani
+            and trans_2.kuanta > 0
+    	) as jml,
+        ( select sum(rupiah) as rupiah
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA MUAT%'
+    	) as biaya_muat,
+      ( select sum(rupiah) as rupiah
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA ANGKUT%'
+    	) as biaya_angkut,
+      ( select sum(rupiah) as total_biaya
+    		from tbl_simtr_transaksi
+            where id_kelompoktani = trans.id_kelompoktani
+            and catatan like '%BIAYA%'
+    	) as total_biaya
+    from tbl_simtr_transaksi trans
+    join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
+    join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    join tbl_dokumen dok on dok.id_dokumen = trans.id_pbma
+    where trans.id_pbma = ?
+    group by wil.nama_wilayah, trans.id_kelompoktani
+    ";
+    return json_encode($this->db->query($query, array($id_pbma))->result());
+  }
+
   public function getAllPbma(){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
@@ -374,6 +448,24 @@ class Transaksi_model extends CI_Model{
     group by dok.id_dokumen
     ";
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
+  }
+
+  public function getDesaByIdPbma($id_pbma = null){
+    if(is_null($id_pbma)){
+      $id_pbma = $this->input->get("id_pbma");
+    }
+    $query =
+    "
+    select
+      wil.nama_wilayah
+    from tbl_simtr_transaksi trn
+    join tbl_dokumen dok on dok.id_dokumen = trn.id_pbma
+    join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+    join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    where dok.id_dokumen = ?
+    group by wil.nama_wilayah
+    ";
+    return json_encode($this->db->query($query, array($id_pbma))->result());
   }
 
 }
