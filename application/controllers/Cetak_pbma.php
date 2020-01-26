@@ -5,6 +5,7 @@ class Cetak_pbma extends CI_Controller{
     parent :: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("transaksi_model");
+    $this->load->model("user_model");
     $this->load->library('ciqrcode');
     $this->load->helper('url');
     $this->load->helper('form');
@@ -12,6 +13,7 @@ class Cetak_pbma extends CI_Controller{
   }
 
   public function index(){
+    date_default_timezone_set('Asia/Jakarta');
     $dataTransaksi = json_decode($this->transaksi_model->detailPbma());
     $data['pageTitle'] = "";
     $data['content'] = $this->loadContent($dataTransaksi);
@@ -23,10 +25,9 @@ class Cetak_pbma extends CI_Controller{
     $opsiCetak = '';
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
       $validasi = true;
-      $params['data'] = '/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
+      $params['data'] = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
       $params['level'] = 'H'; //H=High
       $params['size'] = 1;
-      //$params['savename'] = FCPATH.$config['imagedir'].$image_name; //simpan image QR CODE ke folder assets/images/
       ob_start();
       $this->ciqrcode->generate($params);
       $qrcode = ob_get_contents();
@@ -36,6 +37,9 @@ class Cetak_pbma extends CI_Controller{
     }
 
     $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbma($dataTransaksi[0]->id_pbma));
+    $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    
     $tblContent = '';
     $nomor = 1;
     $subUrea = 0;
@@ -138,6 +142,14 @@ class Cetak_pbma extends CI_Controller{
                     Tgl. Dokumen <b>'.date_format(date_create($dataTransaksi[0]->tgl_buat), "d-m-Y H:i:s").'</b>
                   </p>
                 </div>
+                <div class="col-6 text-right">
+                <div class="row justify-content-end">
+                  <div class="col-4 text-center border pb-4">Dibuat oleh<br>'.$nama_asisten.'<br>
+                    '.$validasiQr.'
+                  </div>
+                  <div class="col-4 text-center border pb-4" style="margin-right: 10px">Disetujui oleh<br>'.$nama_askep.'</div>
+                </div>
+                </div>
               </div>
               <div class="table-responsive push">
                 <table class="table table-bordered table-sm compact">
@@ -158,14 +170,6 @@ class Cetak_pbma extends CI_Controller{
                   '.$tblContent.'
                 </table>
               </div>
-              <div class="row">
-                <div class="col-3 text-center border pb-8">Diminta oleh<br>(Asisten Afd.)<br>
-                  '.$validasiQr.'
-                </div>
-                <div class="col-3 text-center border">Diterima oleh<br>(Ketua Kelompok)</div>
-                <div class="col-3 text-center border">Disetujui oleh<br>(Asisten Kepala TR)</div>
-                <div class="col-3 text-center border">Dikeluarkan oleh<br>(KTU)</div>
-              <div>
               <div class="row px-3">
                 <small>'.date("dmY-His").'</small>
               </div>

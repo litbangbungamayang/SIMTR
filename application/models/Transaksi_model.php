@@ -59,7 +59,9 @@ class Transaksi_model extends CI_Model{
           (case when KT.kategori = 1 then 'PC' when KT.kategori = 2 then 'RT1'
       		when KT.kategori = 3 then 'RT2'
               when KT.kategori = 4 then 'RT3' end) as kategori,
-      	PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi, BAHAN.jenis_bahan, BAHAN.nama_bahan, TRANS.kuanta, BAHAN.satuan
+        KT.id_afd, PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi,
+        BAHAN.jenis_bahan, BAHAN.nama_bahan, TRANS.kuanta, BAHAN.satuan,
+        TRANS.id_au58, dok.tgl_validasi_bagian
       from tbl_simtr_kelompoktani KT
       join
       	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
@@ -68,6 +70,7 @@ class Transaksi_model extends CI_Model{
       join tbl_simtr_transaksi TRANS on TRANS.id_kelompoktani = KT.id_kelompok
       join tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
       join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
+      join tbl_dokumen dok on dok.id_dokumen = TRANS.id_au58
       where TRANS.no_transaksi = ? and TRANS.kuanta > 0
       group by TRANS.id_transaksi";
       return json_encode($this->db->query($query, array($id_kelompok, $no_transaksi))->result());
@@ -80,7 +83,7 @@ class Transaksi_model extends CI_Model{
     }
     $query =
       "select
-      	KT.nama_kelompok, KT.no_kontrak,
+      	KT.nama_kelompok, KT.no_kontrak, KT.id_afd,
           (case when KT.kategori = 1 then 'PC' when KT.kategori = 2 then 'RT1'
       		when KT.kategori = 3 then 'RT2'
               when KT.kategori = 4 then 'RT3' end) as kategori,
@@ -188,6 +191,11 @@ class Transaksi_model extends CI_Model{
     $this->id_user = $this->session->userdata('id_user');
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
+  }
+
+  public function updateIdAu58($id_au58 = null, $no_transaksi = null){
+    $query = "update tbl_simtr_transaksi set id_au58 = ? where no_transaksi = ? and kuanta > 0";
+    $this->db->query($query, array($id_au58, $no_transaksi));
   }
 
   public function getHargaSatuanByIdBahan($id_bahan = null){
@@ -369,6 +377,7 @@ class Transaksi_model extends CI_Model{
       if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
       kt.no_kontrak,
       kt.tahun_giling,
+      kt.id_afd,
       wil.nama_wilayah,
       date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
       ( select
@@ -466,6 +475,36 @@ class Transaksi_model extends CI_Model{
     group by wil.nama_wilayah
     ";
     return json_encode($this->db->query($query, array($id_pbma))->result());
+  }
+
+  public function getAllAu58(){
+    $priv_level = $this->session->userdata("jabatan");
+    $id_afd = $this->session->userdata("afd");
+    $tahun_giling = $this->input->get("tahun_giling");
+    $query =
+    "
+    select
+      dok.id_dokumen,
+      dok.no_dokumen,
+      date_format(dok.tgl_buat, '%d-%m-%Y %H:%s') as tgl_buat,
+      dok.id_user,
+      dok.tgl_validasi_bagian,
+      sum(trn.kuanta) as jml_kuanta,
+      sum(trn.rupiah) as jml_rupiah,
+      trn.tahun_giling,
+      kt.id_kelompok,
+      kt.no_kontrak,
+      kt.nama_kelompok,
+      kt.id_afd,
+      ? as priv_level,
+      trn.no_transaksi
+    from tbl_dokumen dok
+    join tbl_simtr_transaksi trn on trn.id_au58 = dok.id_dokumen
+    join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd = ?
+    group by dok.id_dokumen
+    ";
+    return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
   }
 
 }

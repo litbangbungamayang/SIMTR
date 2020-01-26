@@ -7,6 +7,7 @@ class Transaksi_aktivitas extends CI_Controller{
     $this->load->model("bahan_model");
     $this->load->model("transaksi_model");
     $this->load->model("aktivitas_model");
+    $this->load->model("user_model");
     $this->load->helper('url');
     $this->load->helper('form');
     $this->load->helper('html');
@@ -27,6 +28,9 @@ class Transaksi_aktivitas extends CI_Controller{
   }
 
   public function loadContent($dataTransaksi){
+    $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+
     $contentAktivitas = "";
     $nomor = 1;
     $jmlBiaya = 0;
@@ -90,10 +94,9 @@ class Transaksi_aktivitas extends CI_Controller{
                 </table>
               </div>
               <div class="row">
-                <div class="col-3 text-center border pb-8">Diminta oleh<br>(Asisten Afd.)</div>
-                <div class="col-3 text-center border">Diterima oleh<br>(Ketua Kelompok)</div>
-                <div class="col-3 text-center border">Disetujui oleh<br>(Asisten Kepala TR)</div>
-                <div class="col-3 text-center border">Dikeluarkan oleh<br>(KTU)</div>
+                <div class="col-4 text-center border">Diterima oleh<br>'.$dataTransaksi[0]->nama_kelompok.'</div>
+                <div class="col-4 text-center border pb-8">Diminta oleh<br>'.$nama_asisten.'</div>
+                <div class="col-4 text-center border">Disetujui oleh<br>'.$nama_askep.'</div>
               <div>
               <div class="row px-3">
                 <small>'.date("dmY-His").'</small>

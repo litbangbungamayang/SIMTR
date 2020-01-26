@@ -10,6 +10,7 @@
       $this->load->model("transaksi_model");
       $this->load->model("aktivitas_model");
       $this->load->model("bahan_model");
+      $this->load->model("dokumen_model");
       $this->load->library('form_validation');
       $this->load->library('upload');
       $this->load->helper('url');
@@ -177,6 +178,9 @@
       foreach($biayaMuatData as $biayaMuat){
         $this->transaksi_model->simpan($biayaMuat);
       }
+      $tipe_dokumen = "AU58";
+      $id_dokumen = $this->dokumen_model->simpan($tipe_dokumen, "-");
+      $this->transaksi_model->updateIdAu58($id_dokumen, $no_transaksi);
       if($this->db->trans_status()){
         $this->db->trans_commit();
         echo "Transaksi berhasil.";
