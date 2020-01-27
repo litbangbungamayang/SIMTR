@@ -93,6 +93,9 @@
         foreach($transPostData as $postData){
           $this->transaksi_model->simpan($postData);
         }
+        $tipe_dokumen = "PPK";
+        $id_dokumen = $this->dokumen_model->simpan($tipe_dokumen, "-");
+        $this->transaksi_model->updateIdPpk($id_dokumen, $no_transaksi);
         if($this->db->trans_status()){
           $this->db->trans_commit();
         } else {

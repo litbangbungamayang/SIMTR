@@ -15,6 +15,22 @@ function approve(id_dokumen){
   });
 }
 
+function approveAskep(id_dokumen){
+  $.ajax({
+    url: js_base_url + "List_pbma/validasiDokumenAskep",
+    dataType: "text",
+    type: "POST",
+    data: "id_dokumen=" + id_dokumen,
+    success: function(response){
+      if (response = "SUCCESS"){
+        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+        $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+        alert("Dokumen berhasil divalidasi!");
+      }
+    }
+  });
+}
+
 function cancel(id_dokumen){
   if(confirm("Anda yakin akan membatalkan dokumen ini?")){
     $.ajax({
@@ -73,8 +89,16 @@ $("#tblListPbma").DataTable({
     {
       data: "",
       render: function(data, type, row, meta){
-        if(row.tgl_validasi_bagian == null){
+        if((row.tgl_validasi_bagian == null && row.priv_level == "Asisten Bagian") || (row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_kasubbag == null)){
           return "<span class='tag tag-red'>Belum Divalidasi</span>";
+        } else {
+          if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-red'>Belum Divalidasi</span>";
+          } else {
+            if(row.tgl_validasi_bagian == null || row.tgl_validasi_kasubbag == null){
+              return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+            }
+          }
         }
         return "<span class='tag tag-green'>Sudah Divalidasi</span>";
       },
@@ -83,13 +107,23 @@ $("#tblListPbma").DataTable({
     {
       render: function(data, type, row, meta){
         var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbma?id_pbma=' + row.id_dokumen + '">Lihat Detail</a> ';
-        var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ' +
-        '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
         if(row.priv_level == "Asisten Bagian"){
+          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ' +
+          '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;
           } else {
             return buttonDetail;
+          }
+        } else {
+          if(row.priv_level == "Kepala Sub Bagian"){
+            var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') >Setuju</button> ' +
+            '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
+            if(row.tgl_validasi_kasubbag == null){
+              return buttonDetail + buttonApproval;
+            } else {
+              return buttonDetail;
+            }
           }
         }
         return buttonDetail;

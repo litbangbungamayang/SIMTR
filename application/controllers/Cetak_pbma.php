@@ -20,26 +20,39 @@ class Cetak_pbma extends CI_Controller{
     $this->load->view('main_view', $data);
   }
 
+  public function generateQr($data){
+    $params['data'] = $data;
+    $params['level'] = 'H'; //H=High
+    $params['size'] = 1;
+    ob_start();
+    $this->ciqrcode->generate($params);
+    $qrcode = ob_get_contents();
+    ob_end_clean();
+    return $qrcode;
+  }
+
   public function loadContent($dataTransaksi){
-    $validasiQr = '';
+    $qrAsisten = '';
+    $qrAskep = '';
     $opsiCetak = '';
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
-      $validasi = true;
-      $params['data'] = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
-      $params['level'] = 'H'; //H=High
-      $params['size'] = 1;
-      ob_start();
-      $this->ciqrcode->generate($params);
-      $qrcode = ob_get_contents();
-      ob_end_clean();
-      $validasiQr = '<img src="data:image/png;base64,'.base64_encode($qrcode).'" />';
-      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
+      $qrAsisten = $this->generateQr($dataQr);
+      $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_kasubbag='.$dataTransaksi[0]->tgl_validasi_kasubbag;
+      $qrAskep = $this->generateQr($dataQr);
+      $qrAskep = '<img src="data:image/png;base64,'.base64_encode($qrAskep).'" />';
     }
 
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    }
     $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbma($dataTransaksi[0]->id_pbma));
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
-    
+
     $tblContent = '';
     $nomor = 1;
     $subUrea = 0;
@@ -145,9 +158,11 @@ class Cetak_pbma extends CI_Controller{
                 <div class="col-6 text-right">
                 <div class="row justify-content-end">
                   <div class="col-4 text-center border pb-4">Dibuat oleh<br>'.$nama_asisten.'<br>
-                    '.$validasiQr.'
+                    '.$qrAsisten.'
                   </div>
-                  <div class="col-4 text-center border pb-4" style="margin-right: 10px">Disetujui oleh<br>'.$nama_askep.'</div>
+                  <div class="col-4 text-center border pb-4" style="margin-right: 10px">Disetujui oleh<br>'.$nama_askep.'<br>
+                    '.$qrAskep.'
+                  </div>
                 </div>
                 </div>
               </div>

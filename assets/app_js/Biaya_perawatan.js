@@ -12,32 +12,27 @@ function formatTglStr(dateObj){
   return "";
 }
 
-var nama_kelompok = null;
-var no_kontrak = null;
-var tahun_giling = null;
-var luas = null;
-
-$("#btnBuatPBMA").on("click", function(){
+$("#btnBuatPbp").on("click", function(){
   var objTglAwal = $("#dtpAwal").datepicker("getDate");
   var strTglAwal = formatTglStr(objTglAwal);
   var objTglAkhir = $("#dtpAkhir").datepicker("getDate");
   var strTglAkhir = formatTglStr(objTglAkhir);
   if($("#dtpAwal").datepicker("getDate") != null && $("#dtpAkhir").datepicker("getDate") != null &&
-    $("#tblListPupuk").DataTable().data().any()){
+    $("#tblListPerawatan").DataTable().data().any()){
       console.log(strTglAwal);
-    if (confirm("Buat pengajuan biaya untuk daftar tersebut?")){
-      var url_string = $("#tblListPupuk").DataTable().ajax.url();
+    if (confirm("Buat pengajuan biaya perawatan untuk daftar tersebut?")){
+      var url_string = $("#tblListPerawatan").DataTable().ajax.url();
       var url = new URL(url_string);
       var tgl_awal = url.searchParams.get("tgl_awal");
       var tgl_akhir = url.searchParams.get("tgl_akhir");
         $.ajax({
-          url: js_base_url + "Biaya_muat_angkut_pupuk/buatPbma",
+          url: js_base_url + "Biaya_perawatan/buatPbp",
           dataType: "text",
           type: "POST",
-          data: "tipe_dokumen=PBMA&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir + "&catatan=" + strTglAwal + " s.d " + strTglAkhir,
+          data: "tipe_dokumen=PBP&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir + "&catatan=" + strTglAwal + " s.d " + strTglAkhir,
           success: function(response){
-            alert("Pengajuan berhasil disimpan.");
-            $("#tblListPupuk").DataTable().ajax.reload();
+            alert("Pengajuan biaya perawatan berhasil disimpan.");
+            $("#tblListPerawatan").DataTable().ajax.reload();
           }
         });
         console.log("StartDate = " + tgl_awal + "; EndDate = " + tgl_akhir);
@@ -45,7 +40,7 @@ $("#btnBuatPBMA").on("click", function(){
   }
 })
 
-$("#tblListPupuk").DataTable({
+$("#tblListPerawatan").DataTable({
   bFilter: false,
   bPaginate: false,
   bSort: false,
@@ -53,7 +48,7 @@ $("#tblListPupuk").DataTable({
   autoWidth: false,
   dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling"><"dtpTglAwal"><"dtpTglAkhir">f>tpl',
   ajax: {
-    url: js_base_url + "Biaya_muat_angkut_pupuk/getRekapBiayaMuatAngkutPupuk?tahun_giling=0&tgl_awal=2000-01-01&tgl_akhir=2000-12-31" ,
+    url: js_base_url + "Biaya_perawatan/getRekapBiayaPerawatan?tahun_giling=0&tgl_awal=2000-01-01&tgl_akhir=2000-12-31" ,
     dataSrc: ""
   },
   columns : [
@@ -97,51 +92,9 @@ $("#tblListPupuk").DataTable({
       className: "text-right"
     },
     {
-      data: "urea",
+      data: "jml_perawatan",
       render: function(data, type, row, meta){
-        return parseInt((row.urea == null) ? 0 : row.urea).toLocaleString({maximumFractionDigits: 2}) + " KG";
-      },
-      className: "text-right"
-    },
-    {
-      data: "tsp",
-      render: function(data, type, row, meta){
-        return parseInt((row.tsp == null) ? 0 : row.tsp).toLocaleString({maximumFractionDigits: 2}) + " KG";;
-      },
-      className: "text-right"
-    },
-    {
-      data: "kcl",
-      render: function(data, type, row, meta){
-        return parseInt((row.kcl == null) ? 0 : row.kcl).toLocaleString({maximumFractionDigits: 2}) + " KG";;
-      },
-      className: "text-right"
-    },
-    {
-      data: "jml",
-      render: function(data, type, row, meta){
-        return parseInt((row.jml == null) ? 0 : row.jml).toLocaleString({maximumFractionDigits: 2}) + " KG";;
-      },
-      className: "text-right"
-    },
-    {
-      data: "biaya_muat",
-      render: function(data, type, row, meta){
-        return "Rp " + parseInt(row.biaya_muat).toLocaleString({maximumFractionDigits: 2});;
-      },
-      className: "text-right"
-    },
-    {
-      data: "biaya_angkut",
-      render: function(data, type, row, meta){
-        return "Rp " + parseInt(row.biaya_angkut).toLocaleString({maximumFractionDigits: 2});;
-      },
-      className: "text-right"
-    },
-    {
-      data: "total_biaya",
-      render: function(data, type, row, meta){
-        return "Rp " + parseInt(row.total_biaya).toLocaleString({maximumFractionDigits: 2});;
+        return "Rp " + parseInt(row.jml_perawatan).toLocaleString({maximumFractionDigits: 2});
       },
       className: "text-right"
     }
@@ -163,7 +116,7 @@ $("#tblListPupuk").DataTable({
         tgl_awal = formatTgl(tgl_awal);
         tgl_akhir = formatTgl(tgl_akhir);
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPupuk").DataTable().ajax.url(js_base_url + "Biaya_muat_angkut_pupuk/getRekapBiayaMuatAngkutPupuk?tahun_giling=" + tahun_giling +
+        $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "Biaya_perawatan/getRekapBiayaPerawatan?tahun_giling=" + tahun_giling +
         "&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir).load();
       }
     }
@@ -197,16 +150,9 @@ $("#tblListPupuk").DataTable({
     var intRupiah = function ( i ) {
       return typeof i === 'string' ? i.replace(/[\Rp,]/g, '')*1 : typeof i === 'number' ? i : 0;
     };
-    var intKg = function(i){
-      return typeof i === 'string' ? i.replace(/[\KG,]/g, '')*1 : typeof i === 'number' ? i : 0;
-    }
-    totalBiaya = api.column(12).data().reduce( function (a, b) {
+    totalBiaya = api.column(6).data().reduce( function (a, b) {
         return intRupiah(a) + intRupiah(b);
     },0);
-    totalPupuk = api.column(9).data().reduce(function (a,b){
-      return intKg(a) + intKg(b);
-    }, 0);
-    $(api.column(9).footer()).html('<font color="white" size="3">' + totalPupuk.toLocaleString({maximumFractionDigits: 2}) + ' KG' + '</font>');
-    $(api.column(12).footer()).html( '<font color="white" size="3">' + 'Rp '+ totalBiaya.toLocaleString({maximumFractionDigits: 0}) + '</font>');
+    $(api.column(6).footer()).html( '<font color="white" size="3">' + 'Rp '+ totalBiaya.toLocaleString({maximumFractionDigits: 0}) + '</font>');
   }
 });

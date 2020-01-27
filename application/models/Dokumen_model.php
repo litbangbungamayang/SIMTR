@@ -79,6 +79,19 @@ class Dokumen_model extends CI_Model{
     }
   }
 
+  public function validasiAskep(){
+    $id_dokumen = $this->input->post("id_dokumen");
+    $query = "select * from tbl_dokumen where id_dokumen = ?";
+    $data_dokumen = $this->db->query($query, array($id_dokumen))->row();
+    if($this->session->userdata("jabatan") == "Kepala Sub Bagian"){
+      $query = "update tbl_dokumen set tgl_validasi_kasubbag = now() where id_dokumen = ?";
+      $this->db->query($query, array($id_dokumen));
+      echo "SUCCESS";
+    } else {
+      echo "FAILED";
+    }
+  }
+
   public function batalkan(){
     $id_dokumen = $this->input->post("id_dokumen");
     $query = "update tbl_simtr_transaksi set id_pbma = null where id_pbma = ?";

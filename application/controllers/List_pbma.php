@@ -42,6 +42,10 @@ class List_pbma extends CI_Controller{
     $this->dokumen_model->validasi();
   }
 
+  public function validasiDokumenAskep(){
+    $this->dokumen_model->validasiAskep();
+  }
+
   public function batalkanDokumen(){
     $this->dokumen_model->batalkan();
   }
@@ -65,7 +69,7 @@ class List_pbma extends CI_Controller{
                       <th>Total Biaya</th>
                       <th>Periode Transaksi</th>
                       <th>Status</th>
-                      <th class="text-center">Aksi</th>
+                      <th class="text-center"></th>
                     </tr>
                   </thead>
                   <tbody>

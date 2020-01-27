@@ -38,6 +38,15 @@ class Transaksi_model extends CI_Model{
     }
   }
 
+  public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
+    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
+      $query =
+      "update tbl_simtr_transaksi set id_pbp=? where tgl_transaksi >= ? and tgl_transaksi <= ?
+      and id_pbp is null and kode_transaksi = 2 and kuanta <> 0 and id_aktivitas <> 0 and rupiah <> 0";
+      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
+    }
+  }
+
   public function getTransaksiMasukByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
     $query =
@@ -198,6 +207,11 @@ class Transaksi_model extends CI_Model{
     $this->db->query($query, array($id_au58, $no_transaksi));
   }
 
+  public function updateIdPpk($id_ppk = null, $no_transaksi = null){
+    $query = "update tbl_simtr_transaksi set id_ppk = ? where no_transaksi = ? and id_aktivitas <> 0";
+    $this->db->query($query, array($id_ppk, $no_transaksi));
+  }
+
   public function getHargaSatuanByIdBahan($id_bahan = null){
     if (is_null($id_bahan)) $id_bahan = $this->input->get("id_bahan");
     $query =
@@ -287,12 +301,59 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($kode_transaksi))->result());
   }
 
+  public function getRekapBiayaPerawatan($tgl_awal = null, $tgl_akhir = null, $tahun_giling = null){
+    $afdeling = $this->session->userdata('afd');
+    if(is_null($tgl_awal) || is_null($tgl_akhir) || is_null($tahun_giling)){
+      $tgl_awal = $this->input->get("tgl_awal");
+      $tgl_akhir = $this->input->get("tgl_akhir");
+      $tahun_giling = $this->input->get("tahun_giling");
+    }
+    if(is_null($afdeling)){
+      $afdeling = "";
+    }
+    $query =
+    "
+    select
+    	trans.id_kelompoktani,
+      if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
+      kt.no_kontrak,
+      kt.tahun_giling,
+      wil.nama_wilayah,
+      date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
+      ( select
+    		SUM(PT.luas) as luas
+    	FROM tbl_simtr_kelompoktani kt
+    		JOIN tbl_simtr_petani PT on PT.id_kelompok = kt.id_kelompok
+    	WHERE EXISTS
+    			(SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+    		and kt.id_kelompok = trans.id_kelompoktani
+    		group by kt.id_kelompok
+    	) as luas,
+    	( select sum(rupiah) as rupiah
+    		from tbl_simtr_transaksi
+    		where id_kelompoktani = trans.id_kelompoktani
+    		and id_aktivitas <> 0
+    	) as jml_perawatan
+    from tbl_simtr_transaksi trans
+    join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
+    join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
+    and trans.tgl_transaksi <= ? and trans.tahun_giling like concat('%', ?, '%')
+    and trans.id_pbp is null and kt.id_afd like concat('%', ?, '%') and trans.id_aktivitas <> 0
+    group by wil.nama_wilayah, trans.id_kelompoktani
+    ";
+    return json_encode($this->db->query($query, array($tgl_awal, $tgl_akhir, $tahun_giling, $afdeling))->result());
+  }
+
   public function getRekapBiayaMuatAngkutPupuk($tgl_awal = null, $tgl_akhir = null, $tahun_giling = null){
     $afdeling = $this->session->userdata('afd');
     if(is_null($tgl_awal) || is_null($tgl_akhir) || is_null($tahun_giling)){
       $tgl_awal = $this->input->get("tgl_awal");
       $tgl_akhir = $this->input->get("tgl_akhir");
       $tahun_giling = $this->input->get("tahun_giling");
+    }
+    if(is_null($afdeling)){
+      $afdeling = "";
     }
     $query =
     "
@@ -356,7 +417,7 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
     and trans.tgl_transaksi <= ? and trans.tahun_giling like concat('%', ?, '%')
-    and trans.id_pbma is null and kt.no_kontrak like concat(?, '-%') and trans.id_bahan <> 0
+    and trans.id_pbma is null and kt.id_afd like concat('%', ?, '%') and trans.id_bahan <> 0
 	  and kuanta = 0
     group by wil.nama_wilayah, trans.id_kelompoktani
     ";
@@ -371,6 +432,7 @@ class Transaksi_model extends CI_Model{
       dok.no_dokumen,
       dok.tgl_buat,
       dok.tgl_validasi_bagian,
+      dok.tgl_validasi_kasubbag,
       dok.catatan,
       trans.id_pbma,
     	trans.id_kelompoktani,
@@ -441,11 +503,14 @@ class Transaksi_model extends CI_Model{
   public function getAllPbma(){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
+    if(is_null($id_afd)){
+      $id_afd = "";
+    }
     $tahun_giling = $this->input->get("tahun_giling");
     $query =
     "
     select dok.id_dokumen, dok.no_dokumen, dok.tipe_dokumen, date_format(dok.tgl_buat, '%d-%m-%Y %k:%i:%s') as tgl_buat,
-      dok.tgl_validasi_bagian,
+      dok.tgl_validasi_bagian, dok.tgl_validasi_kasubbag,
     	sum(trn.rupiah) as total,
       concat(date_format(min(trn.tgl_transaksi), '%d-%M-%Y'), ' s.d ',
         date_format(max(trn.tgl_transaksi), '%d-%M-%Y')) as periode,
@@ -453,7 +518,7 @@ class Transaksi_model extends CI_Model{
     from tbl_dokumen dok
     join tbl_simtr_transaksi trn on dok.id_dokumen = trn.id_pbma
     join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
-    where trn.tahun_giling like concat('%', ?, '%') and kt.id_afd = ?
+    where trn.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
     group by dok.id_dokumen
     ";
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
@@ -480,6 +545,9 @@ class Transaksi_model extends CI_Model{
   public function getAllAu58(){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
+    if(is_null($id_afd)){
+      $id_afd = "";
+    }
     $tahun_giling = $this->input->get("tahun_giling");
     $query =
     "
@@ -501,7 +569,7 @@ class Transaksi_model extends CI_Model{
     from tbl_dokumen dok
     join tbl_simtr_transaksi trn on trn.id_au58 = dok.id_dokumen
     join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
-    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd = ?
+    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
     group by dok.id_dokumen
     ";
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
