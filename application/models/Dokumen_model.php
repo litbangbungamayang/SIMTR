@@ -92,10 +92,23 @@ class Dokumen_model extends CI_Model{
     }
   }
 
-  public function batalkan(){
+  public function batalkanPbma(){
     $id_dokumen = $this->input->post("id_dokumen");
     $query = "update tbl_simtr_transaksi set id_pbma = null where id_pbma = ?";
     $this->db->query($query, array($id_dokumen));
+  }
+
+  public function batalkanPpk(){
+    $id_dokumen = $this->input->post("id_dokumen");
+    $query = "update tbl_simtr_transaksi set id_ppk = null where id_ppk = ?";
+    $this->db->query($query, array($id_dokumen));
+  }
+
+  public function batalkanPbp(){
+    $id_dokumen = $this->input->post("id_dokumen");
+    $query = "update tbl_simtr_transaksi set id_pbp = null where id_pbp = ?";
+    $this->db->query($query, array($id_dokumen));
+    return json_encode("SUCCESS");
   }
 
   public function update(){

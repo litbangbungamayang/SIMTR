@@ -1,14 +1,14 @@
 
 function approve(id_dokumen){
   $.ajax({
-    url: js_base_url + "List_pbma/validasiDokumen",
+    url: js_base_url + "List_biaya_perawatan/validasiDokumen",
     dataType: "text",
     type: "POST",
     data: "id_dokumen=" + id_dokumen,
     success: function(response){
       if (response = "SUCCESS"){
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+        $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
         alert("Dokumen berhasil divalidasi!");
       }
     }
@@ -17,14 +17,14 @@ function approve(id_dokumen){
 
 function approveAskep(id_dokumen){
   $.ajax({
-    url: js_base_url + "List_pbma/validasiDokumenAskep",
+    url: js_base_url + "List_biaya_perawatan/validasiDokumenAskep",
     dataType: "text",
     type: "POST",
     data: "id_dokumen=" + id_dokumen,
     success: function(response){
       if (response = "SUCCESS"){
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+        $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
         alert("Dokumen berhasil divalidasi!");
       }
     }
@@ -34,14 +34,14 @@ function approveAskep(id_dokumen){
 function cancel(id_dokumen){
   if(confirm("Anda yakin akan membatalkan dokumen ini?")){
     $.ajax({
-      url: js_base_url + "List_pbma/batalkanDokumen",
+      url: js_base_url + "List_biaya_perawatan/batalkanDokumen",
       dataType: "text",
       type: "POST",
       data: "id_dokumen=" + id_dokumen,
       success: function(response){
         if (response = "SUCCESS"){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-          $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil dibatalkan!");
         }
       }
@@ -50,14 +50,14 @@ function cancel(id_dokumen){
 }
 
 
-$("#tblListPbma").DataTable({
+$("#tblListPerawatan").DataTable({
   bFilter: false,
   bPaginate: false,
   bSort: false,
   bInfo: false,
   autoWidth: false,
   ajax: {
-    url: js_base_url + "List_pbma/getAllPbma?tahun_giling=0" ,
+    url: js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0" ,
     dataSrc: ""
   },
   dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling">f>tpl',
@@ -117,9 +117,10 @@ $("#tblListPbma").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbma?id_pbma=' + row.id_dokumen + '">Lihat Detail</a> ';
+        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '">Lihat Detail</a> ';
         if(row.priv_level == "Asisten Bagian"){
-          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ';
+          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ' +
+          '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;
           } else {
@@ -127,7 +128,8 @@ $("#tblListPbma").DataTable({
           }
         } else {
           if(row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_bagian != null){
-            var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') >Setuju</button> ';
+            var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') >Setuju</button> ' +
+            '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
             if(row.tgl_validasi_kasubbag == null){
               return buttonDetail + buttonApproval;
             } else {
@@ -160,7 +162,7 @@ $("#tblListPbma").DataTable({
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
       tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-      $("#tblListPbma").DataTable().ajax.url(js_base_url + "List_pbma/getAllPbma?tahun_giling=" + tahun_giling).load();
+      $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
     })
   },
   footerCallback: function (row, data, start, end, display){

@@ -58,6 +58,7 @@ class Transaksi_list extends CI_Controller{
           <div class="card-header">
             KELOMPOK '.$this->kelompok->nama_kelompok.'<br>'.$this->kelompok->no_kontrak.'<br>'.$kategori.' / '.$this->kelompok->mt.'
             <br>'.$this->kelompok->nama_varietas.'<br>'.number_format($this->kelompok->luas, 2, ".", ",").' Ha / Desa '.$this->kelompok->nama_wilayah.'
+            <div class="card-options"><a href="#" class="btn btn-primary" onclick="javascript:history.back();" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a></div>
           </div>
           <div class="card-body">
             <div class="col-md-12 col-lg-12">
@@ -110,6 +111,32 @@ class Transaksi_list extends CI_Controller{
                         <th>Kuanta</th>
                         <th>Rupiah</th>
                         <th>Bon Perawatan</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 col-lg-12">
+              <div class="card card-collapsed" id="card_tblTebangan">
+                <div class="card-status bg-orange"></div>
+                <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
+                  <div class="card-title">Transaksi Tebang-Muat-Angkut</div>
+                  <div class="card-options">
+                    <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <table id="tblTransPerawatan" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%">
+                    <thead>
+                      <tr>
+                        <th class="w-1">No.</th>
+                        <th>No. SPTA</th>
+                        <th>No. Truk</th>
+                        <th>Tgl. Timbang</th>
+                        <th>Netto Timbang</th>
+                        <th>Kuanta Rafaksi</th>
+                        <th>Netto Tebu</th>
                       </tr>
                     </thead>
                   </table>

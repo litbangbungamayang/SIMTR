@@ -11,6 +11,7 @@ class Transaksi_aktivitas extends CI_Controller{
     $this->load->helper('url');
     $this->load->helper('form');
     $this->load->helper('html');
+    $this->load->library('ciqrcode');
   }
 
   public function index(){
@@ -27,10 +28,33 @@ class Transaksi_aktivitas extends CI_Controller{
     echo $this->transaksi_model->getTransaksiAktivitasByIdKelompok();
   }
 
+  public function generateQr($data){
+    $params['data'] = $data;
+    $params['level'] = 'H'; //H=High
+    $params['size'] = 1;
+    ob_start();
+    $this->ciqrcode->generate($params);
+    $qrcode = ob_get_contents();
+    ob_end_clean();
+    return $qrcode;
+  }
+
   public function loadContent($dataTransaksi){
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
-
+    $qrAsisten = '';
+    $qrAskep = '';
+    $opsiCetak = '';
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
+      $qrAsisten = $this->generateQr($dataQr);
+      $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_kasubbag='.$dataTransaksi[0]->tgl_validasi_kasubbag;
+      $qrAskep = $this->generateQr($dataQr);
+      $qrAskep = '<img src="data:image/png;base64,'.base64_encode($qrAskep).'" />';
+    }
     $contentAktivitas = "";
     $nomor = 1;
     $jmlBiaya = 0;
@@ -46,26 +70,13 @@ class Transaksi_aktivitas extends CI_Controller{
       <td style="text-align: right;">Rp '.number_format($jmlBiaya,0,".",",").'</td></tr>';
     $container =
     '
-      <style>
-          @media screen
-        {
-          .noPrint{}
-          .noScreen{display:none;}
-        }
-
-          @media print
-        {
-          .noPrint{display:none;}
-          .noScreen{}
-        }
-      </style>
       <div class="page">
         <div class="container">
           <div class="card">
             <div class="card-header">
               <div class="card-options">
-                <a href="Rdkk_list" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
-                <a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>
+                <a href="#" class="btn btn-primary" onclick="javascript:history.back();" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                '.$opsiCetak.'
               </div>
             </div>
             <div class="card-body">
@@ -94,9 +105,9 @@ class Transaksi_aktivitas extends CI_Controller{
                 </table>
               </div>
               <div class="row">
-                <div class="col-4 text-center border">Diterima oleh<br>'.$dataTransaksi[0]->nama_kelompok.'</div>
-                <div class="col-4 text-center border pb-8">Diminta oleh<br>'.$nama_asisten.'</div>
-                <div class="col-4 text-center border">Disetujui oleh<br>'.$nama_askep.'</div>
+                <div class="col-4 text-center border" style="height: 120px">Diterima oleh<br>'.$dataTransaksi[0]->nama_kelompok.'</div>
+                <div class="col-4 text-center border pb-5">Diminta oleh<br>'.$nama_asisten.'<br>'.$qrAsisten.'</div>
+                <div class="col-4 text-center border">Disetujui oleh<br>'.$nama_askep.'<br>'.$qrAskep.'</div>
               <div>
               <div class="row px-3">
                 <small>'.date("dmY-His").'</small>

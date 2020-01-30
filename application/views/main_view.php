@@ -18,7 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <? $this->load->view("_partials/navbar.php") ?>
         <div class="my-3 my-md-3">
           <script>
-            require(['jquery','datatables'], function() {
+            require(['jquery','datatables', 'selectize', 'datepicker'], function() {
               $(document).ready(function() {
                 window.js_base_url = "<? echo base_url(); ?>" + "index.php/";
                 <?

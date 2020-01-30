@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Cetak_pbma extends CI_Controller{
+class Cetak_pbp extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
@@ -14,10 +14,11 @@ class Cetak_pbma extends CI_Controller{
 
   public function index(){
     date_default_timezone_set('Asia/Jakarta');
-    $dataTransaksi = json_decode($this->transaksi_model->detailPbma());
+    $dataTransaksi = json_decode($this->transaksi_model->detailPbp());
     $data['pageTitle'] = "";
     $data['content'] = $this->loadContent($dataTransaksi);
     $this->load->view('main_view', $data);
+    //print_r($dataTransaksi[0]->id_pbp);
   }
 
   public function generateQr($data){
@@ -36,7 +37,7 @@ class Cetak_pbma extends CI_Controller{
     $qrAskep = '';
     $opsiCetak = '';
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
-      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbma.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_pbp.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
       $qrAsisten = $this->generateQr($dataQr);
       $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
     }
@@ -49,24 +50,13 @@ class Cetak_pbma extends CI_Controller{
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
       $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
     }
-    $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbma($dataTransaksi[0]->id_pbma));
+    $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbp($dataTransaksi[0]->id_pbp)); //BISA DIPAKAI JUGA UNTUK PBP
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
-
     $tblContent = '';
     $nomor = 1;
-    $subUrea = 0;
-    $subTsp = 0;
-    $subKcl = 0;
-    $subMuat = 0;
-    $subAngkut = 0;
-    $subTotalBiaya = 0;
-    $totalUrea = 0;
-    $totalTsp = 0;
-    $totalKcl = 0;
-    $totalMuat = 0;
-    $totalAngkut = 0;
-    $totalBiaya = 0;
+    $subPerawatan = 0;
+    $totalPerawatan = 0;
     foreach($dataDesa as $desa){
       foreach($dataTransaksi as $transaksi){
         if($transaksi->nama_wilayah == $desa->nama_wilayah){
@@ -77,29 +67,13 @@ class Cetak_pbma extends CI_Controller{
             <td class='text-center'>$transaksi->no_kontrak</td>
             <td class='text-right'>$transaksi->luas</td>
             <td class='text-center'>$transaksi->tgl_transaksi</td>
-            <td class='text-right'>".number_format($transaksi->urea,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->tsp,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->kcl,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->jml,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->biaya_muat,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->biaya_angkut,0,".",",")."</td>
-            <td class='text-right'>".number_format($transaksi->total_biaya,0,".",",")."</td>
+            <td class='text-right'>".number_format($transaksi->jml_perawatan,0,".",",")."</td>
           </tr>";
-          $subUrea = $subUrea + $transaksi->urea;
-          $subTsp = $subTsp + $transaksi->tsp;
-          $subKcl = $subKcl + $transaksi->kcl;
-          $subMuat = $subMuat + $transaksi->biaya_muat;
-          $subAngkut = $subAngkut + $transaksi->biaya_angkut;
-          $subTotalBiaya = $subTotalBiaya + $transaksi->total_biaya;
+          $subPerawatan = $subPerawatan + $transaksi->jml_perawatan;
           $nomor ++;
         }
       }
-      $totalUrea = $totalUrea + $subUrea;
-      $totalTsp = $totalTsp + $subTsp;
-      $totalKcl = $totalKcl + $subKcl;
-      $totalMuat = $totalMuat + $subMuat;
-      $totalAngkut = $totalAngkut + $subAngkut;
-      $totalBiaya = $totalBiaya + $subTotalBiaya;
+      $totalPerawatan = $totalPerawatan + $subPerawatan;
       $tblContent .=
       "<tr class='bg-gray-lighter text-black font-weight-bold'>
         <td class='text-center'></td>
@@ -107,32 +81,15 @@ class Cetak_pbma extends CI_Controller{
         <td class='text-center'>$desa->nama_wilayah</td>
         <td class='text-right'></td>
         <td class='text-center'></td>
-        <td class='text-right'>".number_format($subUrea,0,".",",")."</td>
-        <td class='text-right'>".number_format($subTsp,0,".",",")."</td>
-        <td class='text-right'>".number_format($subKcl,0,".",",")."</td>
-        <td class='text-right'>".number_format($subUrea + $subTsp + $subKcl,0,".",",")."</td>
-        <td class='text-right'>".number_format($subMuat,0,".",",")."</td>
-        <td class='text-right'>".number_format($subAngkut,0,".",",")."</td>
-        <td class='text-right'>".number_format($subTotalBiaya,0,".",",")."</td>
+        <td class='text-right'>".number_format($subPerawatan,0,".",",")."</td>
       </tr>";
-      $subUrea = 0;
-      $subTsp = 0;
-      $subKcl = 0;
-      $subMuat = 0;
-      $subAngkut = 0;
-      $subTotalBiaya = 0;
+      $subPerawatan = 0;
     }
     $tblContent .=
     "<tr class='bg-gray-light text-black font-weight-bold'>
       <td class='text-center'></td>
       <td class='text-center' colspan='4'>TOTAL PENGAJUAN</td>
-      <td class='text-right'>".number_format($totalUrea,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalTsp,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalKcl,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalUrea + $totalTsp + $totalKcl,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalMuat,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalAngkut,0,".",",")."</td>
-      <td class='text-right'>".number_format($totalBiaya,0,".",",")."</td>
+      <td class='text-right'>".number_format($totalPerawatan,0,".",",")."</td>
     </tr>";
     $container =
     '
@@ -141,21 +98,21 @@ class Cetak_pbma extends CI_Controller{
           <div class="card">
             <div class="card-header">
               <div class="card-options">
-                <a href="List_pbma" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                <a href="List_biaya_perawatan" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
                 '.$opsiCetak.'
               </div>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-6">
-                  <p class="h3">Rekapitulasi Biaya Pupuk</p>
+                  <p class="h3">Rekapitulasi Biaya Perawatan</p>
                   <p class="h5">Periode '.$dataTransaksi[0]->catatan.'</p>
                   <p>
                     No. Dokumen  <b>'.$dataTransaksi[0]->no_dokumen.'</b><br>
                     Tgl. Dokumen <b>'.date_format(date_create($dataTransaksi[0]->tgl_buat), "d-m-Y H:i:s").'</b>
                   </p>
                 </div>
-                <div class="col-6">
+                <div class="col-6 text-right">
                   <div class="row justify-content-end" style="height: 120px">
                     <div class="col-4 text-center border pb-4">Dibuat oleh<br>'.$nama_asisten.'<br>
                       '.$qrAsisten.'
@@ -174,13 +131,7 @@ class Cetak_pbma extends CI_Controller{
                     <th class="text-center">No. Kontrak</th>
                     <th class="text-right">Luas</th>
                     <th class="text-center">Tgl. Transaksi</th>
-                    <th class="text-right">Urea</th>
-                    <th class="text-right">TSP</th>
-                    <th class="text-right">KCL</th>
-                    <th class="text-right">Jml. Pupuk</th>
-                    <th class="text-right">Biaya Muat</th>
-                    <th class="text-right">Biaya Angkut</th>
-                    <th class="text-right">Total Biaya</th>
+                    <th class="text-right">Jumlah Permintaan Biaya</th>
                   </tr>
                   '.$tblContent.'
                 </table>

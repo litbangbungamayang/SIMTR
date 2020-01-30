@@ -1,5 +1,3 @@
-
-
 $("#tblTransPupuk").DataTable({
   bFilter: false,
   bPaginate: true,

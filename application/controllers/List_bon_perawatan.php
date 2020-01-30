@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class List_pbma extends CI_Controller{
+class List_bon_perawatan extends CI_Controller{
   public function __construct(){
     parent:: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
@@ -19,7 +19,7 @@ class List_pbma extends CI_Controller{
     if ($this->session->userdata('id_user') == false){
       redirect('login');
     } else {
-      $data['pageTitle'] = "Penelusuran Pengajuan Biaya Muat & Angkut Pupuk";
+      $data['pageTitle'] = "Rincian Permintaan Perawatan Kebun";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
@@ -27,15 +27,11 @@ class List_pbma extends CI_Controller{
   }
 
   public function loadScript(){
-    return '$.getScript("'.base_url("/assets/app_js/List_pbma.js").'");';
+    return '$.getScript("'.base_url("/assets/app_js/List_bon_perawatan.js").'");';
   }
 
-  public function getAllPbma(){
-    echo $this->transaksi_model->getAllPbma();
-  }
-
-  public function getDesaByIdPbma($id_pbma = null){
-      echo $this->transaksi_model->getDesaByIdPbma($id_pbma);
+  public function getAllPpk(){
+    echo $this->transaksi_model->getAllPpk();
   }
 
   public function validasiDokumen(){
@@ -46,12 +42,7 @@ class List_pbma extends CI_Controller{
     $this->dokumen_model->validasiAskep();
   }
 
-  public function batalkanDokumen(){
-    $this->dokumen_model->batalkanPbma();
-  }
-
   public function loadContent(){
-    // <table id="tblListPupuk" class="table card-table table-vcenter text-nowrap datatable table-sm">
     $container =
     '
     <div class="page">
@@ -60,14 +51,15 @@ class List_pbma extends CI_Controller{
           <div class="card-body">
             <div class="row">
               <div class="table-responsive col-12">
-                <table id="tblListPbma" class="table table-card table-striped table-sm text-nowrap">
+                <table id="tblListPpk" class="table table-card table-striped table-sm text-nowrap">
                   <thead>
                     <tr>
                       <th class="w-1">No.</th>
                       <th>No. Dokumen</th>
                       <th>Tgl. Dibuat</th>
+                      <th>Nama Kelompok</th>
+                      <th>No. Kontrak</th>
                       <th>Total Biaya</th>
-                      <th>Periode Transaksi</th>
                       <th>Status</th>
                       <th class="text-center"></th>
                     </tr>
@@ -78,8 +70,9 @@ class List_pbma extends CI_Controller{
                     <tr>
                       <th class="w-1"></th>
                       <th></th>
-                      <th><font color="white" size="3">Total biaya s.d </font></th>
                       <th></th>
+                      <th></th>
+                      <th><font color="white" size="3">Total Biaya </font></th>
                       <th></th>
                       <th></th>
                       <th></th>

@@ -206,7 +206,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="table-responsive col-md-12">
-                  <table id="tblList" class="table card-table table-vcenter text-nowrap datatable table-lg">
+                  <table id="tblList" class="table card-table table-vcenter text-nowrap datatable table-md compact">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>

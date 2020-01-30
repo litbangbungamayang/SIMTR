@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class List_pbma extends CI_Controller{
+class List_biaya_perawatan extends CI_Controller{
   public function __construct(){
     parent:: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
@@ -19,7 +19,7 @@ class List_pbma extends CI_Controller{
     if ($this->session->userdata('id_user') == false){
       redirect('login');
     } else {
-      $data['pageTitle'] = "Penelusuran Pengajuan Biaya Muat & Angkut Pupuk";
+      $data['pageTitle'] = "Penelusuran Pengajuan Biaya Perawatan";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
@@ -27,11 +27,11 @@ class List_pbma extends CI_Controller{
   }
 
   public function loadScript(){
-    return '$.getScript("'.base_url("/assets/app_js/List_pbma.js").'");';
+    return '$.getScript("'.base_url("/assets/app_js/List_biaya_perawatan.js").'");';
   }
 
-  public function getAllPbma(){
-    echo $this->transaksi_model->getAllPbma();
+  public function getAllPbp(){
+    echo $this->transaksi_model->getAllPbp();
   }
 
   public function getDesaByIdPbma($id_pbma = null){
@@ -47,11 +47,10 @@ class List_pbma extends CI_Controller{
   }
 
   public function batalkanDokumen(){
-    $this->dokumen_model->batalkanPbma();
+    $this->dokumen_model->batalkanPbp();
   }
 
   public function loadContent(){
-    // <table id="tblListPupuk" class="table card-table table-vcenter text-nowrap datatable table-sm">
     $container =
     '
     <div class="page">
@@ -60,7 +59,7 @@ class List_pbma extends CI_Controller{
           <div class="card-body">
             <div class="row">
               <div class="table-responsive col-12">
-                <table id="tblListPbma" class="table table-card table-striped table-sm text-nowrap">
+                <table id="tblListPerawatan" class="table table-card table-striped table-sm text-nowrap">
                   <thead>
                     <tr>
                       <th class="w-1">No.</th>
