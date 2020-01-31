@@ -420,6 +420,7 @@ function actionButtonView(id_kelompok){
           '<div class="dropdown-menu dropdown-menu-right">' +
             '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
             '<a class="dropdown-item" href="Transaksi_list?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Semua Transaksi</a>' +
+            '<a class="dropdown-item" href="Bagi_hasil?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Data Rendemen</a>' +
             '<div class="dropdown-divider"></div>' +
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +

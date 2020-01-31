@@ -16,7 +16,7 @@ function approve(id_dokumen){
 
 $("#tblListAu58").DataTable({
   bFilter: true,
-  bPaginate: false,
+  bPaginate: true,
   bSort: false,
   bInfo: false,
   autoWidth: false,
@@ -60,8 +60,8 @@ $("#tblListAu58").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Transaksi_AU58?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '">Lihat Detail</a> ';
-        var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Validasi</button> '
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Transaksi_AU58?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '"title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
+        var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Validasi" ><i class="fe fe-check-circle"></i></button> '
         if(row.priv_level == "Asisten Bagian"){
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;

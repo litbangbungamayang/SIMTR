@@ -135,8 +135,9 @@ class Transaksi_list extends CI_Controller{
                         <th>No. Truk</th>
                         <th>Tgl. Timbang</th>
                         <th>Netto Timbang</th>
+                        <th>Rafaksi</th>
                         <th>Kuanta Rafaksi</th>
-                        <th>Netto Tebu</th>
+                        <th>Netto Final</th>
                       </tr>
                     </thead>
                   </table>

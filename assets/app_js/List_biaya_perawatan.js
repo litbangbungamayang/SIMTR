@@ -1,34 +1,38 @@
 
 function approve(id_dokumen){
-  $.ajax({
-    url: js_base_url + "List_biaya_perawatan/validasiDokumen",
-    dataType: "text",
-    type: "POST",
-    data: "id_dokumen=" + id_dokumen,
-    success: function(response){
-      if (response = "SUCCESS"){
-        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
-        alert("Dokumen berhasil divalidasi!");
+  if(confirm("Anda akan menyetujui pengajuan biaya perawatan ini?")){
+    $.ajax({
+      url: js_base_url + "List_biaya_perawatan/validasiDokumen",
+      dataType: "text",
+      type: "POST",
+      data: "id_dokumen=" + id_dokumen,
+      success: function(response){
+        if (response = "SUCCESS"){
+          tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+          alert("Dokumen berhasil divalidasi!");
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 function approveAskep(id_dokumen){
-  $.ajax({
-    url: js_base_url + "List_biaya_perawatan/validasiDokumenAskep",
-    dataType: "text",
-    type: "POST",
-    data: "id_dokumen=" + id_dokumen,
-    success: function(response){
-      if (response = "SUCCESS"){
-        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
-        alert("Dokumen berhasil divalidasi!");
+  if(confirm("Anda akan menyetujui pengajuan biaya perawatan ini?")){
+    $.ajax({
+      url: js_base_url + "List_biaya_perawatan/validasiDokumenAskep",
+      dataType: "text",
+      type: "POST",
+      data: "id_dokumen=" + id_dokumen,
+      success: function(response){
+        if (response = "SUCCESS"){
+          tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+          alert("Dokumen berhasil divalidasi!");
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 function cancel(id_dokumen){
@@ -112,14 +116,23 @@ $("#tblListPerawatan").DataTable({
             }
           }
         }
+        if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+          return "<span class='tag tag-red'>Belum Divalidasi</span>";
+        } else {
+          if(row.tgl_validasi_bagian == null || row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+          } else {
+            return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+          }
+        }
       },
       className: "text-center"
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '">Lihat Detail</a> ';
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         if(row.priv_level == "Asisten Bagian"){
-          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ' +
+          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
           '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;
@@ -128,8 +141,8 @@ $("#tblListPerawatan").DataTable({
           }
         } else {
           if(row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_bagian != null){
-            var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') >Setuju</button> ' +
-            '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
+            var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju"><i class="fe fe-check-circle"></i></button> ' +
+            '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
             if(row.tgl_validasi_kasubbag == null){
               return buttonDetail + buttonApproval;
             } else {

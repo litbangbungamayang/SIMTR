@@ -31,7 +31,7 @@ class Transaksi_model extends CI_Model{
   public function postPbma($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
     if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
       $query =
-      "update tbl_simtr_transaksi set id_pbma=? where tgl_transaksi >= ? and tgl_transaksi <= ?
+      "update tbl_simtr_transaksi set id_pbma=? where tgl_transaksi >= ? and tgl_transaksi <= date_add(?, interval 1 day)
       and id_pbma is null and kode_transaksi = 2 and kuanta = 0 and id_bahan <> 0 and rupiah <> 0
       and catatan like 'BIAYA%'";
       return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
@@ -41,7 +41,7 @@ class Transaksi_model extends CI_Model{
   public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
     if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
       $query =
-      "update tbl_simtr_transaksi set id_pbp=? where tgl_transaksi >= ? and tgl_transaksi <= ?
+      "update tbl_simtr_transaksi set id_pbp=? where tgl_transaksi >= ? and tgl_transaksi <= date_add(?, interval 1 day)
       and id_pbp is null and kode_transaksi = 2 and kuanta <> 0 and id_aktivitas <> 0 and rupiah <> 0";
       return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
     }
@@ -261,7 +261,7 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_bahan BHN on BHN.id_bahan = TRANS.id_bahan
     where BHN.tahun_giling = TRANS.tahun_giling and
     	TRANS.tgl_transaksi >= ? and
-    	TRANS.tgl_transaksi <= ? and
+    	TRANS.tgl_transaksi <= date_add(?, interval 1 day) and
       TRANS.tahun_giling like concat('%', ?, '%') and TRANS.kuanta > 0
     group by TRANS.id_kelompoktani
     ";
@@ -285,7 +285,7 @@ class Transaksi_model extends CI_Model{
     where BHN.nama_bahan = ? and
       TRANS.id_kelompoktani = ? and
       TRANS.tgl_transaksi >= ? and
-    	TRANS.tgl_transaksi <= ?
+    	TRANS.tgl_transaksi <= date_add(?, interval 1 day)
     ";
     return json_encode($this->db->query($query, array($nama_bahan, $id_kelompok, $tgl_awal, $tgl_akhir))->result());
   }
@@ -340,7 +340,7 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
     join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
-    and trans.tgl_transaksi <= ? and trans.tahun_giling like concat('%', ?, '%')
+    and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat('%', ?, '%')
     and trans.id_pbp is null and kt.id_afd like concat('%', ?, '%') and trans.id_aktivitas <> 0
     group by wil.nama_wilayah, trans.id_kelompoktani
     ";
@@ -418,7 +418,7 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
     join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
-    and trans.tgl_transaksi <= ? and trans.tahun_giling like concat('%', ?, '%')
+    and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat('%', ?, '%')
     and trans.id_pbma is null and kt.id_afd like concat('%', ?, '%') and trans.id_bahan <> 0
 	  and kuanta = 0
     group by wil.nama_wilayah, trans.id_kelompoktani

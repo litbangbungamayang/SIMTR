@@ -28,6 +28,7 @@ $("#btnBuatPBMA").on("click", function(){
     if (confirm("Buat pengajuan biaya untuk daftar tersebut?")){
       var url_string = $("#tblListPupuk").DataTable().ajax.url();
       var url = new URL(url_string);
+      console.log(url_string);
       var tgl_awal = url.searchParams.get("tgl_awal");
       var tgl_akhir = url.searchParams.get("tgl_akhir");
         $.ajax({
@@ -37,7 +38,7 @@ $("#btnBuatPBMA").on("click", function(){
           data: "tipe_dokumen=PBMA&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir + "&catatan=" + strTglAwal + " s.d " + strTglAkhir,
           success: function(response){
             alert("Pengajuan berhasil disimpan.");
-            $("#tblListPupuk").DataTable().ajax.reload();
+            $("#tblListPupuk").DataTable().ajax.url(js_base_url + "Biaya_muat_angkut_pupuk/getRekapBiayaMuatAngkutPupuk?tahun_giling=0&tgl_awal=2000-01-01&tgl_akhir=2000-12-31").load();
           }
         });
         console.log("StartDate = " + tgl_awal + "; EndDate = " + tgl_akhir);

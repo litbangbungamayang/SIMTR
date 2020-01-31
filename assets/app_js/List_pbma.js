@@ -112,14 +112,23 @@ $("#tblListPbma").DataTable({
             }
           }
         }
+        if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+          return "<span class='tag tag-red'>Belum Divalidasi</span>";
+        } else {
+          if(row.tgl_validasi_bagian == null || row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+          } else {
+            return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+          }
+        }
       },
       className: "text-center"
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a style="width: 80px" class="btn btn-sm btn-gray" href="Cetak_pbma?id_pbma=' + row.id_dokumen + '">Lihat Detail</a> ';
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbma?id_pbma=' + row.id_dokumen + '"title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         if(row.priv_level == "Asisten Bagian"){
-          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') >Setuju</button> ';
+          var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ';
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;
           } else {
@@ -127,7 +136,7 @@ $("#tblListPbma").DataTable({
           }
         } else {
           if(row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_bagian != null){
-            var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') >Setuju</button> ';
+            var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ';
             if(row.tgl_validasi_kasubbag == null){
               return buttonDetail + buttonApproval;
             } else {
