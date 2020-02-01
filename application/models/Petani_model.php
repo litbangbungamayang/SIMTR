@@ -10,6 +10,8 @@ class Petani_model extends CI_Model{
   public $id_kelompok;
   public $nama_petani;
   public $luas;
+  public $scan_ktp;
+  public $scan_kk;
 
   public function rules_petani(){
     return [
@@ -32,6 +34,8 @@ class Petani_model extends CI_Model{
     $this->id_kelompok = $idKelompok;
     $this->nama_petani = $petani->nama_petani;
     $this->luas = $petani->luas;
+    $this->scan_ktp = $petani->scanKtp;
+    $this->scan_kk = $petani->scanKk;
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }

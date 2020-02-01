@@ -67,6 +67,7 @@ class Rdkk_add extends CI_Controller{
 
   public function tambahData(){
     $arrayPetani = $this->session->flashdata("arrayPetani");
+    //var_dump($arrayPetani[0]->scanKtp);
     /*
     [1]=> object(stdClass)#19 (5) {
     ["id_petani"]=> NULL
@@ -74,8 +75,9 @@ class Rdkk_add extends CI_Controller{
     ["nama_petani"]=> string(3) "bbb"
     ["luas"]=> float(7.6164900333385)
     ["gps"]=> array(1) {...}
+    ["scanKtp"]
+    ["scanKk"]
     */
-
     $MAX_IMAGE_SIZE = 200; //in kB
     $petanimodel = $this->petani_model;
     $kelompoktani = $this->kelompoktani_model;
@@ -240,7 +242,7 @@ class Rdkk_add extends CI_Controller{
                     <div class="invalid-feedback">'.form_error('kategori').'</div>
                   </div>
                   <div class="form-group" id="grUploadKtp">
-                    <div class="form-label">Scan Image KTP</div>
+                    <div class="form-label">Scan Image KTP Kelompok</div>
                     <div class="custom-file">
                       <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKtp') != NULL ? "is-invalid" : "").'" name="scanKtp">
                       <label id="lblScanKtp" class="custom-file-label">Pilih file</label>
@@ -333,7 +335,7 @@ class Rdkk_add extends CI_Controller{
             <div class="modal-body">
               <div class="alert alert-danger" id="errMsg">
               </div>
-              <form id="formAddPetani" action="'.site_url('Rdkk_add/addPetaniTemp').'" method="POST" enctype="multipart/form-data">
+              <form id="formAddPetani" action="" method="POST" enctype="multipart/form-data">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaPetani">
@@ -347,6 +349,24 @@ class Rdkk_add extends CI_Controller{
                         <input type="file" accept=".gpx" class="custom-file-input" name="fileGpxKebun" id="fileGpxKebun">
                         <label class="custom-file-label" id="lblFileGpxKebun" name="lblFileGpxKebun">Pilih file</label>
                         <div class="invalid-feedback" id="fbFileGpx"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grUploadKtpPetani">
+                      <div class="form-label">Scan Image KTP Petani</div>
+                      <div class="custom-file">
+                        <input id="scanKtpPetani" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKtpPetani') != NULL ? "is-invalid" : "").'" name="scanKtpPetani">
+                        <label id="lblScanKtpPetani" class="custom-file-label">Pilih file</label>
+                        <div style="" class="invalid-feedback" id="fbScanKtpPetani">'.form_error('scanKtpPetani').'</div>
+                      </div>
+                    </div>
+                    <div class="form-group" id="grUploadKkPetani">
+                      <div class="form-label">Scan Image KK Petani</div>
+                      <div class="custom-file">
+                        <input id="scanKkPetani" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKkPetani') != NULL ? "is-invalid" : "").'" name="scanKkPetani">
+                        <label id="lblScanKkPetani" class="custom-file-label">Pilih file</label>
+                        <div style="" class="invalid-feedback" id="fbScanKkPetani">'.form_error('scanKkPetani').'</div>
                       </div>
                     </div>
                   </div>
@@ -375,16 +395,5 @@ class Rdkk_add extends CI_Controller{
 
   public function loadScript(){
     return '$.getScript("'.base_url("/assets/app_js/Rdkk_add.js").'");';
-  }
-
-  public function addPetaniTemp(){
-    $petani = $this->petani_model;
-    //var_dump("Masuk");
-    //ADD VALIDATION
-    $validation = $this->form_validation;
-    $validation->set_rules($petani->rules_petani());
-    if ($validation->run()){
-
-    }
   }
 }

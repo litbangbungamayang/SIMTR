@@ -136,18 +136,26 @@ function readOpenLayers(gpxFile){
     var luasLahan =  ol.sphere.getArea(poly, {
       projection: "EPSG:4326"
     });
+    var indexScanPetani = arrayScanPetani.length - 1;
     var petani = objPetani(
       null,
       null,
       $("#namaPetani").val().toUpperCase(),
       luasLahan/10000,
-      geom.getCoordinates()
+      geom.getCoordinates(),
+      arrayScanPetani[indexScanPetani].scanKtpPetani,
+      arrayScanPetani[indexScanPetani].scanKkPetani
     );
     $("#lblFileGpxKebun").text("Pilih file");
+    $("#lblScanKtpPetani").text("Pilih file");
+    $("#lblScanKkPetani").text("Pilih file");
     $("#fileGpxKebun").val("");
+    $("#fileScanKtpPetani").val("");
+    $("#fileScanKkPetani").val("");
     arrayPetani.push(petani);
     refreshData();
-    console.log(petani);
+    //console.log(petani);
+    //console.log(arrayScanPetani);
     formAddPetani.reset();
   }
 }
@@ -162,14 +170,25 @@ $("#dialogAddPetani").on("hide.bs.modal", function (e){
 })
 
 var arrayPetani = [];
+var arrayScanPetani = [];
 var formAddPetani = $("#formAddPetani")[0];
-var objPetani = function(id_petani, id_kelompok, nama_petani, luas, arrayGPS){
+var scanKtpPetaniContent = "";
+var scanKkPetaniContent = "";
+var objPetani = function(id_petani, id_kelompok, nama_petani, luas, arrayGPS, scanKtp, scanKk){
   var obj = {};
   obj.id_petani = id_petani;
   obj.id_kelompok = id_kelompok;
   obj.nama_petani = nama_petani;
   obj.luas = luas;
   obj.gps = arrayGPS;
+  obj.scanKtp = scanKtp;
+  obj.scanKk = scanKk;
+  return obj;
+}
+var objScanPetani = function(scanKtpPetani, scanKkPetani){
+  var obj = {};
+  obj.scanKtpPetani = scanKtpPetani;
+  obj.scanKkPetani = scanKkPetani;
   return obj;
 }
 
@@ -232,10 +251,18 @@ function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedB
 
 $("#scanKtp").change(function (e){
   validasiFile($(this), $("#lblScanKtp"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKtp"));
-})
+});
+
+$("#scanKtpPetani").change(function (e){
+  validasiFile($(this), $("#lblScanKtpPetani"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKtpPetani"));
+});
 
 $("#scanKk").change(function (e){
   validasiFile($(this), $("#lblScanKk"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKk"));
+});
+
+$("#scanKkPetani").change(function (e){
+  validasiFile($(this), $("#lblScanKkPetani"), (MAX_IMAGE_SIZE*1024), "image/jpeg", $("#fbScanKkPetani"));
 });
 
 $("#scanSurat").change(function (e){
@@ -248,6 +275,21 @@ $("#namaPetani").on("change", function(){
   $(this).removeClass("is-invalid");
 });
 
+function readFile(scanKtp, scanKk){
+  var dokumen = objScanPetani();
+  var readerKtp = new FileReader();
+  readerKtp.onload = function (e){
+    dokumen.scanKtpPetani = (readerKtp.result).split("data:image/jpeg;base64,")[1];
+  }
+  readerKtp.readAsDataURL(scanKtp);
+  var readerKk = new FileReader();
+  readerKk.onload = function (e){
+    dokumen.scanKkPetani = (readerKtp.result).split("data:image/jpeg;base64,")[1];
+  }
+  readerKk.readAsText(scanKk);
+  arrayScanPetani.push(dokumen);
+}
+
 $("#btnSimpan").on("click", function(){
   $.ajax({
     url: js_base_url + "Rdkk_add/getArrayPetani",
@@ -259,13 +301,20 @@ $("#btnSimpan").on("click", function(){
 
 $("#btnSimpanPetani").on("click", function(){
   var fileGpxKebun = $("#fileGpxKebun");
+  var fileScanKtpPetani = $("#scanKtpPetani");
+  var fileScanKkPetani = $("#scanKkPetani");
   var fbFileGpx = $("#fbFileGpx");
+  var fbScanKtpPetani = $("#fbScanKtpPetani");
+  var fbScanKkPetani = $("#fbScanKkPetani");
   var namaPetani = $("#namaPetani");
   var fbNamaPetani = $("#fbNamaPetani");
   var errMsg = $("#errMsg");
-  if (fileGpxKebun.val() != "" && namaPetani.val() != ""){
-    var selectedFile = $("#fileGpxKebun")[0].files[0];
-    readOpenLayers(selectedFile);
+  if (fileGpxKebun.val() != "" && namaPetani.val() != "" && fileScanKtpPetani.val() != "" && fileScanKkPetani != ""){
+    var gpxFile = $("#fileGpxKebun")[0].files[0];
+    var scanKtpObj = fileScanKtpPetani[0].files[0];
+    var scanKkObj = fileScanKtpPetani[0].files[0];
+    readFile(scanKtpObj, scanKkObj);
+    readOpenLayers(gpxFile);
     namaPetani.removeClass("is-invalid");
     fileGpxKebun.removeClass("is-invalid");
     fbFileGpx.hide();
@@ -279,6 +328,16 @@ $("#btnSimpanPetani").on("click", function(){
       fbFileGpx.show();
       fbFileGpx.html("File gpx belum diinput!");
       fileGpxKebun.addClass("is-invalid");
+    };
+    if (fileScanKtpPetani.val() == ""){
+      fbScanKtpPetani.show();
+      fbScanKtpPetani.html("File scan KTP petani belum diinput!");
+      fbScanKtpPetani.addClass("is-invalid");
+    };
+    if (fileScanKkPetani.val() == ""){
+      fbScanKkPetani.show();
+      fbScanKkPetani.html("File scan KK petani belum diinput!");
+      fileScanKkPetani.addClass("is-invalid");
     };
   }
 });
