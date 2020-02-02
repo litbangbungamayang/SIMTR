@@ -56,6 +56,10 @@
       echo $this->transaksi_model->getHargaSatuanByIdBahan();
     }
 
+    public function getAktivitasBibit(){
+      echo $this->aktivitas_model->getBibit();
+    }
+
     public function getArrayPermintaanPerawatan(){
       $arrayErrorMsg = array();
       $arrayPermintaanPerawatan = json_decode($this->input->post("perawatan"));
@@ -75,9 +79,17 @@
           "tahun_giling" => $permintaanPerawatan->tahun_giling,
           "catatan" => NULL
         );
-        $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokIdAktivitas($permintaanPerawatan->id_kelompok, $permintaanPerawatan->id_aktivitas))->kuanta;
-        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPerawatan->id_kelompok));
         $aktivitas = json_decode($this->aktivitas_model->getAktivitasById($permintaanPerawatan->id_aktivitas));
+        // Cek permintaan bibit atau perawatan -------------
+        if ($aktivitas->jenis_aktivitas == "BIBIT"){
+          $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokJenisAktivitas($permintaanPerawatan->id_kelompok, "BIBIT"))->kuanta;
+          $tipe_dokumen = "BBT";
+        } else if($aktivitas->jenis_aktivitas == "PERAWATAN"){
+          $transaksiYll = json_decode($this->transaksi_model->getTransaksiByIdKelompokIdAktivitas($permintaanPerawatan->id_kelompok, $permintaanPerawatan->id_aktivitas))->kuanta;
+          $tipe_dokumen = "PPK";
+        }
+        // -------------------------------------------------
+        $kelompok = json_decode($this->kelompoktani_model->getKelompokById($permintaanPerawatan->id_kelompok));
         if(($transaksiYll + $permintaanPerawatan->kuanta) <= $kelompok->luas){
           $transPostData[] = $postData;
           $msg = "Transaksi perawatan ".$aktivitas->nama_aktivitas." berhasil ditambahkan.";
@@ -93,7 +105,6 @@
         foreach($transPostData as $postData){
           $this->transaksi_model->simpan($postData);
         }
-        $tipe_dokumen = "PPK";
         $id_dokumen = $this->dokumen_model->simpan($tipe_dokumen, "-");
         $this->transaksi_model->updateIdPpk($id_dokumen, $no_transaksi);
         if($this->db->trans_status()){
@@ -439,7 +450,94 @@
         </div>
       </div>
       ';
-      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan;
+      $content_dialogAddPermintaanBibit =
+      '
+      <div class="modal fade" id="dialogAddPermintaanBibit">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Permintaan Bibit</h4>
+              <button class="close" data-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+              <form id="formAddPermintaanBibit">
+                <div class="row">
+                  <div class="col-md-12 col-lg-12">
+                    <div class="card card-collapsed" id="card_tblPerawatan">
+                      <div class="card-status bg-green"></div>
+                      <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
+                        <div>Transaksi yang lalu</div>
+                        <div class="card-options">
+                          <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <table id="tblBibit" class="table card-table table-vcenter text-nowrap datatable table-md" style="width: 100%;">
+                          <thead>
+                            <tr>
+                              <th class="w-1">No.</th>
+                              <th>No. Transaksi</th>
+                              <th>Tgl. Transaksi</th>
+                              <th>Asal Bibit</th>
+                              <th>Luas Tanam</th>
+                              <th>Rupiah</th>
+                              <th>Surat Permintaan</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grNamaKelompok" style="margin-top: 25px;">
+                      <label class="form-label">Nama Kelompok</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="namaKelompokBibit" disabled>
+                    </div>
+                    <div class="form-group" id="grJenisPupuk">
+                      <label class="form-label">Asal bibit</label>
+                      <select name="asalBibit" id="asalBibit" class="custom-control custom-select" placeholder="Pilih asal bibit">
+                        <option value="">Pilih asal bibit</option>
+                      </select>
+                      <div class="invalid-feedback">Jenis bibit belum dipilih!</div>
+                    </div>
+                    <div class="form-group" id="grLuasDiminta"">
+                      <label class="form-label">Luas tanam yang diminta</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="luasBibitDiminta">
+                      <div class="invalid-feedback">Luas tanam belum diisi!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grLuas" style="margin-top: 25px;">
+                      <label class="form-label">Luas Area</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="luasBakuBibit" disabled>
+                    </div>
+                    <div class="form-group" id="grVarietas"">
+                      <label class="form-label">Varietas Bibit</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="varBibit" disabled>
+                      <div class="invalid-feedback">Varietas bibit belum ada!</div>
+                    </div>
+                    <div class="form-group" id="grBiayaPerHa"">
+                      <label class="form-label">Biaya per hektar</label>
+                      <input type="text" style="" class="form-control" id="biayaBibit" disabled>
+                    </div>
+                    <div class="form-group" id="grBiayaPerHa"">
+                      <label class="form-label">Total Biaya Bibit</label>
+                      <input type="text" style="" class="form-control" id="totalBiayaBibit" disabled>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <button type="button" id="btnSimpanPermintaanBibit" class="btn btn-primary btn-block" name="submit" ><i class="fe fe-save"></i> Ajukan Permintaan Bibit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      ';
+      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan.$content_dialogAddPermintaanBibit;
     }
 
   }

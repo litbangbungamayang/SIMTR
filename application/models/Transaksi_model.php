@@ -183,6 +183,17 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_kelompok, $id_aktivitas))->row());
   }
 
+  public function getTransaksiByIdKelompokJenisAktivitas($id_kelompok = null, $jenis_aktivitas = null){
+    $query =
+    "
+    select sum(trn.kuanta) as kuanta
+    from tbl_simtr_transaksi trn
+      join tbl_aktivitas akt on akt.id_aktivitas = trn.id_aktivitas
+    where id_kelompoktani = ? and akt.jenis_aktivitas = ?
+    ";
+    return json_encode($this->db->query($query, array($id_kelompok, $jenis_aktivitas))->row());
+  }
+
   public function simpan($data_transaksi = null){
     if (is_null($data_transaksi)){
       $post = $this->input->post();

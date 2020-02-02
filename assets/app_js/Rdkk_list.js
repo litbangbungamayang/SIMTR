@@ -1,5 +1,6 @@
 var dialogAddPermintaanPupuk = $("#dialogAddPermintaanPupuk");
 var dialogAddPerawatan = $("#dialogAddPerawatan");
+var dialogAddPermintaanBibit = $("#dialogAddPermintaanBibit");
 var btnSimpanPermintaanPupuk = $("#btnSimpanPermintaanPupuk");
 var btnSimpanPermintaanPerawatan = $("#btnSimpanPermintaanPerawatan");
 var arrayPermintaanPupuk = [];
@@ -34,6 +35,16 @@ var perawatan_jmlBiaya = $("#perawatan_jmlBiaya");
 var perawatan_luasDiminta = $("#perawatan_luasDiminta");
 var perawatan_luas = $("#perawatan_luas");
 var cbxAktivitas = $("#jenis_aktivitas");
+var namaKelompokBibit = $("#namaKelompokBibit");
+var luasBakuBibit = $("#luasBakuBibit");
+var varBibit = $("#varBibit");
+var asalBibit = $("#asalBibit");
+var biayaBibit = $("#biayaBibit");
+var luasBibitDiminta = $("#luasBibitDiminta");
+var totalBiayaBibit = $("#totalBiayaBibit");
+var btnSimpanPermintaanBibit = $("#btnSimpanPermintaanBibit");
+var biaya_aktivitas;
+var selectedRowData;
 
 
 /************************** OBJECT METHODS SECTION *****************************/
@@ -65,6 +76,32 @@ $("#perawatan_luasDiminta").on("blur", function(){
     $(this).val("");
   }
 });
+
+asalBibit.on("change", function(){
+  if ($(this).val() != ""){
+    id_aktivitas_selected = asalBibit.selectize()[0].selectize.getValue();
+    biaya_aktivitas = parseInt(asalBibit.selectize()[0].selectize.options[id_aktivitas_selected].biaya);
+    biayaBibit.val("Rp " + biaya_aktivitas.toLocaleString({maximumFractionDigits: 2}));
+    luasBibitDiminta.val("");
+    totalBiayaBibit.val("");
+  }
+});
+
+luasBibitDiminta.bind("keyup blur", function(){
+  $(this).val($(this).val().replace(/[^0-9. ]/g,""));
+});
+
+luasBibitDiminta.on("blur", function(){
+  if ($(this).val() != "" && asalBibit.selectize()[0].selectize.getValue != ""){
+    $(this).val(parseFloat($(this).val()));
+    var luas_maks = parseFloat(luasBakuBibit.val().replace(/[^0-9. ]/g,""));
+    (parseFloat($(this).val()) > luas_maks) ? $(this).val(luas_maks) : "";
+    totalBiayaBibit.val("Rp " + parseInt(biaya_aktivitas*$(this).val()).toLocaleString({maximumFractionDigits: 0}));
+  } else {
+    $(this).val("");
+  }
+});
+
 
 btnSimpanPermintaanPupuk.on("click", function(){
   if (arrayPermintaanPupuk.length > 0){
@@ -110,6 +147,40 @@ btnSimpanPermintaanPerawatan.on("click", function(){
     });
   }
 })
+
+btnSimpanPermintaanBibit.on("click", function(){
+  var permintaanBaru = objTransaksi(
+    id_aktivitas_selected,
+    0,
+    selectedRowData.id_kelompok,
+    2,
+    selectedRowData.tahun_giling,
+    asalBibit.selectize()[0].selectize.options[id_aktivitas_selected].nama_aktivitas,
+    parseFloat(luasBibitDiminta.val()),
+    parseFloat(luasBibitDiminta.val()),
+    asalBibit.selectize()[0].selectize.options[id_aktivitas_selected].biaya,
+    asalBibit.selectize()[0].selectize.options[id_aktivitas_selected].biaya
+  );
+  var arrayPost = [];
+  arrayPost.push(permintaanBaru);
+  console.log(arrayPost);
+  $.ajax({
+    url: js_base_url + "Rdkk_list/getArrayPermintaanPerawatan",
+    dataType: "json",
+    type: "POST",
+    data: "perawatan=" + JSON.stringify(arrayPost),
+    success: function(response){
+      if(response.length > 0){
+        for(i = 0; i < response.length; i++){
+          console.log(response.length);
+          alert(response[i]);
+        }
+      }
+      arrayPost = [];
+      resetFeedbackAddBibit();
+    }
+  });
+});
 
 dialogAddPermintaanPupuk.on("hide.bs.modal", function(){
   arrayPermintaanPupuk = [];
@@ -293,6 +364,48 @@ function addPerawatan(id_kelompok){
   });
 }
 
+function addBibit(id_kelompok, kategori){
+  dialogAddPermintaanBibit.modal("toggle");
+  dialogAddPermintaanBibit.on("hide.bs.modal", function(){
+    resetFeedbackAddBibit();
+  });
+  var tblListData = $("#tblList").DataTable().rows().data();
+  var tblListArr = $.map(tblListData, function(value, index){
+    return [value];
+  })
+  selectedRowData = tblListArr.find(x => x.id_kelompok == id_kelompok);
+  var arrayAsalBibit;
+
+  namaKelompokBibit.val(selectedRowData.nama_kelompok);
+  luasBakuBibit.val(selectedRowData.luas + " Ha");
+  varBibit.val(selectedRowData.nama_varietas);
+  function validasiFormBibit(){
+    if (asalBibit.val() != "" && luasBibitDiminta.val() != ""){
+      luasBibitDiminta.removeClass("is-invalid");
+      asalBibit.removeClass("is-invalid");
+      return true;
+    } else {
+      (asalBibit.val() == "") ? asalBibit.addClass("is-invalid") : asalBibit.removeClass("is-invalid");
+      (luasBibitDiminta.val() == "") ? luasBibitDiminta.addClass("is-invalid") : luasBibitDiminta.removeClass("is-invalid");
+    }
+    return false;
+  }
+  $.ajax({
+    url: js_base_url + "Rdkk_list/getAktivitasBibit?tahun_giling="+selectedRowData.tahun_giling,
+    type: "GET",
+    dataType: "json",
+    success: function(response){
+      asalBibit.selectize();
+      asalBibit.selectize()[0].selectize.clear();
+      asalBibit.selectize()[0].selectize.clearOptions();
+      asalBibit.selectize()[0].selectize.load(function(callback){
+        callback(response);
+      });
+      arrayAsalBibit = response;
+    }
+  });
+}
+
 function addPupuk(id_kelompok){
   dialogAddPermintaanPupuk.modal("toggle");
   $.ajax({
@@ -366,6 +479,15 @@ function resetFeedbackAddPupuk(){
   refreshTablePermintaan();
 }
 
+function resetFeedbackAddBibit(){
+  asalBibit.val("");
+  biayaBibit.val("");
+  luasBibitDiminta.val("");
+  totalBiayaBibit.val("");
+  luasBibitDiminta.removeClass("is-invalid");
+  asalBibit.removeClass("is-invalid");
+};
+
 function resetFeedbackAddPerawatan(){
   perawatan_luasDiminta.removeClass("is-invalid");
   cbxAktivitas.removeClass("is-invalid");
@@ -413,7 +535,11 @@ function refreshTablePermintaanPerawatan(){
   tblPermintaanPerawatan.draw();
 }
 
-function actionButtonView(id_kelompok){
+function actionButtonView(id_kelompok, kategori){
+  var menu_bibit = "";
+  if(kategori == 1){
+    menu_bibit = '<a class="dropdown-item" href="#" onclick="addBibit(' + id_kelompok + ')"><i class="fe fe-loader"></i> Buat Permintaan Bibit</a>'
+  }
   return  '<div class="btn-group"><button style="width: 80px" type="button" class="btn btn-secondary btn-sm btn-cyan dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
           '<i class="fe fe-settings mr-2"></i> Opsi' +
           '</button>' +
@@ -424,6 +550,7 @@ function actionButtonView(id_kelompok){
             '<div class="dropdown-divider"></div>' +
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
+            menu_bibit +
           '</div></div>';
 }
 
@@ -448,6 +575,17 @@ $("#jenis_aktivitas").selectize({
   maxItems: 1,
   create: false,
   placeholder: "Pilih jenis aktivitas",
+  options: []
+});
+
+$("#asalBibit").selectize({
+  valueField: "id_aktivitas",
+  labelField: "nama_aktivitas",
+  sortField: "nama_aktivitas",
+  searchField: "nama_aktivitas",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih asal bibit",
   options: []
 });
 
@@ -487,7 +625,7 @@ $("#tblList").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return actionButtonView(row.id_kelompok);
+        return actionButtonView(row.id_kelompok, row.kategori);
       }
     }
   ],

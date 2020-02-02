@@ -51,11 +51,15 @@ class Aktivitas_model extends CI_Model{
     $kategori = $this->input->get("kategori");
     ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
     $tstr = "TR";
-    //return json_encode($this->db->query("select * from tbl_aktivitas where tahun_giling = $tahun_giling and tstr = '".$tstr."'")->result());
-    //$query = $this->db->select("*")->from($this->_table)->where("tstr", $tstr)->where("tahun_giling", $tahun_giling)->get();
     $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = ?
-      and tstr = ? and (kategori = 'ALL' or kategori = ?)", array($tahun_giling, $tstr, $kategori));
+      and tstr = ? and (kategori = 'ALL' or kategori = ?) and jenis_aktivitas = 'PERAWATAN'", array($tahun_giling, $tstr, $kategori));
     return json_encode($query->result());
+  }
+
+  public function getBibit(){
+    $tahun_giling = $this->input->get("tahun_giling");
+    $query = "select * from tbl_aktivitas where jenis_aktivitas = ? and tahun_giling = ?";
+    return json_encode($this->db->query($query, array("BIBIT", $tahun_giling))->result());
   }
 
 }
