@@ -1,3 +1,17 @@
+function formatTgl(dateObj){
+  if(dateObj != null){
+    return dateObj.getFullYear() + "-" + ("0" + (dateObj.getMonth()+1)) + "-" + ("0" + dateObj.getDate()).slice(-2);
+  }
+  return "";
+}
+
+function formatTglStr(dateObj){
+  if(dateObj != null){
+    return ("0" + dateObj.getDate()).slice(-2) + "-" + ("0" + (dateObj.getMonth()+1)) + "-" + dateObj.getFullYear();
+  }
+  return "";
+}
+
 function approve(id_dokumen){
   $.ajax({
     url: js_base_url + "List_bon_perawatan/validasiDokumen",
@@ -37,10 +51,10 @@ $("#tblListPpk").DataTable({
   bInfo: false,
   autoWidth: false,
   ajax: {
-    url: js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0" ,
+    url: js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0&tgl_awal=" + "2010-01-01" + "&tgl_akhir=" + "2050-12-31" ,
     dataSrc: ""
   },
-  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling">f>tpl',
+  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling"><"dtpTglAwal"><"dtpTglAkhir">f>tpl',
   columns : [
     {
       data: "no",
@@ -159,9 +173,34 @@ $("#tblListPpk").DataTable({
     $("div.cbxTahunGiling").html('<select style="width: 150px; margin-bottom: 10px; margin-left: 10px" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
     $("div.labelTahunGiling").html('<label style="margin-left: 10px; height: 37px; margin-bottom: 10px; display: block; background: red"></label>');
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
+    function refreshTable(){
+      var tgl_awal = $("#dtpAwal").datepicker("getDate");
+      var tgl_akhir = $("#dtpAkhir").datepicker("getDate");
+      if(tgl_awal != null && tgl_akhir != null){
+        tgl_awal = formatTgl(tgl_awal);
+        tgl_akhir = formatTgl(tgl_akhir);
+        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+        $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=" + tahun_giling +
+        "&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir).load();
+        console.log("triggered");
+      }
+    }
     $("#tahun_giling").on("change", function(){
-      tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-      $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=" + tahun_giling).load();
+      refreshTable();
+    });
+    $("div.dtpTglAwal").html("<input autocomplete='off' type='text' class='form-control text-center' placeholder='Tanggal Awal' id='dtpAwal' style='width: 120px; margin-left: 10px;'>");
+    $("#dtpAwal").datepicker({
+      format: "dd-mm-yyyy"
+    });
+    $("div.dtpTglAkhir").html("<input autocomplete='off' type='text' class='form-control text-center' placeholder='Tanggal Akhir' id='dtpAkhir' style='width: 120px; margin-left: 10px; margin-bottom: 10px'>");
+    $("#dtpAkhir").datepicker({
+      format: "dd-mm-yyyy"
+    });
+    $("#dtpAwal").on("change", function(){
+      refreshTable();
+    });
+    $("#dtpAkhir").on("change", function(){
+      refreshTable();
     })
   },
   footerCallback: function (row, data, start, end, display){

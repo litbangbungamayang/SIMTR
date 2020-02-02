@@ -79,6 +79,7 @@ class Transaksi_list extends CI_Controller{
                           <th>No. Transaksi</th>
                           <th>Tgl. Transaksi</th>
                           <th>Jenis Pupuk</th>
+                          <th>Luas</th>
                           <th>Kuanta</th>
                           <th>Rupiah</th>
                           <th>Biaya Muat</th>
@@ -92,16 +93,44 @@ class Transaksi_list extends CI_Controller{
               </div>
             </div>
             <div class="col-md-12 col-lg-12">
-              <div class="card card-collapsed" id="card_tblTransaksi">
-                <div class="card-status bg-blue"></div>
+              <div class="card card-collapsed" id="card_transBibit">
+                <div class="card-status bg-yellow"></div>
                 <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
-                  <div class="card-title">Transaksi Perawatan</div>
+                  <div class="card-title">Transaksi Permintaan Bibit</div>
                   <div class="card-options">
                     <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
                   </div>
                 </div>
                 <div class="card-body">
-                  <table id="tblTransPerawatan" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%">
+                  <div class="table-responsive col-md-12 col-lg-12">
+                    <table id="tblTransBibit" class="table card-table table-vcenter text-nowrap datatable table-xl" style="width: 100%;">
+                      <thead>
+                        <tr>
+                          <th class="w-1">No.</th>
+                          <th>No. Transaksi</th>
+                          <th>Tgl. Transaksi</th>
+                          <th>Uraian</th>
+                          <th>Luas Tanam</th>
+                          <th>Rupiah</th>
+                          <th>Dokumen</th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 col-lg-12">
+              <div class="card card-collapsed" id="card_tblTransaksi">
+                <div class="card-status bg-blue"></div>
+                <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
+                  <div class="card-title">Transaksi Perawatan Kebun</div>
+                  <div class="card-options">
+                    <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <table id="tblTransPerawatan" class="table card-table table-vcenter text-nowrap datatable table-lg compact" style="width: 100%">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
@@ -113,6 +142,15 @@ class Transaksi_list extends CI_Controller{
                         <th>Bon Perawatan</th>
                       </tr>
                     </thead>
+                    <tfoot class="bg-blue-light">
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th><font color="white" size="3">Jumlah s.d.</font></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tfoot>
                   </table>
                 </div>
               </div>

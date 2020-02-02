@@ -141,7 +141,7 @@ btnSimpanPermintaanPerawatan.on("click", function(){
         }
         arrayPermintaanPerawatanMaks = [];
         arrayPermintaanPerawatan = [];
-        $("#tblPerawatan").DataTable().ajax.url(js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok=" + selectedKelompok.id_kelompok).load();
+        $("#tblPerawatan").DataTable().ajax.url(js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok=" + selectedKelompok.id_kelompok + "&jenis_aktivitas=" + "PERAWATAN").load();
         refreshTablePermintaanPerawatan();
       }
     });
@@ -336,7 +336,7 @@ function addPerawatan(id_kelompok){
       selectedKelompok = response;
       $("#perawatan_namaKelompok").val(response.nama_kelompok);
       $("#perawatan_luas").val(parseFloat(response.luas).toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha");
-      $("#tblPerawatan").DataTable().ajax.url(js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok=" + response.id_kelompok).load();
+      $("#tblPerawatan").DataTable().ajax.url(js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok=" + response.id_kelompok + "&jenis_aktivitas=" + "PERAWATAN").load();
       $.ajax({
         url: js_base_url + "Admin_aktivitas/getAktivitasByTahunGiling",
         type: "GET",
@@ -679,6 +679,13 @@ $("#tblPupuk").DataTable({
     {data: "tgl_transaksi"},
     {data: "nama_bahan"},
     {
+      data: "luas_aplikasi",
+      render: function(data, type, row, meta){
+        return parseFloat(data).toLocaleString(undefined, {maximumFractionDigits:2}) + " HA";
+      },
+      className: "text-right"
+    },
+    {
       data: "kuanta",
       render: function(data, type, row, meta){
         return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2}) + " " +row.satuan;
@@ -803,7 +810,7 @@ $("#tblPerawatan").DataTable({
   bInfo: false,
   dom: 'tp',
   ajax: {
-    url: js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok="+0,
+    url: js_base_url + "Transaksi_aktivitas/getTransaksiAktivitasByIdKelompok?id_kelompok="+0+"&jenis_aktivitas=" + "PERAWATAN",
     dataSrc: ""
   },
   columns : [
@@ -838,6 +845,16 @@ $("#tblPerawatan").DataTable({
       className: "text-center"
     }
   ],
+  footerCallback: function (row, data, start, end, display){
+    var api = this.api(), data;
+    var intRupiah = function ( i ) {
+      return typeof i === 'string' ? i.replace(/[\Rp,]/g, '')*1 : typeof i === 'number' ? i : 0;
+    };
+    totalRupiah = api.column(5).data().reduce( function (a, b) {
+        return intRupiah(a) + intRupiah(b);
+    },0);
+    $(api.column(5).footer()).html('<font size="3" color="white">' + "Rp " + totalRupiah.toLocaleString({maximumFractionDigits: 0}) + ' </font>');
+  },
   initComplete: function(){
 
   }

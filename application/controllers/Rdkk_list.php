@@ -270,6 +270,7 @@
                               <th>No. Transaksi</th>
                               <th>Tgl. Transaksi</th>
                               <th>Jenis Pupuk</th>
+                              <th>Luas</th>
                               <th>Kuanta</th>
                               <th>AU58</th>
                             </tr>
@@ -339,7 +340,7 @@
       $content_dialogAddPerawatan =
       '
       <div class="modal fade" id="dialogAddPerawatan">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">Permintaan Perawatan Kebun</h4>
@@ -358,7 +359,8 @@
                         </div>
                       </div>
                       <div class="card-body">
-                        <table id="tblPerawatan" class="table card-table table-vcenter text-nowrap datatable table-xl" style="width: 100%;">
+                      <div class="row">
+                        <table id="tblPerawatan" class="table card-table table-vcenter text-nowrap datatable table-sm" style="width: 100%;font-size: 95%">
                           <thead>
                             <tr>
                               <th class="w-1">No.</th>
@@ -367,10 +369,20 @@
                               <th>Jenis Aktivitas</th>
                               <th>Kuanta</th>
                               <th>Rupiah</th>
-                              <th>Bon Perawatan</th>
+                              <th>Dok.</th>
                             </tr>
                           </thead>
+                          <tfoot class="bg-gray">
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th><font color="white" size="3">Jumlah s.d.</font></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                          </tfoot>
                         </table>
+                      </div>
                       </div>
                     </div>
                   </div>

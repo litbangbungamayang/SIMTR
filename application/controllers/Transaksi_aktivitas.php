@@ -68,6 +68,11 @@ class Transaksi_aktivitas extends CI_Controller{
     }
     $contentAktivitas = $contentAktivitas.'<tr><td style="text-align: center;"></td><td>JUMLAH</td><td style="text-align: right;"></td><td style="text-align: right;"></td>
       <td style="text-align: right;">Rp '.number_format($jmlBiaya,0,".",",").'</td></tr>';
+    if($dataTransaksi[0]->jenis_aktivitas == "PERAWATAN"){
+      $judul = "Permintaan Perawatan Kebun";
+    } else {
+      $judul = "Permintaan Bibit";
+    }
     $container =
     '
       <div class="page">
@@ -82,7 +87,7 @@ class Transaksi_aktivitas extends CI_Controller{
             <div class="card-body">
               <div class="row">
                 <div class="col-6">
-                  <p class="h3">Permintaan Perawatan Kebun</p>
+                  <p class="h3">'.$judul.'</p>
                   <p>Kelompok <b>'.$dataTransaksi[0]->nama_kelompok.' / '.$dataTransaksi[0]->no_kontrak.'</b><br>
                   Kategori '.$dataTransaksi[0]->kategori.'<br>Luas '.$dataTransaksi[0]->luas.' Ha / Desa '.$dataTransaksi[0]->nama_wilayah.'</p>
                 </div>

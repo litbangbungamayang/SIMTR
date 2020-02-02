@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" id="main_page">
   <head>
     <?
       $arrayPetani = array();

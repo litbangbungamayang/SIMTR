@@ -97,7 +97,8 @@ class Transaksi_model extends CI_Model{
       		when KT.kategori = 3 then 'RT2'
               when KT.kategori = 4 then 'RT3' end) as kategori,
       	PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi, AKT.nama_aktivitas, AKT.biaya, TRANS.kuanta, TRANS.rupiah,
-        dok.no_dokumen, dok.tgl_buat, dok.tgl_validasi_bagian, dok.tgl_validasi_kasubbag, TRANS.id_ppk
+        dok.no_dokumen, dok.tgl_buat, dok.tgl_validasi_bagian, dok.tgl_validasi_kasubbag, TRANS.id_ppk,
+        AKT.jenis_aktivitas
       from tbl_simtr_kelompoktani KT
       join
       	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
@@ -134,7 +135,8 @@ class Transaksi_model extends CI_Model{
     "
     select
       TRANS.id_transaksi, TRANS.id_kelompoktani, BAHAN.id_bahan, BAHAN.nama_bahan, BAHAN.satuan,
-      TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, BAHAN.biaya_muat, BAHAN.biaya_angkut
+      TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, BAHAN.biaya_muat, BAHAN.biaya_angkut,
+      (ROUND(TRANS.kuanta/BAHAN.dosis_per_ha, 2)) as luas_aplikasi
     from tbl_simtr_transaksi TRANS
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
     where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK' and TRANS.kuanta > 0
@@ -144,15 +146,16 @@ class Transaksi_model extends CI_Model{
 
   public function getTransaksiAktivitasByIdKelompok(){
     $id_kelompok = $this->input->get("id_kelompok");
+    $jenis_aktivitas = $this->input->get("jenis_aktivitas");
     $query =
     "
     select
       TRANS.id_transaksi, TRANS.id_kelompoktani, AKTV.id_aktivitas, AKTV.nama_aktivitas, AKTV.biaya, TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi
     from tbl_simtr_transaksi TRANS
     join tbl_aktivitas AKTV on AKTV.id_aktivitas = TRANS.id_aktivitas
-    where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2
+    where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2 and AKTV.jenis_aktivitas = ?
     ";
-    return json_encode($this->db->query($query, array($id_kelompok))->result());
+    return json_encode($this->db->query($query, array($id_kelompok, $jenis_aktivitas))->result());
   }
 
   public function getTransaksiByIdKelompokIdBahan($id_kelompok = null, $id_bahan = null){
@@ -343,12 +346,14 @@ class Transaksi_model extends CI_Model{
     		group by kt.id_kelompok
     	) as luas,
     	( select sum(rupiah) as rupiah
-    		from tbl_simtr_transaksi
+    		from tbl_simtr_transaksi trn_2
+        join tbl_aktivitas akt on akt.id_aktivitas = trn_2.id_aktivitas
     		where id_kelompoktani = trans.id_kelompoktani
-    		and id_aktivitas <> 0
+        and akt.tunai = 1
     	) as jml_perawatan
     from tbl_simtr_transaksi trans
     join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
+    join tbl_aktivitas akt on akt.id_aktivitas = trans.id_aktivitas
     join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
     and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat('%', ?, '%')
@@ -602,8 +607,10 @@ class Transaksi_model extends CI_Model{
       dok.catatan, ? as priv_level
     from tbl_dokumen dok
     join tbl_simtr_transaksi trn on dok.id_dokumen = trn.id_pbp
+    join tbl_aktivitas akt on akt.id_aktivitas = trn.id_aktivitas
     join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
     where trn.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
+    and akt.tunai = 1
     group by dok.id_dokumen
     ";
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
@@ -685,6 +692,8 @@ class Transaksi_model extends CI_Model{
       $id_afd = "";
     }
     $tahun_giling = $this->input->get("tahun_giling");
+    $tgl_awal = $this->input->get("tgl_awal");
+    $tgl_akhir = $this->input->get("tgl_akhir");
     $query =
     "
     select
@@ -705,11 +714,14 @@ class Transaksi_model extends CI_Model{
       trn.no_transaksi
     from tbl_dokumen dok
     join tbl_simtr_transaksi trn on trn.id_ppk = dok.id_dokumen
+    join tbl_aktivitas akt on akt.id_aktivitas = trn.id_aktivitas
     join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
-    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
+    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%') and
+    trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
+    and akt.tunai = 1
     group by dok.id_dokumen
     ";
-    return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
+    return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
   }
 
 }
