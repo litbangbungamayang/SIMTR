@@ -28,22 +28,30 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->select("*")->from($this->_table)->where("id_aktivitas", $id_aktivitas)->get()->result());
   }
 
-  public function postPbma($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
-    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
+  public function postPbma($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null, $id_afd = null){
+    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir) && !is_null($id_afd)){
       $query =
-      "update tbl_simtr_transaksi set id_pbma=? where tgl_transaksi >= ? and tgl_transaksi <= date_add(?, interval 1 day)
-      and id_pbma is null and kode_transaksi = 2 and kuanta = 0 and id_bahan <> 0 and rupiah <> 0
-      and catatan like 'BIAYA%'";
-      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
+      "update tbl_simtr_transaksi trn
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+      set trn.id_pbma=?
+      where trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
+      and trn.id_pbma is null and trn.kode_transaksi = 2 and trn.kuanta = 0 and trn.id_bahan <> 0 and trn.rupiah <> 0
+      and kt.id_afd = ?
+      and trn.catatan like 'BIAYA%'";
+      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd)));
     }
   }
 
-  public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null){
-    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir)){
+  public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null, $id_afd = null){
+    if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir) && !is_null($id_afd)){
       $query =
-      "update tbl_simtr_transaksi set id_pbp=? where tgl_transaksi >= ? and tgl_transaksi <= date_add(?, interval 1 day)
-      and id_pbp is null and kode_transaksi = 2 and kuanta <> 0 and id_aktivitas <> 0 and rupiah <> 0";
-      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir)));
+      "update tbl_simtr_transaksi trn
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+      set trn.id_pbp=?
+      where trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
+      and trn.id_pbp is null and trn.kode_transaksi = 2 and trn.kuanta <> 0 and trn.id_aktivitas <> 0 and trn.rupiah <> 0
+      and kt.id_afd = ?";
+      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd)));
     }
   }
 
@@ -552,9 +560,10 @@ class Transaksi_model extends CI_Model{
     		group by kt.id_kelompok
     	) as luas,
     	( select sum(rupiah) as rupiah
-    		from tbl_simtr_transaksi
-    		where id_kelompoktani = trans.id_kelompoktani
-    		and id_aktivitas <> 0
+    		from tbl_simtr_transaksi trans_2
+        join tbl_aktivitas akt on akt.id_aktivitas = trans_2.id_aktivitas
+    		where trans_2.id_kelompoktani = trans.id_kelompoktani
+    		and trans_2.id_aktivitas <> 0 and akt.tunai = 1
     	) as jml_perawatan
     from tbl_simtr_transaksi trans
     join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok

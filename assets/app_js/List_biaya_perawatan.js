@@ -132,8 +132,8 @@ $("#tblListPerawatan").DataTable({
       render: function(data, type, row, meta){
         var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         if(row.priv_level == "Asisten Bagian"){
-          var buttonApproval = '<button style="width: 80px" class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
-          '<button style="width: 80px" type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ')>Batalkan</button>';
+          var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
+          '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
           if(row.tgl_validasi_bagian == null){
             return buttonDetail + buttonApproval;
           } else {

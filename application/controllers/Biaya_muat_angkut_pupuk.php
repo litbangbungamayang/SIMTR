@@ -35,9 +35,10 @@ class Biaya_muat_angkut_pupuk extends CI_Controller{
     $tgl_awal = $post["tgl_awal"];
     $tgl_akhir = $post["tgl_akhir"];
     $tipe_dokumen = $post["tipe_dokumen"];
+    $id_afd = $this->session->userdata("afd");
     $this->db->trans_begin();
     $id_dokumen =  $this->dokumen_model->simpan($tipe_dokumen);
-    $this->transaksi_model->postPbma($id_dokumen, $tgl_awal, $tgl_akhir);
+    $this->transaksi_model->postPbma($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd);
     if($this->db->trans_status()){
       $this->db->trans_commit();
       echo "SUCCESS";
