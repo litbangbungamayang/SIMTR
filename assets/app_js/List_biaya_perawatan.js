@@ -27,7 +27,7 @@ function approveAskep(id_dokumen){
       success: function(response){
         if (response = "SUCCESS"){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0").load();
           alert("Dokumen berhasil divalidasi!");
         }
       }
@@ -45,7 +45,7 @@ function cancel(id_dokumen){
       success: function(response){
         if (response = "SUCCESS"){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0").load();
           alert("Dokumen berhasil dibatalkan!");
         }
       }

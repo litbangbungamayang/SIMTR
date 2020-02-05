@@ -611,7 +611,35 @@ $("#tblList").DataTable({
     {data: "nama_kelompok"},
     {data: "no_kontrak"},
     {
+      data: "kategori",
+      render: function(data, type, row, meta){
+        var katg = "";
+        switch(data){
+          case "1":
+            katg = "PC";
+            break;
+          case "2":
+            katg = "RT 1";
+            break;
+          case "3":
+            katg = "RT 2";
+            break;
+          case "4":
+            katg = "RT 3";
+            break;
+        }
+        return katg;
+      },
+      className: "text-center"
+    },
+    {
       data: "tahun_giling",
+      render: function(data, type, row, meta){
+        var tahun_tanam = parseInt(data) - 1;
+        var str_tahungiling = data.toString().substr(2,2);
+        var str_tahuntanam = tahun_tanam.toString().substr(2,2);
+        return str_tahuntanam + "/" + str_tahungiling;
+      },
       className: "text-center"
     },
     {data: "nama_wilayah"},
@@ -642,7 +670,10 @@ $("#tblList").DataTable({
     var i;
     var optionTahun = '<option value="0">Pilih tahun giling</option>';
     for (i=0; i < 4; i++){
-      optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
+      var tahun_tanam = parseInt(currYear + i) - 1;
+      var str_tahungiling = (currYear + i).toString().substr(2,2);
+      var str_tahuntanam = tahun_tanam.toString().substr(2,2);
+      optionTahun += '<option value="' + parseInt(currYear + i) + '">' + 'KTG ' + str_tahuntanam + '/' + str_tahungiling + '</option>';
     }
     $("div.cbxTahunGiling").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
     $("div.labelTahunGiling").html('<label class="form-label" style="margin: 0px 10px 0px 0px;"></label>');

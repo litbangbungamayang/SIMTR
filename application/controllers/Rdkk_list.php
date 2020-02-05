@@ -223,7 +223,8 @@
                         <th class="w-1">No.</th>
                         <th>Nama Kelompok</th>
                         <th>No. Kontrak</th>
-                        <th>Tahun Giling</th>
+                        <th>Kategori</th>
+                        <th>KTG</th>
                         <th>Desa</th>
                         <th>MT</th>
                         <th>Varietas</th>

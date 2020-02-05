@@ -20,7 +20,11 @@ class Transaksi_aktivitas extends CI_Controller{
     $dataTransaksi = json_decode($this->transaksi_model->getTransaksiAktivitasByNoTransaksi($no_transaksi, $id_kelompok));
     date_default_timezone_set('Asia/Jakarta');
     $data['pageTitle'] = "";
-    $data['content'] = $this->loadContent($dataTransaksi);
+    if($dataTransaksi[0]->jenis_aktivitas == "BIBIT" && $dataTransaksi[0]->tunai == 0){
+      $data['content'] = $this->loadSuratBibit($dataTransaksi);
+    } else {
+      $data['content'] = $this->loadContent($dataTransaksi);
+    }
     $this->load->view('main_view', $data);
   }
 
@@ -45,6 +49,9 @@ class Transaksi_aktivitas extends CI_Controller{
     $qrAsisten = '';
     $qrAskep = '';
     $opsiCetak = '';
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    }
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
       $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
       $qrAsisten = $this->generateQr($dataQr);
@@ -71,7 +78,7 @@ class Transaksi_aktivitas extends CI_Controller{
     if($dataTransaksi[0]->jenis_aktivitas == "PERAWATAN"){
       $judul = "Permintaan Perawatan Kebun";
     } else {
-      $judul = "Permintaan Bibit";
+      $judul = "Permintaan Bibit ";
     }
     $container =
     '
@@ -116,6 +123,124 @@ class Transaksi_aktivitas extends CI_Controller{
               <div>
               <div class="row px-3">
                 <small>'.date("dmY-His").'</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ';
+    return $container;
+  }
+
+  public function loadSuratBibit($dataTransaksi){
+    $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $qrAsisten = '';
+    $qrAskep = '';
+    $opsiCetak = '';
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
+      $qrAsisten = $this->generateQr($dataQr);
+      $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_kasubbag='.$dataTransaksi[0]->tgl_validasi_kasubbag;
+      $qrAskep = $this->generateQr($dataQr);
+      $qrAskep = '<img src="data:image/png;base64,'.base64_encode($qrAskep).'" />';
+    }
+    $container =
+    '
+      <div class="page">
+        <div class="container">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-options">
+                <a href="#" class="btn btn-primary" onclick="javascript:history.back();" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                '.$opsiCetak.'
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row col-11">
+                <div class="col-2">
+                  No. Dokumen <br>
+                  Lampiran <br>
+                  Perihal <br>
+                </div>
+                <div class="col-4">
+                  : <strong> BUMA/TR/'.$dataTransaksi[0]->no_dokumen.'/'.$dataTransaksi[0]->tahun_giling.'</strong><br>
+                  : <strong> - </strong><br>
+                  : <strong> Permohonan Bibit TR Tahun Giling '.$dataTransaksi[0]->tahun_giling.'</strong>
+                </div>
+                <div class="col-4 text-right">
+                  Bungamayang, '.date_format(date_create($dataTransaksi[0]->tgl_transaksi), "d-M-Y").'
+                </div>
+              </div><br><br>
+              <div class="row col-11" style="margin-left: 20px">
+                <div class="col-8">
+                  <p>
+                    Kepada Yth. Manajer Kebun <br>
+                    PG. Bungamayang <br>
+                    di tempat
+                  </p>
+                  <p>
+                    Saya yang bertandatangan dibawah ini:<br>
+                    <div class="row">
+                      <div class="col-3">
+                        Nama Kelompok <br>
+                        No. Kontrak <br>
+                        Desa <br>
+                      </div>
+                      <div class="col-4">
+                        : <strong> '.$dataTransaksi[0]->nama_kelompok.'</strong><br>
+                        : <strong> '.$dataTransaksi[0]->no_kontrak.'</strong><br>
+                        : <strong> '.$dataTransaksi[0]->nama_wilayah.'</strong><br>
+                      </div>
+                    </div><br>
+                    akan mengajukan permohonan bibit untuk TRIT I Tahun Giling '.$dataTransaksi[0]->tahun_giling.' dengan kebutuhan sebagai berikut:<br>
+                    <div class="row">
+                      <div class="col-3">
+                        Luas tanam <br>
+                        Masa tanam <br>
+                        Varietas bibit <br>
+                      </div>
+                      <div class="col-4">
+                        : <strong> '.$dataTransaksi[0]->luas.' Ha</strong><br>
+                        : <strong> '.$dataTransaksi[0]->mt.'</strong><br>
+                        : <strong> '.$dataTransaksi[0]->nama_varietas.'</strong><br>
+                      </div>
+                    </div><br>
+                    Demikian disampaikan, mohon persetujuan.
+                  </p>
+                </div>
+              </div>
+              <div class="row col-10" style="height: 120px">
+                <div class="col-4 text-center">
+                Asisten Afd. '.$dataTransaksi[0]->id_afd.'
+                <br><br>'.$qrAsisten.'<br>
+                '.$nama_asisten.'
+                </div>
+                <div class="col-4 text-center">
+                Koordinator
+                </div>
+                <div class="col-4 text-center">
+                Ketua Kelompok
+                <br><br><br>
+                '.$dataTransaksi[0]->nama_kelompok.'
+                </div>
+              </div><br>
+              <div class="row col-10" style="height: 120px">
+                <div class="col-12 text-center">
+                Mengetahui,<br>
+                Asisten Kepala TR
+                <br><br>'.$qrAskep.'<br>
+                '.$nama_askep.'
+                </div>
+              </div><br><br>
+              <div class="row px-3">
+                <small> printed at '.date("dmY-His").'</small>
               </div>
             </div>
           </div>

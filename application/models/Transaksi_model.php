@@ -100,13 +100,13 @@ class Transaksi_model extends CI_Model{
     }
     $query =
       "select
-      	KT.nama_kelompok, KT.no_kontrak, KT.id_afd,
+      	KT.nama_kelompok, KT.no_kontrak, KT.id_afd, KT.tahun_giling, KT.mt, vrt.nama_varietas,
           (case when KT.kategori = 1 then 'PC' when KT.kategori = 2 then 'RT1'
       		when KT.kategori = 3 then 'RT2'
               when KT.kategori = 4 then 'RT3' end) as kategori,
       	PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi, AKT.nama_aktivitas, AKT.biaya, TRANS.kuanta, TRANS.rupiah,
         dok.no_dokumen, dok.tgl_buat, dok.tgl_validasi_bagian, dok.tgl_validasi_kasubbag, TRANS.id_ppk,
-        AKT.jenis_aktivitas
+        AKT.jenis_aktivitas, AKT.tunai
       from tbl_simtr_kelompoktani KT
       join
       	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
@@ -116,6 +116,7 @@ class Transaksi_model extends CI_Model{
       join tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
       join tbl_aktivitas AKT on AKT.id_aktivitas = TRANS.id_aktivitas
       join tbl_dokumen dok on dok.id_dokumen = TRANS.id_ppk
+      join tbl_varietas vrt on vrt.id_varietas = KT.id_varietas
       where TRANS.no_transaksi = ?
       group by TRANS.id_transaksi";
       return json_encode($this->db->query($query, array($id_kelompok, $no_transaksi))->result());
@@ -366,6 +367,7 @@ class Transaksi_model extends CI_Model{
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
     and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat('%', ?, '%')
     and trans.id_pbp is null and kt.id_afd like concat('%', ?, '%') and trans.id_aktivitas <> 0
+    and akt.tunai = 1
     group by wil.nama_wilayah, trans.id_kelompoktani
     ";
     return json_encode($this->db->query($query, array($tgl_awal, $tgl_akhir, $tahun_giling, $afdeling))->result());
