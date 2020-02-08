@@ -65,6 +65,10 @@ class Rdkk_add extends CI_Controller{
     $this->session->set_flashdata("arrayPetani", $arrayPetani);
   }
 
+  public function getDeskripsiDesaByIdKabupaten(){
+    echo $this->wilayah_model->getDeskripsiDesaByIdKabupaten($this->input->get("idKab"));
+  }
+
   public function tambahData(){
     $arrayPetani = $this->session->flashdata("arrayPetani");
     //var_dump($arrayPetani[0]->scanKtp);

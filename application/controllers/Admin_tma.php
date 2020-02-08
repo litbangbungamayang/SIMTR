@@ -5,6 +5,7 @@ class Admin_tma extends CI_Controller{
     parent :: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("transaksi_model");
+    $this->load->model("biayatma_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -23,6 +24,14 @@ class Admin_tma extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/Admin_tma.js").'");';
   }
 
+  public function addBiayaTma(){
+    echo $this->biayatma_model->simpan();
+  }
+
+  public function getAllBiayaTma(){
+    echo $this->biayatma_model->getAllBiayaTma();
+  }
+
   public function loadContent(){
     $content =
     '
@@ -35,7 +44,7 @@ class Admin_tma extends CI_Controller{
               </div>
               <div class="row">
                 <div class="table-responsive col-md-12">
-                  <table id="tblBahan" class="table card-table table-vcenter text-nowrap datatable table-sm">
+                  <table id="tblBiayaTma" class="table card-table table-vcenter text-nowrap datatable table-sm">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
@@ -84,18 +93,24 @@ class Admin_tma extends CI_Controller{
                     </div>
                     <div class="form-group" id="grNamaKab">
                       <label class="form-label">Kabupaten</label>
-                      <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="Pilih jenis bahan"></select>
-                      <div class="invalid-feedback">Jenis bahan belum dipilih!</div>
+                      <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="Pilih nama kabupaten"></select>
+                      <div class="invalid-feedback">Kabupaten belum dipilih!</div>
                     </div>
+                  </div>
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaDesa">
-                      <label class="form-label">Kabupaten</label>
-                      <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="Pilih jenis bahan"></select>
-                      <div class="invalid-feedback">Jenis bahan belum dipilih!</div>
+                      <label class="form-label">Desa</label>
+                      <select name="namaDesa" id="namaDesa" class="custom-control custom-select" placeholder="Pilih nama desa"></select>
+                      <div class="invalid-feedback">Desa belum dipilih!</div>
                     </div>
-                  <div>
+                    <div class="form-group" id="grBiaya">
+                      <label class="form-label">Biaya TMA per ton tebu</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="biaya" name="biaya" placeholder="Biaya per ton tebu">
+                      <div class="invalid-feedback" id="fbNamaBahan">Biaya belum diinput!</div>
+                    </div>
+                  </div>
                 </div>
-                <button type="button" id="btnSimpanBahan" class="btn btn-primary btn-block" name="" >Simpan data bahan</button>
+                <button type="button" id="btnSimpanBiayaTma" class="btn btn-primary btn-block" name="" >Simpan data biaya TMA</button>
               </form>
             </div>
           </div>
