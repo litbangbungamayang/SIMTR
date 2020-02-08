@@ -17,6 +17,12 @@
             </div>
           </li>
           <li class="nav-item dropdown" style="display: <? echo ($loggedUser->jabatan == 'Superadmin') ? 'none' : ''; ?>">
+            <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-droplet"></i> Bibit</a>
+            <div class="dropdown-menu dropdown-menu-arrow">
+              <a href="<? echo site_url('/List_permohonan_bibit')?>" class="dropdown-item "><i class="fe fe-file-text"></i> Permohonan Bibit PG</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown" style="display: <? echo ($loggedUser->jabatan == 'Superadmin') ? 'none' : ''; ?>">
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-sunset"></i> Pupuk</a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/List_au58')?>" class="dropdown-item "><i class="fe fe-file-text"></i> Rincian AU58</a>

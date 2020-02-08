@@ -735,4 +735,43 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
   }
 
+  public function getAllPermohonanBibit(){
+    $priv_level = $this->session->userdata("jabatan");
+    $id_afd = $this->session->userdata("afd");
+    if(is_null($id_afd)){
+      $id_afd = "";
+    }
+    $tahun_giling = $this->input->get("tahun_giling");
+    $tgl_awal = $this->input->get("tgl_awal");
+    $tgl_akhir = $this->input->get("tgl_akhir");
+    $query =
+    "
+    select
+      dok.id_dokumen,
+      dok.no_dokumen,
+      date_format(dok.tgl_buat, '%d-%m-%Y %H:%s') as tgl_buat,
+      dok.id_user,
+      dok.tgl_validasi_bagian,
+      dok.tgl_validasi_kasubbag,
+      sum(trn.kuanta) as jml_kuanta,
+      sum(trn.rupiah) as jml_rupiah,
+      trn.tahun_giling,
+      kt.id_kelompok,
+      kt.no_kontrak,
+      kt.nama_kelompok,
+      kt.id_afd,
+      ? as priv_level,
+      trn.no_transaksi
+    from tbl_dokumen dok
+    join tbl_simtr_transaksi trn on trn.id_ppk = dok.id_dokumen
+    join tbl_aktivitas akt on akt.id_aktivitas = trn.id_aktivitas
+    join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%') and
+    trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
+    and akt.tunai = 0 and akt.jenis_aktivitas = 'BIBIT'
+    group by dok.id_dokumen
+    ";
+    return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
+  }
+
 }

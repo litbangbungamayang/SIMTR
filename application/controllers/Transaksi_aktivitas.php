@@ -163,7 +163,7 @@ class Transaksi_aktivitas extends CI_Controller{
               </div>
             </div>
             <div class="card-body">
-              <div class="row col-11">
+              <div class="row col-12">
                 <div class="col-2">
                   No. Dokumen <br>
                   Lampiran <br>
@@ -174,11 +174,11 @@ class Transaksi_aktivitas extends CI_Controller{
                   : <strong> - </strong><br>
                   : <strong> Permohonan Bibit TR Tahun Giling '.$dataTransaksi[0]->tahun_giling.'</strong>
                 </div>
-                <div class="col-4 text-right">
+                <div class="col-6 text-right">
                   Bungamayang, '.date_format(date_create($dataTransaksi[0]->tgl_transaksi), "d-M-Y").'
                 </div>
               </div><br><br>
-              <div class="row col-11" style="margin-left: 20px">
+              <div class="row col-12" style="margin-left: 20px; margin-right: 20px">
                 <div class="col-8">
                   <p>
                     Kepada Yth. Manajer Kebun <br>
@@ -216,10 +216,10 @@ class Transaksi_aktivitas extends CI_Controller{
                   </p>
                 </div>
               </div>
-              <div class="row col-10" style="height: 120px">
+              <div class="row col-12" style="height: 120px; margin-left: 20px; margin-right: 20px">
                 <div class="col-4 text-center">
                 Asisten Afd. '.$dataTransaksi[0]->id_afd.'
-                <br><br>'.$qrAsisten.'<br>
+                <br>'.$qrAsisten.'<br>
                 '.$nama_asisten.'
                 </div>
                 <div class="col-4 text-center">
@@ -227,15 +227,15 @@ class Transaksi_aktivitas extends CI_Controller{
                 </div>
                 <div class="col-4 text-center">
                 Ketua Kelompok
-                <br><br><br>
+                <br><br><br><br>
                 '.$dataTransaksi[0]->nama_kelompok.'
                 </div>
               </div><br>
-              <div class="row col-10" style="height: 120px">
+              <div class="row col-12" style="height: 120px; margin-left: 20px; margin-right: 20px">
                 <div class="col-12 text-center">
                 Mengetahui,<br>
                 Asisten Kepala TR
-                <br><br>'.$qrAskep.'<br>
+                <br>'.$qrAskep.'<br>
                 '.$nama_askep.'
                 </div>
               </div><br><br>
