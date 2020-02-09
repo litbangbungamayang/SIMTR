@@ -2,24 +2,111 @@ var $cbxNamaDesa, cbxNamaDesa;
 var $cbxNamaKab, cbxNamaKab;
 var $cbxTahunGiling;
 var txtBiaya = $("#biaya");
+var oldValue;
+var flag_edit = false;
+
+function editData(id_biaya){
+  flag_edit = true;
+  $.ajax({
+    url: js_base_url + "Admin_tma/getBiayaTmaById",
+    type: "GET",
+    dataType: "json",
+    data: "id_biayatma=" + id_biaya,
+    success: function (response){
+      oldValue = response;
+      $("#dialogAddTma").modal("toggle");
+      txtBiaya.val("Rp " + parseInt(response.biaya).toLocaleString());
+      $("#tahun_giling").selectize()[0].selectize.setValue(response.tahun_giling);
+      cbxNamaKab.setValue(response.id_kabupaten);
+      var id_wilayah = response.id_wilayah;
+      cbxNamaDesa.disable();
+      cbxNamaDesa.clearOptions();
+      cbxNamaDesa.load(function (callback){
+        $.ajax({
+          url: js_base_url + "Rdkk_add/getDeskripsiDesaByIdKabupaten",
+          type: "GET",
+          dataType: "json",
+          data: "idKab=" + response.id_kabupaten,
+          success: function(response){
+            cbxNamaDesa.enable();
+            callback(response);
+            cbxNamaDesa.setValue(id_wilayah);
+          }
+        })
+      })
+    }
+  })
+}
 
 $("#btnSimpanBiayaTma").on("click", function(){
   var formResult = validasiForm();
   if(formResult != null){
-    var controller = "Admin_tma/addBiayaTma";
-    $.ajax({
-      url: js_base_url + controller,
-      type: "POST",
-      dataType: "json",
-      data: formResult,
-      success: function (response){
-        if(response != ""){
-          alert("Data berhasil disimpan!");
+    if(!flag_edit){
+      $.ajax({
+        url: js_base_url + "Admin_tma/addBiayaTma",
+        type: "POST",
+        dataType: "json",
+        data: formResult,
+        success: function (response){
+          if(response != "DUPLIKAT"){
+            alert("Data berhasil disimpan!");
+            $("#tblBiayaTma").DataTable().ajax.reload();
+          } else {
+            alert("Data sudah ada, tidak bisa membuat data biaya dengan desa yang sama.");
+          }
           $("#dialogAddTma").modal("toggle");
-          $("#tblBiayaTma").DataTable().ajax.reload();
         }
+      })
+    } else {
+      if(oldValue.id_wilayah != formResult.id_wilayah){
+        $.ajax({
+          url: js_base_url + "Admin_tma/editBiayaTma",
+          type: "POST",
+          dataType: "json",
+          data: formResult,
+          success: function (response){
+            switch (response) {
+              case "DUPLIKAT":
+                alert("Data sudah ada, tidak bisa membuat data biaya dengan desa yang sama.");
+                break;
+              case "1":
+                alert("Data berhasil disimpan!");
+                $("#tblBiayaTma").DataTable().ajax.reload();
+                break;
+              case "EXIST":
+                alert("Data tidak bisa diubah, sudah ada transaksi.");
+                break;
+            }
+            $("#dialogAddTma").modal("toggle");
+          }
+        })
+      } else if(oldValue.id_wilayah == formResult.id_wilayah && (oldValue.biaya != formResult.biaya
+        || oldValue.tahun_giling != formResult.tahun_giling)){
+        $.ajax({
+          url: js_base_url + "Admin_tma/editBiayaTmaWilayahTetap",
+          type: "POST",
+          dataType: "json",
+          data: formResult,
+          success: function (response){
+            switch (response) {
+              case "DUPLIKAT":
+                alert("Data sudah ada, tidak bisa membuat data biaya dengan desa yang sama.");
+                break;
+              case "1":
+                alert("Data berhasil disimpan!");
+                $("#tblBiayaTma").DataTable().ajax.reload();
+                break;
+              case "EXIST":
+                alert("Data tidak bisa diubah, sudah ada transaksi.");
+                break;
+            }
+            $("#dialogAddTma").modal("toggle");
+          }
+        })
+      } else {
+        $("#dialogAddTma").modal("toggle");
       }
-    })
+    }
   }
 })
 
@@ -85,7 +172,12 @@ $.ajax({
 function validasiForm(){
   if(cbxTahunGiling.getValue() != "" && txtBiaya.val() != "" && cbxNamaDesa.getValue() != ""){
     var biayaValue = txtBiaya.val().replace(/[^0-9]/g,"");
-    var result = {id_wilayah: cbxNamaDesa.getValue(), tahun_giling: cbxTahunGiling.getValue(), biaya: biayaValue};
+    if(!flag_edit){
+      var result = {id_wilayah: cbxNamaDesa.getValue(), tahun_giling: cbxTahunGiling.getValue(), biaya: biayaValue};
+    } else {
+      var result = {id_biayatma: oldValue.id_biayatma, id_wilayah: cbxNamaDesa.getValue(),
+        tahun_giling: cbxTahunGiling.getValue(), biaya: biayaValue};
+    }
     resetForm();
     return result;
   } else {
@@ -129,8 +221,8 @@ $("#tblBiayaTma").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return '<button type="button" onclick="editData('+row.id_bahan+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  ' +
-        '<button type="button" onclick="hapusData('+row.id_bahan+')" class="btn btn-danger btn-sm" name="hapus_data" value="'+row.id_bahan+'" title="Hapus Data"><i class="fe fe-trash-2"></i></button>'
+        return '<button type="button" onclick="editData('+row.id_biayatma+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  ' +
+        '<button type="button" onclick="hapusData('+row.id_biayatma+')" class="btn btn-danger btn-sm" name="hapus_data" value="'+row.id_bahan+'" title="Hapus Data"><i class="fe fe-trash-2"></i></button>'
       },
       className: "text-center"
     }

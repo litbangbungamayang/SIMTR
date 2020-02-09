@@ -25,11 +25,45 @@ class Admin_tma extends CI_Controller{
   }
 
   public function addBiayaTma(){
-    echo $this->biayatma_model->simpan();
+    $post = $this->input->post();
+    $tahun_giling = $post["tahun_giling"];
+    $id_wilayah = $post["id_wilayah"];
+    $biaya = $post["biaya"];
+    if(is_null(json_decode($this->biayatma_model->cekDuplikat($post)))){
+      echo $this->biayatma_model->simpan($post);
+    } else {
+      echo json_encode("DUPLIKAT");
+    }
   }
 
   public function getAllBiayaTma(){
     echo $this->biayatma_model->getAllBiayaTma();
+  }
+
+  public function getBiayaTmaById(){
+    echo $this->biayatma_model->getBiayaTmaById();
+  }
+
+  public function editBiayaTma(){
+    $post = $this->input->post();
+    if(is_null(json_decode($this->biayatma_model->cekDuplikat($post)))){
+      if(is_null(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])))){
+        echo $this->biayatma_model->editBiayaTma($post);
+      } else {
+        echo json_encode("EXIST");
+      }
+    } else {
+      echo json_encode("DUPLIKAT");
+    }
+  }
+
+  public function editBiayaTmaWilayahTetap(){
+    $post = $this->input->post();
+    if(is_null(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])))){
+      echo $this->biayatma_model->editBiayaTma($post);
+    } else {
+      echo json_encode("EXIST");
+    }
   }
 
   public function loadContent(){
