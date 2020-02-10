@@ -70,6 +70,7 @@ class Biayatma_model extends CI_Model{
     if(is_null($post)) $post = $this->input->post();
     $query = "update tbl_simtr_biayatma set tahun_giling = ?, id_wilayah = ?, biaya = ? where id_biayatma = ?";
     $this->db->query($query, array($post["tahun_giling"], $post["id_wilayah"], $post["biaya"], $post["id_biayatma"]));
+    echo $this->db->affected_rows();
     return json_encode($this->db->affected_rows());
   }
 

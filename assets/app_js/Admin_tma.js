@@ -106,6 +106,7 @@ $("#btnSimpanBiayaTma").on("click", function(){
       } else {
         $("#dialogAddTma").modal("toggle");
       }
+      flag_edit = false;
     }
   }
 })

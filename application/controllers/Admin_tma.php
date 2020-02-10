@@ -47,7 +47,8 @@ class Admin_tma extends CI_Controller{
   public function editBiayaTma(){
     $post = $this->input->post();
     if(is_null(json_decode($this->biayatma_model->cekDuplikat($post)))){
-      if(is_null(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])))){
+      $record_count = sizeof(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])));
+      if($record_count == 0){
         echo $this->biayatma_model->editBiayaTma($post);
       } else {
         echo json_encode("EXIST");
@@ -59,7 +60,8 @@ class Admin_tma extends CI_Controller{
 
   public function editBiayaTmaWilayahTetap(){
     $post = $this->input->post();
-    if(is_null(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])))){
+    $record_count = sizeof(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])));
+    if($record_count == 0){
       echo $this->biayatma_model->editBiayaTma($post);
     } else {
       echo json_encode("EXIST");
