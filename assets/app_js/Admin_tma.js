@@ -5,6 +5,26 @@ var txtBiaya = $("#biaya");
 var oldValue;
 var flag_edit = false;
 
+function hapusData(id_biaya){
+  if(confirm("Anda yakin akan menghapus data ini?")){
+    $.ajax({
+      url: js_base_url + "Admin_tma/hapusDataById",
+      type: "POST",
+      dataType: "json",
+      data: "id_biayatma=" + id_biaya,
+      success: function(response){
+        if(response == 1){
+          alert("Data berhasil dihapus!");
+          $("#tblBiayaTma").DataTable().ajax.reload();
+        } else if(response == "EXIST"){
+          alert("Data tidak dapat dihapus, sudah ada transaksi.");
+          $("#tblBiayaTma").DataTable().ajax.reload();
+        }
+      }
+    })
+  }
+}
+
 function editData(id_biaya){
   flag_edit = true;
   $.ajax({
@@ -92,7 +112,7 @@ $("#btnSimpanBiayaTma").on("click", function(){
               case "DUPLIKAT":
                 alert("Data sudah ada, tidak bisa membuat data biaya dengan desa yang sama.");
                 break;
-              case "1":
+              case 1:
                 alert("Data berhasil disimpan!");
                 $("#tblBiayaTma").DataTable().ajax.reload();
                 break;

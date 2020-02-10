@@ -36,6 +36,16 @@ class Admin_tma extends CI_Controller{
     }
   }
 
+  public function hapusDataById(){
+    $post = $this->input->post();
+    $record_count = sizeof(json_decode($this->biayatma_model->getTransaksiByIdBiayaTma($post["id_biayatma"])));
+    if($record_count == 0){
+      echo $this->biayatma_model->hapusData($post);
+    } else {
+      echo json_encode("EXIST");
+    }
+  }
+
   public function getAllBiayaTma(){
     echo $this->biayatma_model->getAllBiayaTma();
   }
