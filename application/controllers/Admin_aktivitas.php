@@ -123,7 +123,7 @@ class Admin_aktivitas extends CI_Controller{
             <div class="modal-body">
               <form id="formAddAktivitas">
                 <div class="row">
-                  <div class="col-md-12 col-lg-6">
+                  <div class="col-md-12 col-lg-3">
                     <div class="form-group" id="grTahunGiling">
                       <label class="form-label">Tahun Giling</label>
                       <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">

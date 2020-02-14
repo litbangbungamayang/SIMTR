@@ -550,7 +550,79 @@
         </div>
       </div>
       ';
-      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan.$content_dialogAddPermintaanBibit;
+      $content_dialogAddPermintaanTma =
+      '
+      <div class="modal fade" id="dialogAddPermintaanTma">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Permintaan Biaya TMA</h4>
+              <button class="close" data-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+              <form id="formAddPermintaanTma">
+                <div class="row">
+                  <div class="col-md-12 col-lg-12">
+                    <div class="card card-collapsed" id="card_tblPerawatan">
+                      <div class="card-status bg-green"></div>
+                      <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
+                        <div>Tebu masuk yang lalu</div>
+                        <div class="card-options">
+                          <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <table id="tblBibit" class="table card-table table-vcenter text-nowrap datatable table-md" style="width: 100%;">
+                          <thead>
+                            <tr>
+                              <th class="w-1">No.</th>
+                              <th>No. Transaksi</th>
+                              <th>Tgl. Transaksi</th>
+                              <th>Asal Bibit</th>
+                              <th>Luas Tanam</th>
+                              <th>Rupiah</th>
+                              <th>Surat Permintaan</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-12">
+                    <div class="card" id="card_tblPerawatan">
+                      <div class="card-status bg-red"></div>
+                      <div class="card-header">
+                        <div>Tebu masuk belum diverifikasi</div>
+                      </div>
+                      <div class="card-body">
+                        <table id="tblTebuMasukSkrg" class="table card-table table-vcenter text-nowrap datatable table-sm compact" style="width: 100%;">
+                          <thead>
+                            <tr>
+                              <th class="w-1">No.</th>
+                              <th>No. SPTA</th>
+                              <th>Tgl. Timbang</th>
+                              <th>No. Truk</th>
+                              <th>Bruto</th>
+                              <th>Tarra</th>
+                              <th>Netto</th>
+                              <th>Rafaksi</th>
+                              <th>Berat Setelah Rafaksi</th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      ';
+      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan.$content_dialogAddPermintaanBibit.$content_dialogAddPermintaanTma;
     }
 
   }
