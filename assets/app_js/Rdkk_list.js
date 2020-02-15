@@ -4,6 +4,7 @@ var dialogAddPermintaanTma = $("#dialogAddPermintaanTma");
 var dialogAddPermintaanBibit = $("#dialogAddPermintaanBibit");
 var btnSimpanPermintaanPupuk = $("#btnSimpanPermintaanPupuk");
 var btnSimpanPermintaanPerawatan = $("#btnSimpanPermintaanPerawatan");
+var selectedKelompok;
 var arrayPermintaanPupuk = [];
 var arrayAktivitas = [];
 var arrayPermintaanPerawatan = [];
@@ -471,8 +472,26 @@ function addPupuk(id_kelompok){
   })
 }
 
-function addTma(){
+function addTma(id_kelompok){
   dialogAddPermintaanTma.modal("toggle");
+  $.ajax({
+    url: js_base_url + "Rdkk_list/getKelompokById",
+    data: {id_kelompok: id_kelompok},
+    dataType: "json",
+    type: "GET",
+    success: function(response){
+      var id_wilayah = response.id_wilayah;
+      $.ajax({
+        url: js_base_url + "Admin_tma/getBiayaTmaByIdWilayah",
+        data: {id_wilayah: id_wilayah},
+        dataType: "json",
+        type: "GET",
+        success: function(response){
+
+        }
+      })
+    }
+  })
 }
 
 function resetFeedbackAddPupuk(){
@@ -556,7 +575,7 @@ function actionButtonView(id_kelompok, kategori){
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
             menu_bibit +
-            '<a class="dropdown-item" href="#" onclick="addTma(' + id_kelompok + ')"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
+            '<a class="dropdown-item" href="List_tebu_masuk?id_kelompok=' + id_kelompok + '" onclick=""><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
           '</div></div>';
 }
 
@@ -683,7 +702,6 @@ $("#tblList").DataTable({
     }
     $("div.cbxTahunGiling").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
     $("div.labelTahunGiling").html('<label class="form-label" style="margin: 0px 10px 0px 0px;"></label>');
-    //console.log($("#tahun_giling").selectize()[0].selectize.getValue());
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
       tahun_giling = parseInt($("#tahun_giling").val()) || 0;
@@ -894,73 +912,5 @@ $("#tblPerawatan").DataTable({
   },
   initComplete: function(){
 
-  }
-});
-
-$("#tblTebuMasukSkrg").DataTable({
-  bFilter: false,
-  bPaginate: true,
-  bSort: false,
-  bInfo: false,
-  dom: 'tp',
-  ajax: {
-    url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
-    dataSrc: ""
-  },
-  columns : [
-    {
-      data: "no",
-      render: function(data, type, row, meta){
-        return meta.row + meta.settings._iDisplayStart + 1;
-      }
-    },
-    {data: "no_spat"},
-    {data: "tgl_timbang"},
-    {data: "no_angkutan"},
-    {
-      data: "bruto",
-      render: function(data, type, row, meta){
-        return parseFloat(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
-    },
-    {
-      data: "tara",
-      render: function(data, type, row, meta){
-        return parseFloat(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
-    },
-    {
-      data: "netto",
-      render: function(data, type, row, meta){
-        return parseInt(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
-    },
-    {
-      data: "RAFAKSI",
-      render: function(data, type, row, meta){
-        return parseInt(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " % (" + Math.round((row.RAFAKSI/100)*row.netto).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG)";
-      },
-      className: "text-right"
-    },
-    {
-      data: "RAFAKSI",
-      render: function(data, type, row, meta){
-        return parseInt(Math.round(((100-row.RAFAKSI)/100)*row.netto)).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
-    }
-  ],
-  footerCallback: function (row, data, start, end, display){
-    var api = this.api(), data;
-    var intRupiah = function ( i ) {
-      return typeof i === 'string' ? i.replace(/[\Rp,]/g, '')*1 : typeof i === 'number' ? i : 0;
-    };
-    totalRupiah = api.column(5).data().reduce( function (a, b) {
-        return intRupiah(a) + intRupiah(b);
-    },0);
-    $(api.column(5).footer()).html('<font size="3" color="white">' + "Rp " + totalRupiah.toLocaleString({maximumFractionDigits: 0}) + ' </font>');
   }
 });

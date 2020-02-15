@@ -622,7 +622,7 @@
         </div>
       </div>
       ';
-      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan.$content_dialogAddPermintaanBibit.$content_dialogAddPermintaanTma;
+      return $container.$content_dialogAddPermintaanPupuk.$content_dialogAddPerawatan.$content_dialogAddPermintaanBibit;
     }
 
   }

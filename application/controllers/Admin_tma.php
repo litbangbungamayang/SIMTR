@@ -54,6 +54,10 @@ class Admin_tma extends CI_Controller{
     echo $this->biayatma_model->getBiayaTmaById();
   }
 
+  public function getBiayaTmaByIdWilayah(){
+    echo $this->biayatma_model->getBiayaTmaByIdWilayah();
+  }
+
   public function editBiayaTma(){
     $post = $this->input->post();
     if(is_null(json_decode($this->biayatma_model->cekDuplikat($post)))){

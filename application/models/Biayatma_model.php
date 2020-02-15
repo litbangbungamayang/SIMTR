@@ -66,6 +66,27 @@ class Biayatma_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_biaya))->row());
   }
 
+  public function getBiayaTmaByIdWilayah(){
+    $id_wilayah = $this->input->get("id_wilayah");
+    $query =
+    "
+    select
+    	tma.id_biayatma,
+    	tma.id_wilayah,
+      kab.id_wilayah as id_kabupaten,
+      concat('DESA ', wil.nama_wilayah, ' ', kec.nama_wilayah) as deskripsi,
+      kab.nama_wilayah as kabupaten,
+      tma.biaya,
+      tma.tahun_giling
+    from tbl_simtr_biayatma tma
+    join tbl_simtr_wilayah wil on tma.id_wilayah = wil.id_wilayah
+    join tbl_simtr_wilayah kec on left(kec.id_wilayah, 6) = left(tma.id_wilayah, 6)
+    join tbl_simtr_wilayah kab on left(kab.id_wilayah, 4) = left(tma.id_wilayah, 4)
+    where kab.level = 2 and kec.level = 3 and tma.id_wilayah = ?
+    ";
+    return json_encode($this->db->query($query, array($id_wilayah))->row());
+  }
+
   public function editBiayaTma($post = null){
     if(is_null($post)) $post = $this->input->post();
     $query = "update tbl_simtr_biayatma set tahun_giling = ?, id_wilayah = ?, biaya = ? where id_biayatma = ?";
