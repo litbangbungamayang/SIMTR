@@ -16,16 +16,10 @@ class List_tebu_masuk extends CI_Controller{
   }
 
   public function index(){
-    if ($this->session->userdata('id_user') == false){
-      redirect('login');
-    } else {
-      $id_kelompok = $this->input->get("id_kelompok");
-      echo $id_kelompok;
-      $data['pageTitle'] = "Rincian Tebu Masuk (SIMPG)";
-      $data['content'] = $this->loadContent();
-      $data['script'] = $this->loadScript();
-      $this->load->view('main_view', $data);
-    }
+    $data['pageTitle'] = "Rincian Tebu Masuk (SIMPG)";
+    $data['content'] = $this->loadContent();
+    $data['script'] = $this->loadScript();
+    $this->load->view('main_view', $data);
   }
 
   public function loadScript(){
@@ -45,14 +39,10 @@ class List_tebu_masuk extends CI_Controller{
                   <thead>
                     <tr>
                       <th class="w-1">No.</th>
-                      <th>No. SPTA</th>
-                      <th>Tgl. Timbang</th>
-                      <th>No. Truk</th>
-                      <th>Bruto</th>
-                      <th>Tarra</th>
+                      <th>Kode Blok</th>
+                      <th>Nama Kelompok</th>
                       <th>Netto</th>
-                      <th>Rafaksi</th>
-                      <th>Berat Setelah Rafaksi</th>
+                      <th>Tgl. Timbang</th>
                     </tr>
                   </thead>
                 </table>

@@ -17,7 +17,7 @@ class Transaksi_list extends CI_Controller{
     $this->load->helper('form');
     $this->load->helper('html');
     $this->load->helper('file');
-    $this->kelompok = "AAA";
+    $this->kelompok = "";
   }
 
   public function index(){

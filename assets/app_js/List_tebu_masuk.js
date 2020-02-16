@@ -6,7 +6,9 @@ $("#tblTebuMasukSkrg").DataTable({
   dom: 'tp',
   ajax: {
     //url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
-    url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
+    //url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
+    url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01",
+    //url: "",
     dataSrc: ""
   },
   columns : [
@@ -16,53 +18,23 @@ $("#tblTebuMasukSkrg").DataTable({
         return meta.row + meta.settings._iDisplayStart + 1;
       }
     },
-    {data: "no_spat"},
-    {data: "tgl_timbang"},
-    {data: "no_angkutan"},
+    {data: "kode_blok"},
     {
-      data: "bruto",
-      render: function(data, type, row, meta){
-        return parseFloat(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
-    },
-    {
-      data: "tara",
-      render: function(data, type, row, meta){
-        return parseFloat(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
-      },
-      className: "text-right"
+      data: "deskripsi_blok"
     },
     {
       data: "netto",
       render: function(data, type, row, meta){
-        return parseInt(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
+        return parseFloat(data/1000).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " TON";
       },
       className: "text-right"
     },
     {
-      data: "RAFAKSI",
+      data: "tgl_timbang",
       render: function(data, type, row, meta){
-        return parseInt(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " % (" + Math.round((row.RAFAKSI/100)*row.netto).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG)";
-      },
-      className: "text-right"
-    },
-    {
-      data: "RAFAKSI",
-      render: function(data, type, row, meta){
-        return parseInt(Math.round(((100-row.RAFAKSI)/100)*row.netto)).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2}) + " KG";
+        return data;
       },
       className: "text-right"
     }
-  ],
-  footerCallback: function (row, data, start, end, display){
-    var api = this.api(), data;
-    var intRupiah = function ( i ) {
-      return typeof i === 'string' ? i.replace(/[\Rp,]/g, '')*1 : typeof i === 'number' ? i : 0;
-    };
-    totalRupiah = api.column(5).data().reduce( function (a, b) {
-        return intRupiah(a) + intRupiah(b);
-    },0);
-    $(api.column(5).footer()).html('<font size="3" color="white">' + "Rp " + totalRupiah.toLocaleString({maximumFractionDigits: 0}) + ' </font>');
-  }
+  ]
 });

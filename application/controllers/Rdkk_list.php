@@ -48,6 +48,10 @@
       echo $this->kelompoktani_model->getKelompokById();
     }
 
+    public function getKelompokByKodeBlok(){
+      echo $this->kelompoktani_model->getKelompokByKodeBlok();
+    }
+
     public function addTransaksiPupuk(){
       echo $this->transaksi_model->simpan();
     }
