@@ -7,7 +7,7 @@ class List_tebu_masuk extends CI_Controller{
     parent:: __construct();
     if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("kelompoktani_model");
-    $this->load->model("transaksi_model");
+    $this->load->model("biayatma_model");
     $this->load->model("bahan_model");
     $this->load->helper('url');
     $this->load->helper('form');
@@ -26,6 +26,44 @@ class List_tebu_masuk extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/List_tebu_masuk.js").'");';
   }
 
+  function getApiDataTimbangPeriodeGroup(){
+    $tgl_timbang_awal = $this->input->get("tgl_timbang_awal");
+    $tgl_timbang_akhir = $this->input->get("tgl_timbang_akhir");
+    $id_afd = $this->session->userdata("afd");
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=".$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => 30,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "GET",
+      CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache"
+      ),
+    ));
+    $response = curl_exec($curl);
+    $error = curl_error($curl);
+    $response = json_decode($response);
+    $dataResponse = [];
+    curl_close($curl);
+    for($i = 0; $i < sizeof($response); $i++){
+      $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
+      $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah));
+      $dataElement = [
+        "kode_blok" => $dataKelompok->kode_blok,
+        "no_kontrak" => $dataKelompok->no_kontrak,
+        "id_wilayah" => $dataKelompok->id_wilayah,
+        "nama_wilayah" => $dataKelompok->nama_wilayah,
+        "nama_kelompok" => $dataKelompok->nama_kelompok,
+        "netto" => $response[$i]->netto,
+        "tgl_timbang" => $response[$i]->tgl_timbang,
+        "biaya" => (is_null($dataBiayaTma)) ? null : $dataBiayaTma->biaya
+      ];
+      array_push($dataResponse, $dataElement);
+    }
+    print_r(json_encode($dataResponse));
+  }
+
   public function loadContent(){
     $id_afd = $this->session->userdata("afd");
     $container =
@@ -42,9 +80,12 @@ class List_tebu_masuk extends CI_Controller{
                     <tr>
                       <th class="w-1">No.</th>
                       <th>Kode Blok</th>
-                      <th>Nama Kelompok & No. Kontrak</th>
+                      <th>No. Kontrak</th>
+                      <th>Nama Kelompok</th>
+                      <th>Wilayah</th>
                       <th>Netto</th>
                       <th>Tgl. Timbang</th>
+                      <th>Biaya TMA</th>
                     </tr>
                   </thead>
                 </table>

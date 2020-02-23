@@ -9,6 +9,7 @@ class Kelompoktani_model extends CI_Model{
   public $id_kelompok;
   public $nama_kelompok;
   public $no_kontrak;
+  public $kode_blok;
   public $no_ktp;
   public $id_desa;
   public $mt;
@@ -93,7 +94,9 @@ class Kelompoktani_model extends CI_Model{
     $lastId = $this->db->insert_id();
     $tahun_giling = substr($this->tahun_giling,2);
     $noKontrak = $afdeling."-".$this->kategori.$tahun_giling."-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
-    $this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
+    $kode_blok = $tahun_giling.$afdeling.$this->kategori.str_pad($lastId, 4, "0", STR_PAD_LEFT);
+    //$this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
+    $this->db->set(array('no_kontrak' => $noKontrak, 'kode_blok' => $kode_blok))->where('id_kelompok', $lastId)->update($this->_table);
     return $lastId;
   }
 

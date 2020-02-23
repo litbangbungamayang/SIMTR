@@ -66,8 +66,8 @@ class Biayatma_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_biaya))->row());
   }
 
-  public function getBiayaTmaByIdWilayah(){
-    $id_wilayah = $this->input->get("id_wilayah");
+  public function getBiayaTmaByIdWilayah($id_wilayah = null){
+    if(is_null($id_wilayah))$id_wilayah = $this->input->get("id_wilayah");
     $query =
     "
     select

@@ -1,3 +1,5 @@
+var arrayDataTebu;
+
 function formatTgl(dateObj){
   if(dateObj != null){
     return dateObj.getFullYear() + "-" + ("0" + (dateObj.getMonth()+1)) + "-" + ("0" + dateObj.getDate()).slice(-2);
@@ -16,6 +18,18 @@ $("#btnTransferTma").on("click", function(){
   console.log($("#tblTebuMasukSkrg").DataTable().rows().data());
 })
 
+$.ajax({
+  //url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
+  url: js_base_url + "List_tebu_masuk/getApiDataTimbangPeriodeGroup",
+  dataType: "json",
+  type: "get",
+  data:{tgl_timbang_awal: "2010-01-01", tgl_timbang_akhir: "2030-01-01"},
+  success: function(response){
+    arrayDataTebu = response;
+
+  }
+})
+
 $("#tblTebuMasukSkrg").DataTable({
   bFilter: false,
   bPaginate: true,
@@ -25,10 +39,11 @@ $("#tblTebuMasukSkrg").DataTable({
   ajax: {
     //url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
-    url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
-    //url: "",
+    //url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
+    url: js_base_url + "List_tebu_masuk/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01",
     dataSrc: ""
   },
+  //data: arrayDataTebu,
   columns : [
     {
       data: "no",
@@ -37,9 +52,9 @@ $("#tblTebuMasukSkrg").DataTable({
       }
     },
     {data: "kode_blok"},
-    {
-      data: "deskripsi_blok"
-    },
+    {data: "no_kontrak"},
+    {data: "nama_kelompok"},
+    {data: "nama_wilayah"},
     {
       data: "netto",
       render: function(data, type, row, meta){
@@ -53,6 +68,17 @@ $("#tblTebuMasukSkrg").DataTable({
         return data;
       },
       className: "text-right"
+    },
+    {
+      data: "biaya",
+      render: function(data, type, row, meta){
+        if(data == null){
+          return "<span class='tag tag-red'>Data Biaya TMA belum ada!</span>";
+        } else {
+          return "Rp" + parseInt(data).toLocaleString({minimumFractionDigits: 2, maximumFractionDigits:2});
+        }
+      },
+      className: "text-center"
     }
   ],
   initComplete: function(){
@@ -80,7 +106,7 @@ $("#tblTebuMasukSkrg").DataTable({
         tgl_awal = formatTgl(tgl_awal);
         tgl_akhir = formatTgl(tgl_akhir);
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblTebuMasukSkrg").DataTable().ajax.url("http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=" + tgl_awal +"&tgl_timbang_akhir=" + tgl_akhir + "&afd=" + id_afd).load();
+        $("#tblTebuMasukSkrg").DataTable().ajax.url(js_base_url + "List_tebu_masuk/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=" + tgl_awal +"&tgl_timbang_akhir=" + tgl_akhir).load();
         console.log("triggered");
       }
     }
