@@ -575,7 +575,7 @@ function actionButtonView(id_kelompok, kategori){
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
             menu_bibit +
-            '<a class="dropdown-item" href="List_tebu_masuk?id_kelompok=' + id_kelompok + '" onclick=""><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
+            '<a class="dropdown-item" href="" onclick=""><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
           '</div></div>';
 }
 
