@@ -41,7 +41,7 @@
           <li class="nav-item dropdown" style="display: <? echo ($loggedUser->jabatan == 'Superadmin') ? 'none' : ''; ?>">
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-zap"></i> TMA</a>
             <div class="dropdown-menu dropdown-menu-arrow">
-              <a href="<? echo site_url('/List_tebu_masuk')?>" class="dropdown-item " style="display: <? echo ($loggedUser->jabatan == 'Kepala Sub Bagian') ? 'none' : ''; ?>"><i class="fe fe-zap"></i> Rincian Tebu Masuk (Migrasi SIMPG)</a>
+              <a href="<? echo site_url('/Biaya_tma')?>" class="dropdown-item " style="display: <? echo ($loggedUser->jabatan == 'Kepala Sub Bagian') ? 'none' : ''; ?>"><i class="fe fe-zap"></i> Pengajuan Biaya TMA</a>
               <a href="<? echo site_url('/')?>" class="dropdown-item "><i class="fe fe-zap"></i> Pengajuan Rekap Biaya TMA</a>
               <a href="<? echo site_url('/')?>" class="dropdown-item "><i class="fe fe-zap"></i> Penelusuran Rekap Biaya TMA</a>
             </div>
