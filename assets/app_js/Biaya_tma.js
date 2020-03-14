@@ -15,7 +15,7 @@ function formatTglStr(dateObj){
 }
 
 $("#btnBuatPBTMA").on("click", function(){
-  //console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json()));
+  console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json()));
   if(confirm("Apakah Anda yakin akan membuat pengajuan biaya TMA atas daftar berikut?")){
     $.ajax({
       url: js_base_url + "Biaya_tma/buatPbtma",

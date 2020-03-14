@@ -9,6 +9,7 @@ class Biaya_tma extends CI_Controller{
     $this->load->model("kelompoktani_model");
     $this->load->model("biayatma_model");
     $this->load->model("bahan_model");
+    $this->load->model("dokumen_model");
     $this->load->helper('url');
     $this->load->helper('form');
     $this->load->helper('html');
@@ -32,26 +33,26 @@ class Biaya_tma extends CI_Controller{
   function buatPbtma(){
     $postData = $this->input->post("dataPost");
     $jsonData = json_decode($postData);
+    //---------- Buat dokumen PBTMA baru -----------
+    $id_pbtma = $this->dokumen_model->simpan("PBTMA", "");
+    //----------------------------------------------
     $db_server = "";
     if($this->server_env == "LOCAL"){
       $db_server = $this->simpg_address_local;
     } else {
       $db_server = $this->simpg_address_live;
     }
-    $data = array(
-      "dataPost" => "OK BAANGET"
+    $data_to_post = array(
+      "array_data" => $jsonData,
+      "id_dokumen" => $id_pbtma
     );
     $curl = curl_init();
     curl_setopt_array($curl, array(
       CURLOPT_URL => $db_server."setPbtma",
-      CURLOPT_POST => true,
-      CURLOPT_POSTFIELDS => http_build_query($data),
-      CURLOPT_RETURNTRANSFER => true,
-      CURLINFO_HEADER_OUT => true,
-      CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache",
-        "Content-Type: application/json"
-      ),
+      CURLOPT_POST => 1,
+      CURLOPT_POSTFIELDS => http_build_query($data_to_post),
+      CURLOPT_RETURNTRANSFER => 1,
+      CURLOPT_USERAGENT => "SIMTR"
     ));
     $response = curl_exec($curl);
     $error = curl_error($curl);
@@ -98,11 +99,11 @@ class Biaya_tma extends CI_Controller{
         "netto" => $response[$i]->netto,
         "tgl_timbang" => $response[$i]->tgl_timbang,
         "biaya" => (is_null($dataBiayaTma)) ? null : $dataBiayaTma->biaya,
-        "jml_biaya" => (is_null($dataBiayaTma)) ? null : ($dataBiayaTma->biaya)*($response[$i]->netto)
+        "jml_biaya" => (is_null($dataBiayaTma)) ? null : ($dataBiayaTma->biaya)*($response[$i]->netto)/1000
       ];
       array_push($dataResponse, $dataElement);
     }
-    print_r(json_encode($dataResponse));
+    echo(json_encode($dataResponse));
   }
 
   public function loadContent(){

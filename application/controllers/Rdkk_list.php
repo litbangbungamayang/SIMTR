@@ -32,7 +32,8 @@
 
     public function test(){
       $kelompoktani = $this->kelompoktani_model;
-      echo $kelompoktani->getAllKelompok();
+      //echo $kelompoktani->getAllKelompok();
+      echo json_encode("MASUK");
     }
 
     public function getAllKelompok(){
