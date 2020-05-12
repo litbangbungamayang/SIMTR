@@ -15,17 +15,27 @@ function formatTglStr(dateObj){
 }
 
 $("#btnBuatPBTMA").on("click", function(){
-  console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json()));
-  if(confirm("Apakah Anda yakin akan membuat pengajuan biaya TMA atas daftar berikut?")){
-    $.ajax({
-      url: js_base_url + "Biaya_tma/buatPbtma",
-      data: {dataPost: JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())},
-      type: "POST",
-      dataType: "json",
-      success: function(response){
-        alert.response;
-      }
-    })
+  //console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())); untuk ambil underlying data di tabel
+  if($("#dtpAwal").datepicker("getDate") != null && $("#dtpAkhir").datepicker("getDate") != null &&
+    $("#tblTebuMasukSkrg").DataTable().data().any()){
+    var objTglAwal = $("#dtpAwal").datepicker("getDate");
+    var strTglAwal = formatTglStr(objTglAwal);
+    var objTglAkhir = $("#dtpAkhir").datepicker("getDate");
+    var strTglAkhir = formatTglStr(objTglAkhir);
+    if(confirm("Apakah Anda yakin akan membuat pengajuan biaya TMA atas daftar berikut?")){
+      $.ajax({
+        url: js_base_url + "Biaya_tma/buatPbtma",
+        //data: {dataPost: JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())},
+        data: {tipe_dokumen: "PBTMA", catatan: strTglAwal + " s.d. " + strTglAkhir},
+        type: "POST",
+        dataType: "json"
+      }).done(function(){
+        alert("Pengajuan biaya TMA berhasil disimpan!");
+        $("#tblTebuMasukSkrg").DataTable().ajax.reload();
+      }).fail(function(){
+        alert("Pengajuan biaya TMA tidak berhasil!");
+      })
+    }
   }
 })
 
@@ -39,7 +49,7 @@ $("#tblTebuMasukSkrg").DataTable({
     //url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
-    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01",
+    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2000-01-01&tgl_timbang_akhir=2000-01-01",
     dataSrc: ""
   },
   //data: arrayDataTebu,
@@ -117,7 +127,6 @@ $("#tblTebuMasukSkrg").DataTable({
         tgl_akhir = formatTgl(tgl_akhir);
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
         $("#tblTebuMasukSkrg").DataTable().ajax.url(js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=" + tgl_awal +"&tgl_timbang_akhir=" + tgl_akhir).load();
-        console.log("triggered");
       }
     }
     $("#tahun_giling").on("change", function(){

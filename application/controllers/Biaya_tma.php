@@ -15,7 +15,7 @@ class Biaya_tma extends CI_Controller{
     $this->load->helper('html');
     $this->load->helper('file');
     $this->simpg_address_live = "http://simpgbuma.ptp7.com/index.php/api_buma/";
-    $this->simpg_address_local = "http://localhost/simpg/index.php/api_buma/";
+    $this->simpg_address_local = "http://localhost/simpg/index.php/api_bcn/";
     $this->server_env = "LOCAL";
   }
 
@@ -31,10 +31,13 @@ class Biaya_tma extends CI_Controller{
   }
 
   function buatPbtma(){
-    $postData = $this->input->post("dataPost");
-    $jsonData = json_decode($postData);
+    //$postData = $this->input->post("dataPost");
+    //$jsonData = json_decode($postData);
+    $postData = ($this->session->userdata("proses_spta"));
+    $tipe_dokumen = $this->input->post["tipe_dokumen"];
+    $catatan = $this->input->post["catatan"];
     //---------- Buat dokumen PBTMA baru -----------
-    $id_pbtma = $this->dokumen_model->simpan("PBTMA", "");
+    $id_pbtma = $this->dokumen_model->simpan($tipe_dokumen, $catatan);
     //----------------------------------------------
     $db_server = "";
     if($this->server_env == "LOCAL"){
@@ -43,7 +46,7 @@ class Biaya_tma extends CI_Controller{
       $db_server = $this->simpg_address_live;
     }
     $data_to_post = array(
-      "array_data" => $jsonData,
+      "array_data" => $postData,
       "id_dokumen" => $id_pbtma
     );
     $curl = curl_init();
@@ -56,9 +59,17 @@ class Biaya_tma extends CI_Controller{
     ));
     $response = curl_exec($curl);
     $error = curl_error($curl);
-    $response = json_decode($response);
-    print_r($response);
+    //$response = json_decode($response);
+    echo $response;
     curl_close($curl);
+  }
+
+  function setSptaUtkProses($dataSpta){
+    $this->session->set_userdata("proses_spta", $dataSpta);
+  }
+
+  function getSptaUtkProses(){
+    echo $this->session->userdata("proses_spta");
   }
 
   function getApiDataTimbangPeriodeGroup(){
@@ -87,6 +98,25 @@ class Biaya_tma extends CI_Controller{
     $response = json_decode($response);
     $dataResponse = [];
     curl_close($curl);
+    //DATA PER SPTA ---------------
+    $curl_spta = curl_init();
+    curl_setopt_array($curl_spta, array(
+      CURLOPT_URL => $db_server."getDataTimbangPerSpta?tgl_timbang_awal=".$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => 30,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "GET",
+      CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache"
+      ),
+    ));
+    $response_spta = curl_exec($curl_spta);
+    $error_spta = curl_error($curl_spta);
+    $dataResponse_spta = [];
+    curl_close($curl_spta);
+    //var_dump($response_spta);
+    $this->setSptaUtkProses($response_spta);
+    //====================================
     for($i = 0; $i < sizeof($response); $i++){
       $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
       $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah));
