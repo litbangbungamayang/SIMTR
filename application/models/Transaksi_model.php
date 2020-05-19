@@ -232,6 +232,11 @@ class Transaksi_model extends CI_Model{
     $this->db->query($query, array($id_au58, $no_transaksi));
   }
 
+  public function updateIdPbtma($id_pbtma = null, $no_transaksi = null){
+    $query = "update tbl_simtr_transaksi set id_pbtma = ? where no_transaksi = ? and kuanta > 0";
+    $this->db->query($query, array($id_pbtma, $no_transaksi));
+  }
+
   public function updateIdPpk($id_ppk = null, $no_transaksi = null){
     $query = "update tbl_simtr_transaksi set id_ppk = ? where no_transaksi = ? and id_aktivitas <> 0";
     $this->db->query($query, array($id_ppk, $no_transaksi));

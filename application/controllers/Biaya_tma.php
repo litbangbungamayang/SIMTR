@@ -8,6 +8,8 @@ class Biaya_tma extends CI_Controller{
     if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("kelompoktani_model");
     $this->load->model("biayatma_model");
+    $this->load->model("transaksitma_model");
+    $this->load->model("transaksi_model");
     $this->load->model("bahan_model");
     $this->load->model("dokumen_model");
     $this->load->helper('url');
@@ -34,34 +36,87 @@ class Biaya_tma extends CI_Controller{
     //$postData = $this->input->post("dataPost");
     //$jsonData = json_decode($postData);
     $postData = ($this->session->userdata("proses_spta"));
-    $tipe_dokumen = $this->input->post["tipe_dokumen"];
-    $catatan = $this->input->post["catatan"];
+    $tipe_dokumen = $this->input->post("tipe_dokumen");
+    $catatan = $this->input->post("catatan");
+    $tahun_giling = $this->input->post("tahun_giling");
+    $data_kelompok_post = json_decode($this->input->post("data_kelompok"));
     //---------- Buat dokumen PBTMA baru -----------
     $id_pbtma = $this->dokumen_model->simpan($tipe_dokumen, $catatan);
     //----------------------------------------------
-    $db_server = "";
-    if($this->server_env == "LOCAL"){
-      $db_server = $this->simpg_address_local;
-    } else {
-      $db_server = $this->simpg_address_live;
+    /*
+    $this->id_bahan = $post["id_bahan"];
+    $this->id_aktivitas = $post["id_aktivitas"];
+    $this->id_kelompoktani = $post["id_kelompoktani"];
+    $this->id_vendor = $post["id_vendor"];
+    $this->kode_transaksi = $post["kode_transaksi"];
+    $this->no_transaksi = $post["no_transaksi"];
+    $this->kuanta = $post["kuanta_bahan"];
+    $this->rupiah = $post["rupiah_bahan"];
+    $this->catatan = strtoupper($post["catatan"]);
+    $this->tahun_giling = $post["tahun_giling"];
+    $no_transaksi = "TR"."-".$arrayPermintaanPerawatan[0]->id_kelompok."-".$arrayPermintaanPerawatan[0]->tahun_giling."-".date("YmdHis");
+    */
+    // INPUT ke Tabel Transaksi ================================================
+    $no_transaksi = "TR-TMA-".$data_kelompok_post[0]->tahun_giling."-".date("YmdHis");
+    $this->db->trans_begin();
+    foreach ($data_kelompok_post as $value) {
+      $id_kelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($value->kode_blok))->id_kelompok;
+      $data_transaksi = [
+        "id_bahan" => 0,
+        "id_aktivitas" => $value->id_wilayah,
+        "id_kelompoktani" => $id_kelompok,
+        "id_vendor" => 0,
+        "kode_transaksi" => 2,
+        "no_transaksi" => $no_transaksi,
+        "kuanta_bahan" => $value->netto,
+        "rupiah_bahan" => $value->jml_biaya,
+        "catatan" => $catatan,
+        "tahun_giling" => $value->tahun_giling
+      ];
+      $this->transaksi_model->simpan($data_transaksi);
+      $this->transaksi_model->updateIdPbtma($id_pbtma, $no_transaksi);
     }
-    $data_to_post = array(
-      "array_data" => $postData,
-      "id_dokumen" => $id_pbtma
-    );
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-      CURLOPT_URL => $db_server."setPbtma",
-      CURLOPT_POST => 1,
-      CURLOPT_POSTFIELDS => http_build_query($data_to_post),
-      CURLOPT_RETURNTRANSFER => 1,
-      CURLOPT_USERAGENT => "SIMTR"
-    ));
-    $response = curl_exec($curl);
-    $error = curl_error($curl);
-    //$response = json_decode($response);
-    echo $response;
-    curl_close($curl);
+    if($this->db->trans_status()){
+      $this->db->trans_commit();
+      //==========================================================================
+      // Kalau berhasil simpan data transaksi, baru update simtr_status di simpg
+      $db_server = "";
+      if($this->server_env == "LOCAL"){
+        $db_server = $this->simpg_address_local;
+      } else {
+        $db_server = $this->simpg_address_live;
+      }
+      $data_to_post = array(
+        "array_data" => $postData,
+        "id_dokumen" => $id_pbtma
+      );
+      $curl = curl_init();
+      curl_setopt_array($curl, array(
+        CURLOPT_URL => $db_server."setPbtma",
+        CURLOPT_POST => 1,
+        CURLOPT_POSTFIELDS => http_build_query($data_to_post),
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_USERAGENT => "SIMTR"
+      ));
+      $response = curl_exec($curl);
+      $error = curl_error($curl);
+      //$response = json_decode($response);
+      //-------------- Buat record di tabel transaksitma ------------------------
+      // Sementara ini nggak perlu bro! kita kan nyimpen di table transaksi
+      /*
+      if (json_decode($response) == "SUCCESS"){
+        $jml_netto = $this->session->userdata("nilai_pbtma")["jml_netto"];
+        $jml_biaya = $this->session->userdata("nilai_pbtma")["jml_biaya"];
+        $id_afd = $this->session->userdata("afd");
+        $request = array("id_pbtma"=>$id_pbtma, "jml_netto"=>$jml_netto, "jml_biaya"=>$jml_biaya,
+          "afd"=>$id_afd);
+        $this->transaksitma_model->simpan($request);
+      }
+      */
+      //-------------------------------------------------------------------------
+      echo $response;
+      curl_close($curl);
+    }
   }
 
   function setSptaUtkProses($dataSpta){
@@ -72,19 +127,20 @@ class Biaya_tma extends CI_Controller{
     echo $this->session->userdata("proses_spta");
   }
 
-  function getApiDataTimbangPeriodeGroup(){
-    $tgl_timbang_awal = $this->input->get("tgl_timbang_awal");
-    $tgl_timbang_akhir = $this->input->get("tgl_timbang_akhir");
-    $id_afd = $this->session->userdata("afd");
-    $db_server = "";
-    if($this->server_env == "LOCAL"){
-      $db_server = $this->simpg_address_local;
-    } else {
-      $db_server = $this->simpg_address_live;
-    }
+  function setNilaiPbtma($dataPbtma){
+    $this->session->set_userdata("nilai_pbtma", $dataPbtma);
+  }
+
+  function getNilaiPbtma(){
+    echo $this->session->userdata("nilai_pbtma");
+  }
+
+  function getCurl($request){
+    $db_server = $request["db_server"];
+    $url = str_replace(" ", "", $request["url"]);
     $curl = curl_init();
     curl_setopt_array($curl, array(
-      CURLOPT_URL => $db_server."getDataTimbangPeriodeGroup?tgl_timbang_awal=".$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd,
+      CURLOPT_URL => $db_server.$url,
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_TIMEOUT => 30,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -95,43 +151,58 @@ class Biaya_tma extends CI_Controller{
     ));
     $response = curl_exec($curl);
     $error = curl_error($curl);
-    $response = json_decode($response);
-    $dataResponse = [];
     curl_close($curl);
-    //DATA PER SPTA ---------------
-    $curl_spta = curl_init();
-    curl_setopt_array($curl_spta, array(
-      CURLOPT_URL => $db_server."getDataTimbangPerSpta?tgl_timbang_awal=".$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd,
-      CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_TIMEOUT => 30,
-      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-      CURLOPT_CUSTOMREQUEST => "GET",
-      CURLOPT_HTTPHEADER => array(
-        "cache-control: no-cache"
-      ),
-    ));
-    $response_spta = curl_exec($curl_spta);
-    $error_spta = curl_error($curl_spta);
-    $dataResponse_spta = [];
-    curl_close($curl_spta);
-    //var_dump($response_spta);
-    $this->setSptaUtkProses($response_spta);
-    //====================================
-    for($i = 0; $i < sizeof($response); $i++){
-      $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
-      $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah));
-      $dataElement = [
-        "kode_blok" => $dataKelompok->kode_blok,
-        "no_kontrak" => $dataKelompok->no_kontrak,
-        "id_wilayah" => $dataKelompok->id_wilayah,
-        "nama_wilayah" => $dataKelompok->nama_wilayah,
-        "nama_kelompok" => $dataKelompok->nama_kelompok,
-        "netto" => $response[$i]->netto,
-        "tgl_timbang" => $response[$i]->tgl_timbang,
-        "biaya" => (is_null($dataBiayaTma)) ? null : $dataBiayaTma->biaya,
-        "jml_biaya" => (is_null($dataBiayaTma)) ? null : ($dataBiayaTma->biaya)*($response[$i]->netto)/1000
-      ];
-      array_push($dataResponse, $dataElement);
+    return $response; // output as json encoded
+  }
+
+  function getApiDataTimbangPeriodeGroup(){
+    $tgl_timbang_awal = $this->input->get("tgl_timbang_awal");
+    $tgl_timbang_akhir = $this->input->get("tgl_timbang_akhir");
+    $tahun_giling = $this->input->get("tahun_giling");
+    $id_afd = $this->session->userdata("afd");
+    $db_server = "";
+    if($this->server_env == "LOCAL"){
+      $db_server = $this->simpg_address_local;
+    } else {
+      $db_server = $this->simpg_address_live;
+    }
+    $request = array("db_server"=>$db_server,
+    "url"=>"getDataTimbangPeriodeGroup?tgl_timbang_awal=".$tgl_timbang_awal.
+      "&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd."&tahun_giling=".$tahun_giling);
+    $response = json_decode($this->getCurl($request));
+    //var_dump($response);
+    $dataResponse = [];
+    if (!is_null($response)){
+      //DATA PER SPTA ---------------
+      $req_spta = array("db_server"=>$db_server, "url"=>"getDataTimbangPerSpta?tgl_timbang_awal="
+        .$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd);
+      $response_spta = $this->getCurl($req_spta);
+      $this->setSptaUtkProses($response_spta);
+      //====================================
+      $jml_tebu = 0;
+      $jml_biaya = 0;
+      for($i = 0; $i < sizeof($response); $i++){
+        $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
+        $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah));
+        $dataElement = [
+          "kode_blok" => $dataKelompok->kode_blok,
+          "no_kontrak" => $dataKelompok->no_kontrak,
+          "id_wilayah" => $dataKelompok->id_wilayah,
+          "nama_wilayah" => $dataKelompok->nama_wilayah,
+          "nama_kelompok" => $dataKelompok->nama_kelompok,
+          "netto" => $response[$i]->netto,
+          "tgl_timbang" => $response[$i]->tgl_timbang,
+          "biaya" => (is_null($dataBiayaTma)) ? null : $dataBiayaTma->biaya,
+          "jml_biaya" => (is_null($dataBiayaTma)) ? null : ($dataBiayaTma->biaya)*($response[$i]->netto)/1000,
+          "tahun_giling" => $dataKelompok->tahun_giling
+        ];
+        array_push($dataResponse, $dataElement);
+        $jml_tebu += $response[$i]->netto;
+        $jml_biaya += (is_null($dataBiayaTma)) ? 0 : ($dataBiayaTma->biaya)*($response[$i]->netto)/1000;
+      }
+      $data_pbtma = array("jml_netto"=>$jml_tebu, "jml_biaya"=>$jml_biaya);
+      $this->setNilaiPbtma($data_pbtma);
+      ///var_dump($data_pbtma);
     }
     echo(json_encode($dataResponse));
   }
