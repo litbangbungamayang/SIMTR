@@ -1,15 +1,15 @@
 
 function approve(id_dokumen){
-  if(confirm("Anda akan menyetujui pengajuan biaya perawatan ini?")){
+  if(confirm("Anda akan menyetujui pengajuan biaya TMA ini?")){
     $.ajax({
-      url: js_base_url + "List_biaya_perawatan/validasiDokumen",
+      url: js_base_url + "List_biaya_tma/validasiDokumen",
       dataType: "text",
       type: "POST",
       data: "id_dokumen=" + id_dokumen,
       success: function(response){
         if (response = "SUCCESS"){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+          $("#tblListBiayaTma").DataTable().ajax.url(js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil divalidasi!");
         }
       }
@@ -18,16 +18,16 @@ function approve(id_dokumen){
 }
 
 function approveAskep(id_dokumen){
-  if(confirm("Anda akan menyetujui pengajuan biaya perawatan ini?")){
+  if(confirm("Anda akan menyetujui pengajuan biaya TMA ini?")){
     $.ajax({
-      url: js_base_url + "List_biaya_perawatan/validasiDokumenAskep",
+      url: js_base_url + "List_biaya_tma/validasiAskep",
       dataType: "text",
       type: "POST",
       data: "id_dokumen=" + id_dokumen,
       success: function(response){
         if (response = "SUCCESS"){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-          $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0").load();
+          $("#tblListBiayaTma").DataTable().ajax.url(js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil divalidasi!");
         }
       }
@@ -61,7 +61,7 @@ $("#tblListBiayaTma").DataTable({
   bInfo: false,
   autoWidth: false,
   ajax: {
-    url: js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0" ,
+    url: js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=0" ,
     dataSrc: ""
   },
   dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling">f>tpl',
@@ -78,6 +78,13 @@ $("#tblListBiayaTma").DataTable({
     {
       data: "tgl_buat",
       className: "text-center"
+    },
+    {
+      data: "netto",
+      render: function(data, type, row, meta){
+        return parseFloat(row.netto/1000).toLocaleString({maximumFractionDigits: 0}) + " TON";
+      },
+      className: "text-right"
     },
     {
       data: "total",
@@ -130,7 +137,7 @@ $("#tblListBiayaTma").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbtma?id_pbtma=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         if(row.priv_level == "Asisten Bagian"){
           var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
           '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
@@ -175,7 +182,7 @@ $("#tblListBiayaTma").DataTable({
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
       tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-      $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
+      $("#tblListBiayaTma").DataTable().ajax.url(js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=" + tahun_giling).load();
     })
   },
   footerCallback: function (row, data, start, end, display){
@@ -183,10 +190,17 @@ $("#tblListBiayaTma").DataTable({
     var intRupiah = function ( i ) {
       return typeof i === 'string' ? i.replace(/[\Rp,]/g, '')*1 : typeof i === 'number' ? i : 0;
     };
-    totalBiaya = api.column(3).data().reduce( function (a, b) {
+    var intNetto = function ( i ) {
+      return typeof i === 'string' ? i.replace(/[\TON,]/g, '')*1 : typeof i === 'number' ? i : 0;
+    };
+    totalBiaya = api.column(4).data().reduce( function (a, b) {
         return intRupiah(a) + intRupiah(b);
     },0);
-    $(api.column(3).footer()).html('<font color="white" size="3">' + 'Rp ' + totalBiaya.toLocaleString({maximumFractionDigits: 0}) + '</font>');
+    totalNetto = api.column(3).data().reduce( function (a, b) {
+        return intNetto(a) + intNetto(b);
+    },0);
+    $(api.column(3).footer()).html('<font color="white" size="3">' + parseFloat(totalNetto/1000).toLocaleString({maximumFractionDigits: 0}) + ' TON </font>');
+    $(api.column(4).footer()).html('<font color="white" size="3">' + 'Rp ' + totalBiaya.toLocaleString({maximumFractionDigits: 0}) + '</font>');
   },
   language: {
     "search": ""

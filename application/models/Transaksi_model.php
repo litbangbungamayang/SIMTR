@@ -533,6 +533,44 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_pbma))->result());
   }
 
+  public function detailPbtma(){
+    $id_pbtma = $this->input->get("id_pbtma");
+    $query =
+    "
+    select
+      dok.no_dokumen,
+      dok.tgl_buat,
+      dok.tgl_validasi_bagian,
+      dok.tgl_validasi_kasubbag,
+      dok.catatan,
+      trans.id_pbtma,
+      trans.id_kelompoktani,
+      if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
+      kt.no_kontrak,
+      kt.tahun_giling,
+      kt.id_afd,
+      wil.nama_wilayah,
+      date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
+      ( select
+    		SUM(PT.luas) as luas
+    	FROM tbl_simtr_kelompoktani kt
+    		JOIN tbl_simtr_petani PT on PT.id_kelompok = kt.id_kelompok
+    	WHERE EXISTS
+    			(SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+    		and kt.id_kelompok = trans.id_kelompoktani
+    		group by kt.id_kelompok
+    	) as luas,
+      trans.kuanta as netto,
+      trans.rupiah as biaya
+      from tbl_simtr_transaksi trans
+      join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
+      join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+      join tbl_dokumen dok on dok.id_dokumen = trans.id_pbtma
+      where trans.id_pbtma = ?
+    ";
+    return json_encode($this->db->query($query, array($id_pbtma))->result());
+  }
+
   public function detailPbp(){
     $id_pbp = $this->input->get("id_pbp");
     $query =
@@ -549,11 +587,6 @@ class Transaksi_model extends CI_Model{
       kt.no_kontrak,
       kt.tahun_giling,
       kt.id_afd,
-      wil.nama_wilayah,
-      date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
-      if (length(kt.nama_kelompok) > 20, concat(substring(kt.nama_kelompok,1,17), '...'), kt.nama_kelompok) as nama_kelompok,
-      kt.no_kontrak,
-      kt.tahun_giling,
       wil.nama_wilayah,
       date_format(trans.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi,
       trans.id_pbp,
@@ -630,6 +663,29 @@ class Transaksi_model extends CI_Model{
     group by dok.id_dokumen
     ";
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
+  }
+
+  public function getAllPbtma($request){
+    if(!is_null($request)){
+      $id_afd = $request["afd"];
+      $tahun_giling = $request["tahun_giling"];
+      $priv_level = $request["priv_level"];
+      $query =
+      "
+      select
+        dok.id_dokumen, dok.no_dokumen, dok.tipe_dokumen,
+        date_format(dok.tgl_buat, '%d-%m-%Y %k:%i:%s') as tgl_buat,
+        dok.tgl_validasi_bagian, dok.tgl_validasi_kasubbag,
+        sum(trn.rupiah) as total, sum(trn.kuanta) as netto,
+        dok.catatan, ? as priv_level
+      from tbl_dokumen dok
+      join tbl_simtr_transaksi trn on trn.id_pbtma = dok.id_dokumen
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+      where trn.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
+      group by dok.id_dokumen
+      ";
+      return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
+    }
   }
 
   public function getDesaByIdPbma($id_pbma = null){
