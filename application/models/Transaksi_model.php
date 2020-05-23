@@ -560,13 +560,14 @@ class Transaksi_model extends CI_Model{
     		and kt.id_kelompok = trans.id_kelompoktani
     		group by kt.id_kelompok
     	) as luas,
-      trans.kuanta as netto,
-      trans.rupiah as biaya
+      sum(trans.kuanta) as netto,
+      sum(trans.rupiah) as biaya
       from tbl_simtr_transaksi trans
       join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
       join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
       join tbl_dokumen dok on dok.id_dokumen = trans.id_pbtma
       where trans.id_pbtma = ?
+      group by kt.id_kelompok
     ";
     return json_encode($this->db->query($query, array($id_pbtma))->result());
   }
@@ -685,6 +686,23 @@ class Transaksi_model extends CI_Model{
       group by dok.id_dokumen
       ";
       return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd))->result());
+    }
+  }
+
+  public function getDesaByIdPbtma($id_pbtma){
+    if(!is_null($id_pbtma)){
+      $query =
+      "
+      select
+        wil.nama_wilayah
+      from tbl_simtr_transaksi trn
+      join tbl_dokumen dok on dok.id_dokumen = trn.id_pbtma
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+      join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+      where dok.id_dokumen = ?
+      group by wil.nama_wilayah
+      ";
+      return json_encode($this->db->query($query, array($id_pbtma))->result());
     }
   }
 

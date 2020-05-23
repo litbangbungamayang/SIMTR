@@ -50,27 +50,46 @@ class Cetak_pbtma extends CI_Controller{
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
       $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
     }
-    //$dataDesa = json_decode($this->transaksi_model->getDesaByIdPbp($dataTransaksi[0]->id_pbp)); //BISA DIPAKAI JUGA UNTUK PBP
+    $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbtma($dataTransaksi[0]->id_pbtma)); //BISA DIPAKAI JUGA UNTUK PBP
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $tblContent = '';
     $nomor = 1;
     $totalBiaya = 0;
     $totalNetto = 0;
-    foreach($dataTransaksi as $transaksi){
+    $subBiaya = 0;
+    $subNetto = 0;
+    foreach ($dataDesa as $desa) {
+      foreach($dataTransaksi as $transaksi){
+        if($transaksi->nama_wilayah == $desa->nama_wilayah){
+          $tblContent .=
+          "<tr>
+            <td class='text-center'>$nomor</td>
+            <td>$transaksi->nama_kelompok</td>
+            <td class='text-center'>$transaksi->no_kontrak</td>
+            <td class='text-right'>$transaksi->luas</td>
+            <td class='text-center'>$transaksi->tgl_transaksi</td>
+            <td class='text-right'>".number_format(($transaksi->netto)/1000,2,".",",")."</td>
+            <td class='text-right'>Rp".number_format($transaksi->biaya,0,".",",")."</td>
+          </tr>";
+          $subBiaya = $subBiaya + $transaksi->biaya;
+          $subNetto = $subNetto + $transaksi->netto;
+          $nomor ++;
+        }
+      }
+      $totalBiaya = $totalBiaya + $subBiaya;
+      $totalNetto = $totalNetto + $subNetto;
       $tblContent .=
-      "<tr>
-        <td class='text-center'>$nomor</td>
-        <td>$transaksi->nama_kelompok</td>
-        <td class='text-center'>$transaksi->no_kontrak</td>
-        <td class='text-right'>$transaksi->luas</td>
-        <td class='text-center'>$transaksi->tgl_transaksi</td>
-        <td class='text-right'>".number_format(($transaksi->netto)/1000,2,".",",")."</td>
-        <td class='text-right'>Rp".number_format($transaksi->biaya,0,".",",")."</td>
+      "<tr class='bg-gray-lighter text-black font-weight-bold'>
+        <td></td>
+        <td></td>
+        <td>SUB TOTAL</td>
+        <td colspan='2' >$desa->nama_wilayah</td>
+        <td class='text-right'>".number_format($subNetto/1000,2,".",",")."</td>
+        <td class='text-right'>Rp".number_format($subBiaya,0,".",",")."</td>
       </tr>";
-      $totalBiaya =  $totalBiaya + $transaksi->biaya;
-      $totalNetto = $totalNetto + $transaksi->netto;
-      $nomor ++;
+      $subBiaya = 0;
+      $subNetto = 0;
     }
     $tblContent .=
     "<tr class='bg-gray-light text-black font-weight-bold'>
@@ -78,6 +97,7 @@ class Cetak_pbtma extends CI_Controller{
       <td class='text-right'>".number_format($totalNetto/1000,2,".",",")."</td>
       <td class='text-right'>Rp".number_format($totalBiaya,0,".",",")."</td>
     </tr>";
+
     $container =
     '
       <div class="page">
