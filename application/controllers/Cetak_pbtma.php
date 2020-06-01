@@ -17,8 +17,13 @@ class Cetak_pbtma extends CI_Controller{
     $dataTransaksi = json_decode($this->transaksi_model->detailPbtma());
     $data['pageTitle'] = "";
     $data['content'] = $this->loadContent($dataTransaksi);
+    $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
     //print_r($dataTransaksi[0]->id_pbp);
+  }
+
+  public function loadScript(){
+    return '$.getScript("'.base_url("/assets/app_js/List_biaya_tma.js").'");';
   }
 
   public function generateQr($data){
@@ -48,7 +53,7 @@ class Cetak_pbtma extends CI_Controller{
     }
 
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
-      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="cetak();"><i class="fe fe-printer"></i> Cetak </a>';
     }
     $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbtma($dataTransaksi[0]->id_pbtma)); //BISA DIPAKAI JUGA UNTUK PBP
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;

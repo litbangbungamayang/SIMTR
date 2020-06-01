@@ -1,4 +1,11 @@
 
+function cetak(){
+  window.print();
+  window.onafterprint = function(){
+    alert("Printing finished");
+  }
+}
+
 function approve(id_dokumen){
   if(confirm("Anda akan menyetujui pengajuan biaya TMA ini?")){
     $.ajax({
