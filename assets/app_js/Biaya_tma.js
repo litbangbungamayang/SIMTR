@@ -55,7 +55,7 @@ $("#tblTebuMasukSkrg").DataTable({
     //url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
-    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2000-01-01&tgl_timbang_akhir=2000-01-01&tahun_giling=2000",
+    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2021-01-01&tgl_timbang_akhir=2022-01-01&tahun_giling=2021",
     dataSrc: ""
   },
   //data: arrayDataTebu,

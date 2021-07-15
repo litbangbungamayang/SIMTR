@@ -123,7 +123,7 @@ class Admin_aktivitas extends CI_Controller{
             <div class="modal-body">
               <form id="formAddAktivitas">
                 <div class="row">
-                  <div class="col-md-12 col-lg-3">
+                  <div class="col-md-12 col-lg-4">
                     <div class="form-group" id="grTahunGiling">
                       <label class="form-label">Tahun Giling</label>
                       <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">
@@ -137,7 +137,7 @@ class Admin_aktivitas extends CI_Controller{
                       <div class="invalid-feedback" id="fbNamaAktivitas">Nama aktivitas belum diinput!</div>
                     </div>
                   </div>
-                  <div class="col-md-12 col-lg-6">
+                  <div class="col-md-12 col-lg-4">
                     <div class="form-group" id="grKategori">
                       <label class="form-label">Kategori khusus</label>
                       <select name="kategori" id="kategori" class="custom-control custom-select" placeholder="Pilih kategori">
@@ -151,6 +151,16 @@ class Admin_aktivitas extends CI_Controller{
                       <label class="form-label">Biaya per Hektar</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="biaya" name="biaya" placeholder="Biaya per Ha.">
                       <div class="invalid-feedback" id="fbNamaBahan">Biaya belum diinput!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-4">
+                    <div class="form-group" id="grKategori">
+                      <label class="form-label">Jenis Aktivitas</label>
+                      <select name="jenis_aktivitas" id="jenis_aktivitas" class="custom-control custom-select" placeholder="Pilih jenis">
+                        <option value="BIBIT">BIBIT</option>
+                        <option value="PERAWATAN">PERAWATAN</option>
+                      </select>
+                      <div class="invalid-feedback">Jenis aktivitas belum dipilih!</div>
                     </div>
                   </div>
                 </div>

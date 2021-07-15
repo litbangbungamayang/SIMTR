@@ -7,6 +7,7 @@ class Aktivitas_model extends CI_Model{
   public $tahun_giling;
   public $nama_aktivitas;
   public $biaya;
+  public $jenis_aktivitas;
 
   public function simpan(){
     $post = $this->input->post();
@@ -15,6 +16,7 @@ class Aktivitas_model extends CI_Model{
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya = $post["biaya"];
     $this->kategori = $post["kategori"];
+    $this->jenis_aktivitas = $post["jenis_aktivitas"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -48,11 +50,11 @@ class Aktivitas_model extends CI_Model{
 
   public function getAktivitasByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
-    $kategori = $this->input->get("kategori");
-    ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
+    //$kategori = $this->input->get("kategori");
+    //($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
     $tstr = "TR";
     $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = ?
-      and tstr = ? and (kategori = 'ALL' or kategori = ?) and jenis_aktivitas = 'PERAWATAN'", array($tahun_giling, $tstr, $kategori));
+      and tstr = ?", array($tahun_giling,$tstr));
     return json_encode($query->result());
   }
 

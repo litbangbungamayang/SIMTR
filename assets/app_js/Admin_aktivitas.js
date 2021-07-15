@@ -1,9 +1,11 @@
 $('#tahun_giling').selectize({create: false, sortField: 'text'});
 $('#kategori').selectize({create: false, sortField: 'text'});
+$("#jenis_aktivitas").selectize({create: false, sortField: 'text'});
 
 var txtNamaAktivitas = $("#nama_aktivitas");
 var cbxTahunGiling = $("#tahun_giling");
 var cbxKategori = $("#kategori");
+var cbxJenisAktivitas = $("#jenis_aktivitas");
 var txtBiaya = $("#biaya");
 var btnSimpanAktivitas = $("#btnSimpanAktivitas");
 var tblAktivitas = $("#tblAktivitas");
@@ -25,7 +27,8 @@ txtBiaya.bind("keyup blur", function(){
 function validasiForm(){
   var biayaValue = txtBiaya.val().replace(/[^0-9]/g,"");
   if (cbxTahunGiling.selectize()[0].selectize.getValue() != "" && txtNamaAktivitas.val() != "" && biayaValue != ""){
-    var formValue = {nama_aktivitas: txtNamaAktivitas.val(), tahun_giling: cbxTahunGiling.selectize()[0].selectize.getValue(), biaya: biayaValue, kategori: cbxKategori.selectize()[0].selectize.getValue()};
+    var formValue = {nama_aktivitas: txtNamaAktivitas.val(), tahun_giling: cbxTahunGiling.selectize()[0].selectize.getValue(),
+      biaya: biayaValue, kategori: cbxKategori.selectize()[0].selectize.getValue(), jenis_aktivitas: cbxJenisAktivitas.selectize()[0].selectize.getValue()};
     return formValue;
   } else {
     (txtNamaAktivitas.val() == "") ? txtNamaAktivitas.addClass("is-invalid") : "";

@@ -16,9 +16,9 @@ class Biaya_tma extends CI_Controller{
     $this->load->helper('form');
     $this->load->helper('html');
     $this->load->helper('file');
-    $this->simpg_address_live = "http://simpgbuma.ptp7.com/index.php/api_buma/";
+    $this->simpg_address_live = "http://simpgbuma.ptpn7.com/index.php/api_bcn/";
     $this->simpg_address_local = "http://localhost/simpg/index.php/api_bcn/";
-    $this->server_env = "LOCAL";
+    $this->server_env = "LIVE";
   }
 
   public function index(){
@@ -153,6 +153,7 @@ class Biaya_tma extends CI_Controller{
     $error = curl_error($curl);
     curl_close($curl);
     return $response; // output as json encoded
+    //var_dump($response);
   }
 
   function getApiDataTimbangPeriodeGroup(){
@@ -169,8 +170,9 @@ class Biaya_tma extends CI_Controller{
     $request = array("db_server"=>$db_server,
     "url"=>"getDataTimbangPeriodeGroup?tgl_timbang_awal=".$tgl_timbang_awal.
       "&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd."&tahun_giling=".$tahun_giling);
+    //var_dump($request);
     $response = json_decode($this->getCurl($request));
-    //var_dump($response);
+    //var_dump($response[0]->kode_blok);
     $dataResponse = [];
     if (!is_null($response)){
       //DATA PER SPTA ---------------
