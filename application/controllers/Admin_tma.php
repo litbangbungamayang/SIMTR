@@ -29,6 +29,8 @@ class Admin_tma extends CI_Controller{
     $tahun_giling = $post["tahun_giling"];
     $id_wilayah = $post["id_wilayah"];
     $biaya = $post["biaya"];
+    $zona = $post["zona"];
+    $desk_zona = $post["desk_zona"];
     if(is_null(json_decode($this->biayatma_model->cekDuplikat($post)))){
       echo $this->biayatma_model->simpan($post);
     } else {
@@ -100,7 +102,8 @@ class Admin_tma extends CI_Controller{
                         <th class="w-1">No.</th>
                         <th>Tahun Giling</th>
                         <th>Nama Desa</th>
-                        <th>Kabupaten</th>
+                        <th>Zona</th>
+                        <th>Desk. Zona</th>
                         <th>Biaya TMA per Ton Tebu</th>
                         <th class="text-center">Aksi</th>
                       </tr>
@@ -120,6 +123,10 @@ class Admin_tma extends CI_Controller{
     $optionText = "";
     for ($x = $currYear; $x <= $currYear + 4; $x++){
       $optionText .= '<option value="'.$x.'">'.$x.'</option>';
+    }
+    $optionZona = "";
+    for ($x = 0; $x <= 20; $x++){
+      $optionZona .= '<option value="'.$x.'">'.$x.'</option>';
     }
     $content_dialogAddBahan =
     '
@@ -146,12 +153,22 @@ class Admin_tma extends CI_Controller{
                       <select name="namaKab" id="namaKab" class="custom-control custom-select" placeholder="Pilih nama kabupaten"></select>
                       <div class="invalid-feedback">Kabupaten belum dipilih!</div>
                     </div>
-                  </div>
-                  <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaDesa">
                       <label class="form-label">Desa</label>
                       <select name="namaDesa" id="namaDesa" class="custom-control custom-select" placeholder="Pilih nama desa"></select>
                       <div class="invalid-feedback">Desa belum dipilih!</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grZona">
+                      <label class="form-label">Zona TMA</label>
+                      <select name="zona" id="zona" class="custom-control custom-select" placeholder="Zona TMA jika ada">
+                      '.$optionZona.'
+                      </select>
+                    </div>
+                    <div class="form-group" id="grZonaDesk">
+                      <label class="form-label">Deskripsi Zona</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="desk_zona" name="desk_zona" placeholder="Deskripsi zona">
                     </div>
                     <div class="form-group" id="grBiaya">
                       <label class="form-label">Biaya TMA per ton tebu</label>

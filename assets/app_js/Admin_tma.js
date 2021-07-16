@@ -1,7 +1,9 @@
 var $cbxNamaDesa, cbxNamaDesa;
 var $cbxNamaKab, cbxNamaKab;
+var $cbxZona, cbxZona;
 var $cbxTahunGiling;
 var txtBiaya = $("#biaya");
+var txtDeskZona = $("#desk_zona");
 var oldValue;
 var flag_edit = false;
 
@@ -36,6 +38,8 @@ function editData(id_biaya){
       oldValue = response;
       $("#dialogAddTma").modal("toggle");
       txtBiaya.val("Rp " + parseInt(response.biaya).toLocaleString());
+      txtDeskZona.val(response.deskripsi_zona);
+      cbxZona.setValue(response.zona);
       $("#tahun_giling").selectize()[0].selectize.setValue(response.tahun_giling);
       cbxNamaKab.setValue(response.id_kabupaten);
       var id_wilayah = response.id_wilayah;
@@ -78,6 +82,8 @@ $("#btnSimpanBiayaTma").on("click", function(){
         }
       })
     } else {
+      console.log(oldValue);
+      console.log(formResult);
       if(oldValue.id_wilayah != formResult.id_wilayah){
         $.ajax({
           url: js_base_url + "Admin_tma/editBiayaTma",
@@ -101,7 +107,7 @@ $("#btnSimpanBiayaTma").on("click", function(){
           }
         })
       } else if(oldValue.id_wilayah == formResult.id_wilayah && (oldValue.biaya != formResult.biaya
-        || oldValue.tahun_giling != formResult.tahun_giling)){
+        || oldValue.tahun_giling != formResult.tahun_giling || oldValue.zona != formResult.zona || oldValue.deskripsi_zona != formResult.desk_zona)){
         $.ajax({
           url: js_base_url + "Admin_tma/editBiayaTmaWilayahTetap",
           type: "POST",
@@ -155,6 +161,15 @@ $cbxNamaDesa = $("#namaDesa").selectize({
   placeholder: "Pilih desa"
 })
 
+$cbxZona = $("#zona").selectize({
+  valueField: "zona",
+  labelField: "zona",
+  searchField: "zona",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih zona TMA"
+});
+
 $.ajax({
   url: js_base_url + "Rdkk_add/getAllKabupaten",
   type: "GET",
@@ -194,10 +209,22 @@ function validasiForm(){
   if(cbxTahunGiling.getValue() != "" && txtBiaya.val() != "" && cbxNamaDesa.getValue() != ""){
     var biayaValue = txtBiaya.val().replace(/[^0-9]/g,"");
     if(!flag_edit){
-      var result = {id_wilayah: cbxNamaDesa.getValue(), tahun_giling: cbxTahunGiling.getValue(), biaya: biayaValue};
+      var result = {
+        id_wilayah: cbxNamaDesa.getValue(),
+        tahun_giling: cbxTahunGiling.getValue(),
+        biaya: biayaValue,
+        zona: cbxZona.getValue(),
+        desk_zona: txtDeskZona.val().toUpperCase()
+      };
     } else {
-      var result = {id_biayatma: oldValue.id_biayatma, id_wilayah: cbxNamaDesa.getValue(),
-        tahun_giling: cbxTahunGiling.getValue(), biaya: biayaValue};
+      var result = {
+        id_biayatma: oldValue.id_biayatma,
+        id_wilayah: cbxNamaDesa.getValue(),
+        tahun_giling: cbxTahunGiling.getValue(),
+        biaya: biayaValue,
+        zona: cbxZona.getValue(),
+        desk_zona: txtDeskZona.val()
+      };
     }
     resetForm();
     return result;
@@ -212,7 +239,9 @@ function resetForm(){
   cbxNamaDesa.clearOptions();
   cbxNamaDesa.clear();
   cbxNamaKab.clear();
+  cbxZona.clear();
   txtBiaya.val("");
+  txtDeskZona.val("");
   txtBiaya.removeClass("is-invalid");
   $cbxNamaKab.removeClass("is-invalid");
   $cbxNamaDesa.removeClass("is-invalid");
@@ -232,7 +261,8 @@ $("#tblBiayaTma").DataTable({
     {data: "no", render: function(data, type, row, meta){return meta.row + meta.settings._iDisplayStart + 1}},
     {data: "tahun_giling"},
     {data: "deskripsi"},
-    {data: "kabupaten"},
+    {data: "zona"},
+    {data: "deskripsi_zona"},
     {
       data: "biaya",
       className: "text-right",
@@ -276,5 +306,6 @@ $("#tblBiayaTma").DataTable({
   }
 });
 
+cbxZona = $cbxZona[0].selectize;
 cbxNamaDesa = $cbxNamaDesa[0].selectize;
 cbxTahunGiling = $cbxTahunGiling[0].selectize;

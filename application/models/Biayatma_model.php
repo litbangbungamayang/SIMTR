@@ -6,12 +6,16 @@ class Biayatma_model extends CI_Model{
   public $tahun_giling;
   public $id_wilayah;
   public $biaya;
+  public $zona;
+  public $deskripsi_zona;
 
   public function simpan($post = null){
     if(is_null($post))$post = $this->input->post();
     $this->id_wilayah = $post["id_wilayah"];
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya = $post["biaya"];
+    $this->zona = $post["zona"];
+    $this->deskripsi_zona = $post["desk_zona"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -20,8 +24,9 @@ class Biayatma_model extends CI_Model{
     if(is_null($get))$get = $this->input->get();
     $tahun_giling = $get["tahun_giling"];
     $id_wilayah = $get["id_wilayah"];
-    $query = "select * from tbl_simtr_biayatma where tahun_giling = ? and id_wilayah = ?";
-    return json_encode($this->db->query($query, array($tahun_giling, $id_wilayah))->row());
+    $zona = $get["zona"];
+    $query = "select * from tbl_simtr_biayatma where tahun_giling = ? and id_wilayah = ? and zona = ?";
+    return json_encode($this->db->query($query, array($tahun_giling, $id_wilayah, $zona))->row());
   }
 
   public function getAllBiayaTma(){
@@ -32,10 +37,12 @@ class Biayatma_model extends CI_Model{
     	tma.id_biayatma,
     	tma.id_wilayah,
       left(tma.id_wilayah, 4) as id_kabupaten,
-      concat('DESA ', wil.nama_wilayah, ' ', kec.nama_wilayah) as deskripsi,
+      concat('DESA ', wil.nama_wilayah, ' ', kec.nama_wilayah, ' ', kab.nama_wilayah) as deskripsi,
       kab.nama_wilayah as kabupaten,
       tma.biaya,
-      tma.tahun_giling
+      tma.tahun_giling,
+      tma.zona,
+      tma.deskripsi_zona
     from tbl_simtr_biayatma tma
     join tbl_simtr_wilayah wil on tma.id_wilayah = wil.id_wilayah
     join tbl_simtr_wilayah kec on left(kec.id_wilayah, 6) = left(tma.id_wilayah, 6)
@@ -56,7 +63,9 @@ class Biayatma_model extends CI_Model{
       concat('DESA ', wil.nama_wilayah, ' ', kec.nama_wilayah) as deskripsi,
       kab.nama_wilayah as kabupaten,
       tma.biaya,
-      tma.tahun_giling
+      tma.tahun_giling,
+      tma.zona,
+      tma.deskripsi_zona
     from tbl_simtr_biayatma tma
     join tbl_simtr_wilayah wil on tma.id_wilayah = wil.id_wilayah
     join tbl_simtr_wilayah kec on left(kec.id_wilayah, 6) = left(tma.id_wilayah, 6)
@@ -96,7 +105,7 @@ class Biayatma_model extends CI_Model{
 
   public function getTransaksiByIdBiayaTma($id_biayatma = null){
     if(is_null($id_biayatma))$id_biayatma = $this->input->get("id_biayatma");
-    $query = "select * from tbl_simtr_transaksi trn where id_biayatma = ?";
+    $query = "select * from tbl_simtr_transaksitma trn where id_biayatma = ?";
     return json_encode($this->db->query($query, array($id_biayatma))->result());
   }
 
