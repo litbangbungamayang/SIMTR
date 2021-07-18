@@ -95,8 +95,12 @@ class Biaya_tma extends CI_Controller{
         CURLOPT_URL => $db_server."setPbtma",
         CURLOPT_POST => 1,
         CURLOPT_POSTFIELDS => http_build_query($data_to_post),
-        CURLOPT_RETURNTRANSFER => 1,
-        CURLOPT_USERAGENT => "SIMTR"
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_HTTPHEADER => array(
+          'cache-control: no-cache'
+        )
       ));
       $response = curl_exec($curl);
       $error = curl_error($curl);
@@ -114,8 +118,9 @@ class Biaya_tma extends CI_Controller{
       }
       */
       //-------------------------------------------------------------------------
-      echo $response;
       curl_close($curl);
+      echo $response; //==> for testing
+      //return $response; //==> for result
     }
   }
 
@@ -153,7 +158,6 @@ class Biaya_tma extends CI_Controller{
     $error = curl_error($curl);
     curl_close($curl);
     return $response; // output as json encoded
-    //var_dump($response);
   }
 
   function getApiDataTimbangPeriodeGroup(){
@@ -170,9 +174,7 @@ class Biaya_tma extends CI_Controller{
     $request = array("db_server"=>$db_server,
     "url"=>"getDataTimbangPeriodeGroup?tgl_timbang_awal=".$tgl_timbang_awal.
       "&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd."&tahun_giling=".$tahun_giling);
-    //var_dump($request);
     $response = json_decode($this->getCurl($request));
-    //var_dump($response[0]->kode_blok);
     $dataResponse = [];
     if (!is_null($response)){
       //DATA PER SPTA ---------------
@@ -185,7 +187,7 @@ class Biaya_tma extends CI_Controller{
       $jml_biaya = 0;
       for($i = 0; $i < sizeof($response); $i++){
         $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
-        $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah));
+        $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah, $dataKelompok->zona));
         $dataElement = [
           "kode_blok" => $dataKelompok->kode_blok,
           "no_kontrak" => $dataKelompok->no_kontrak,
@@ -204,7 +206,6 @@ class Biaya_tma extends CI_Controller{
       }
       $data_pbtma = array("jml_netto"=>$jml_tebu, "jml_biaya"=>$jml_biaya);
       $this->setNilaiPbtma($data_pbtma);
-      ///var_dump($data_pbtma);
     }
     echo(json_encode($dataResponse));
   }

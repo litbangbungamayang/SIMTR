@@ -75,8 +75,11 @@ class Biayatma_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_biaya))->row());
   }
 
-  public function getBiayaTmaByIdWilayah($id_wilayah = null){
-    if(is_null($id_wilayah))$id_wilayah = $this->input->get("id_wilayah");
+  public function getBiayaTmaByIdWilayah($id_wilayah = null, $zona = null){
+    if(is_null($id_wilayah)||is_null($zona)){
+      $id_wilayah = $this->input->get("id_wilayah");
+      $zona = $this->input->get("zona");
+    }
     $query =
     "
     select
@@ -91,9 +94,9 @@ class Biayatma_model extends CI_Model{
     join tbl_simtr_wilayah wil on tma.id_wilayah = wil.id_wilayah
     join tbl_simtr_wilayah kec on left(kec.id_wilayah, 6) = left(tma.id_wilayah, 6)
     join tbl_simtr_wilayah kab on left(kab.id_wilayah, 4) = left(tma.id_wilayah, 4)
-    where kab.level = 2 and kec.level = 3 and tma.id_wilayah = ?
+    where kab.level = 2 and kec.level = 3 and tma.id_wilayah = ? and tma.zona = ?
     ";
-    return json_encode($this->db->query($query, array($id_wilayah))->row());
+    return json_encode($this->db->query($query, array($id_wilayah, $zona))->row());
   }
 
   public function editBiayaTma($post = null){

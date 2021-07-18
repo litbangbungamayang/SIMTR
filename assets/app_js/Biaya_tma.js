@@ -15,7 +15,7 @@ function formatTglStr(dateObj){
 }
 
 $("#btnBuatPBTMA").on("click", function(){
-  console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())); //untuk ambil underlying data di tabel
+  //console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())); //untuk ambil underlying data di tabel
   if($("#dtpAwal").datepicker("getDate") != null && $("#dtpAkhir").datepicker("getDate") != null &&
     $("#tblTebuMasukSkrg").DataTable().data().any()){
     var objTglAwal = $("#dtpAwal").datepicker("getDate");

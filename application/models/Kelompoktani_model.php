@@ -21,6 +21,7 @@ class Kelompoktani_model extends CI_Model{
   public $scan_surat;
   public $id_user;
   public $id_afd;
+  public $zona;
 
   public function rules(){
     return [
@@ -87,6 +88,7 @@ class Kelompoktani_model extends CI_Model{
     $this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
     $afdeling = $this->session->userdata('afd');
     $id_user = $this->session->userdata('id_user');
+    $zona = 0;
     $this->id_user = $id_user;
     $this->id_afd = $afdeling;
     //$this->db->trans_begin();
@@ -177,7 +179,7 @@ class Kelompoktani_model extends CI_Model{
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, TO_BASE64(KT.scan_ktp) as scan_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.id_wilayah, WIL.nama_wilayah, SUM(PT.luas) as luas,
-        VAR.nama_varietas, KT.tahun_giling, KT.kode_blok
+        VAR.nama_varietas, KT.tahun_giling, KT.kode_blok, KT.zona
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
         JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
