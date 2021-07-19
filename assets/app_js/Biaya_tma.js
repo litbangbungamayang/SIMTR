@@ -37,7 +37,8 @@ $("#btnBuatPBTMA").on("click", function(){
         dataType: "json"
       }).done(function(){
         alert("Pengajuan biaya TMA berhasil disimpan!");
-        $("#tblTebuMasukSkrg").DataTable().ajax.reload();
+        //$("#tblTebuMasukSkrg").DataTable().ajax.reload();
+        $("#tblTebuMasukSkrg").DataTable().ajax.url(js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=1900-01-01&tgl_timbang_akhir=1900-01-02").load();
       }).fail(function(){
         alert("Pengajuan biaya TMA tidak berhasil!");
       })
@@ -50,13 +51,28 @@ $("#tblTebuMasukSkrg").DataTable({
   bPaginate: true,
   bSort: false,
   bInfo: false,
-  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling"><"dtpTglAwal"><"dtpTglAkhir">f>tpl',
+  serverSide: false,
+  processing: true,
+  language: {
+    "search": "",
+    "processing": '<div class="loader"></div>',
+    'loadingRecords': '<div id="indicator">Memuat...</div>',
+  },
+  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling"><"dtpTglAwal"><"dtpTglAkhir">r>tpl',
   ajax: {
     //url: "http://simpgbuma.ptpn7.com/index.php/dashboardtimbangan/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/index.php/api_buma/getDataTimbang?kode_blok=1230940&tgl_timbang=2019-06-24",
     //url: "http://localhost/simpg/index.php/api_buma/getDataTimbangPeriodeGroup?tgl_timbang_awal=2010-01-01&tgl_timbang_akhir=2030-01-01&afd=" + id_afd,
-    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=2021-01-01&tgl_timbang_akhir=2022-01-01&tahun_giling=2021",
+    url: js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=1900-01-01&tgl_timbang_akhir=1901-01-01&tahun_giling=2021",
+    //url: "",
     dataSrc: ""
+  },
+  'preDrawCallback': function(settings) {
+    //alert("Loading");
+    //$("#loadingScreen").modal("toggle");
+  },
+  'drawCallback': function(settings) {
+    //$("#loadingScreen").modal("toggle");
   },
   //data: arrayDataTebu,
   columns : [
@@ -142,7 +158,7 @@ $("#tblTebuMasukSkrg").DataTable({
     $("#dtpAwal").datepicker({
       format: "dd-mm-yyyy"
     });
-    $("div.dtpTglAkhir").html("<input autocomplete='off' type='text' class='form-control text-center' placeholder='Tanggal Akhir' id='dtpAkhir' style='width: 120px; margin-left: 10px; margin-bottom: 10px'>");
+    $("div.dtpTglAkhir").html("<input autocomplete='off' type='text' class='form-control text-center' placeholder='Tanggal Akhir' id='dtpAkhir' style='width: 120px; margin-left: 10px; margin-bottom: 10px; margin-right: 10px'>");
     $("#dtpAkhir").datepicker({
       format: "dd-mm-yyyy"
     });
@@ -169,8 +185,5 @@ $("#tblTebuMasukSkrg").DataTable({
     },0);
     $(api.column(8).footer()).html('<font color="white" size="3">Rp' + parseInt(totalRp).toLocaleString('EN-ID',{minimumFractionDigits: 0,maximumFractionDigits:0}) + '</font>');
     $(api.column(5).footer()).html('<font color="white" size="3">' + parseFloat(totalTon).toLocaleString('EN-ID',{minimumFractionDigits: 2,maximumFractionDigits:2}) + ' TON</font>');
-  },
-  language: {
-    "search": ""
   }
 });

@@ -119,8 +119,8 @@ class Biaya_tma extends CI_Controller{
       */
       //-------------------------------------------------------------------------
       curl_close($curl);
-      echo $response; //==> for testing
-      //return $response; //==> for result
+      //echo $response; //==> for testing
+      echo json_encode($response); //==> for result
     }
   }
 
@@ -266,7 +266,17 @@ class Biaya_tma extends CI_Controller{
       </div>
     </div>
     ';
-    return $container;
+    $loadingScreen =
+    '
+      <div class="modal fade" id="loadingScreen">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="loader"></div>
+          </div>
+        </div>
+      </div>
+    ';
+    return $container.$loadingScreen;
   }
 
 }
