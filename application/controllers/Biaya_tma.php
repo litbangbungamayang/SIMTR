@@ -176,7 +176,7 @@ class Biaya_tma extends CI_Controller{
       "&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd."&tahun_giling=".$tahun_giling);
     $response = json_decode($this->getCurl($request));
     $dataResponse = [];
-    if (!is_null($response)){
+    if (sizeof($response) > 0){
       //DATA PER SPTA ---------------
       $req_spta = array("db_server"=>$db_server, "url"=>"getDataTimbangPerSpta?tgl_timbang_awal="
         .$tgl_timbang_awal."&tgl_timbang_akhir=".$tgl_timbang_akhir."&afd=".$id_afd);

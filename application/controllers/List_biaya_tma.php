@@ -62,9 +62,12 @@ class List_biaya_tma extends CI_Controller{
       "tahun_giling"=>$this->input->get("tahun_giling"),
       "priv_level"=>$this->session->userdata("jabatan")
     );
-    $array_pbtma =  json_decode($this->transaksi_model->getAllPbtma($request));
+    //$array_pbtma =  json_decode($this->transaksi_model->getAllPbtma($request));
+    
     $array_dataTable = [];
+    echo $this->transaksi_model->getAllPbtma($request);
     //================ Crosscheck integritas data SIMPG =========================
+    /*
     $simpg_address = json_decode($this->global_scope->getSimpgEnv());
     $url = "getGroupSptaByIdPbtma?id_pbtma=";
     foreach ($array_pbtma as $pbtma) {
@@ -86,7 +89,9 @@ class List_biaya_tma extends CI_Controller{
       }
     }
     echo json_encode($array_dataTable);
+    */
     //==========================================================================
+
   }
 
   public function validasiDokumen(){
