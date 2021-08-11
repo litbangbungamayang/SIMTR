@@ -142,7 +142,7 @@ class Transaksi_list extends CI_Controller{
                         <th>Bon Perawatan</th>
                       </tr>
                     </thead>
-                    <tfoot class="bg-blue-light">
+                    <tfoot class="bg-blue">
                       <th></th>
                       <th></th>
                       <th></th>
@@ -159,25 +159,31 @@ class Transaksi_list extends CI_Controller{
               <div class="card card-collapsed" id="card_tblTebangan">
                 <div class="card-status bg-orange"></div>
                 <div class="card-header" data-toggle="card-collapse" style="cursor: pointer">
-                  <div class="card-title">Transaksi Tebang-Muat-Angkut</div>
+                  <div class="card-title">Transaksi Biaya Tebang-Muat-Angkut</div>
                   <div class="card-options">
                     <a href="#" class="card-options-collapse" data-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a>
                   </div>
                 </div>
                 <div class="card-body">
-                  <table id="tblTransPerawatan" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%">
+                  <table id="tblTransTma" class="table card-table table-vcenter text-nowrap datatable table-lg" style="width: 100%">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
-                        <th>No. SPTA</th>
-                        <th>No. Truk</th>
-                        <th>Tgl. Timbang</th>
-                        <th>Netto Timbang</th>
-                        <th>Rafaksi</th>
-                        <th>Kuanta Rafaksi</th>
-                        <th>Netto Final</th>
+                        <th>No. PBTMA</th>
+                        <th>Tgl. Pengajuan</th>
+                        <th>Periode Tebang</th>
+                        <th>Ton Tebu</th>
+                        <th>Rupiah</th>
                       </tr>
                     </thead>
+                    <tfoot class="bg-blue">
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th><font color="white" size="3">Jumlah s.d.</font></th>
+                      <th></th>
+                      <th></th>
+                    </tfoot>
                   </table>
                 </div>
               </div>

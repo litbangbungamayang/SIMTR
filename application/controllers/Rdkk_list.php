@@ -246,6 +246,10 @@
           </div>
         </div>
       </div>
+      <form id="formKonfirmasi" action="'.site_url('Aff_kebun/konfirmasi').'" method="POST">
+      <input type="hidden" id="id_kelompok" name="id_kelompok" value="">
+      <input type="hidden" id="kode_blok" name="kode_blok" value="">
+      </form>
       ';
       $content_dialogAddPermintaanPupuk =
       '

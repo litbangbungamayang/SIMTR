@@ -1,10 +1,19 @@
 var arrayDataTebu;
+var loadingScreen = $("#loadingScreen");
 
 function formatTgl(dateObj){
   if(dateObj != null){
     return dateObj.getFullYear() + "-" + ("0" + (dateObj.getMonth()+1)) + "-" + ("0" + dateObj.getDate()).slice(-2);
   }
   return "";
+}
+
+function showLoadingModal(){
+  loadingScreen.modal({
+    backdrop: 'static',
+    keyboard: false
+  });
+  loadingScreen.modal("toggle");
 }
 
 function formatTglStr(dateObj){
@@ -15,6 +24,7 @@ function formatTglStr(dateObj){
 }
 
 $("#btnBuatPBTMA").on("click", function(){
+  //showLoadingModal();
   //console.log(JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())); //untuk ambil underlying data di tabel
   if($("#dtpAwal").datepicker("getDate") != null && $("#dtpAkhir").datepicker("getDate") != null &&
     $("#tblTebuMasukSkrg").DataTable().data().any()){
@@ -34,10 +44,14 @@ $("#btnBuatPBTMA").on("click", function(){
             data_kelompok: JSON.stringify($("#tblTebuMasukSkrg").DataTable().ajax.json())
           },
         type: "POST",
-        dataType: "json"
+        dataType: "json",
+        beforeSend: function(){
+          loadingScreen.modal("toggle");
+        }
       }).done(function(){
         alert("Pengajuan biaya TMA berhasil disimpan!");
         //$("#tblTebuMasukSkrg").DataTable().ajax.reload();
+        loadingScreen.modal("toggle");
         $("#tblTebuMasukSkrg").DataTable().ajax.url(js_base_url + "Biaya_tma/getApiDataTimbangPeriodeGroup?tgl_timbang_awal=1900-01-01&tgl_timbang_akhir=1900-01-02").load();
       }).fail(function(){
         alert("Pengajuan biaya TMA tidak berhasil!");

@@ -156,14 +156,29 @@ class Transaksi_model extends CI_Model{
   public function getTransaksiAktivitasByIdKelompok(){
     $id_kelompok = $this->input->get("id_kelompok");
     $jenis_aktivitas = $this->input->get("jenis_aktivitas");
-    $query =
-    "
-    select
-      TRANS.id_transaksi, TRANS.id_kelompoktani, AKTV.id_aktivitas, AKTV.nama_aktivitas, AKTV.biaya, TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi
-    from tbl_simtr_transaksi TRANS
-    join tbl_aktivitas AKTV on AKTV.id_aktivitas = TRANS.id_aktivitas
-    where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2 and AKTV.jenis_aktivitas = ?
-    ";
+    // Khusus TMA
+    if ($id_kelompok == $jenis_aktivitas){
+      $query =
+      "
+      select
+        TRANS.id_transaksi, TRANS.id_kelompoktani, TRANS.no_transaksi, sum(TRANS.kuanta/1000) as kuanta, sum(TRANS.rupiah) as rupiah, TRANS.tgl_transaksi,
+        CONCAT('PBTMA-',TRANS.id_pbtma) as id_pbtma, TRANS.catatan
+      from tbl_simtr_transaksi TRANS
+      where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2 and TRANS.id_aktivitas = ?
+      GROUP BY TRANS.id_pbtma
+      ";
+    } else {
+      $query =
+      "
+      select
+        TRANS.id_transaksi, TRANS.id_kelompoktani, AKTV.id_aktivitas, AKTV.nama_aktivitas, AKTV.biaya,
+        TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi,
+        TRANS.id_pbtma
+      from tbl_simtr_transaksi TRANS
+      join tbl_aktivitas AKTV on AKTV.id_aktivitas = TRANS.id_aktivitas
+      where TRANS.id_kelompoktani = ? and TRANS.kode_transaksi = 2 and AKTV.jenis_aktivitas = ?
+      ";
+    }
     return json_encode($this->db->query($query, array($id_kelompok, $jenis_aktivitas))->result());
   }
 

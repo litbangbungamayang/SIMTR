@@ -4,6 +4,9 @@ var dialogAddPermintaanTma = $("#dialogAddPermintaanTma");
 var dialogAddPermintaanBibit = $("#dialogAddPermintaanBibit");
 var btnSimpanPermintaanPupuk = $("#btnSimpanPermintaanPupuk");
 var btnSimpanPermintaanPerawatan = $("#btnSimpanPermintaanPerawatan");
+var formKonfirmasi = $("#formKonfirmasi");
+var formInputIdKelompok = document.getElementById("id_kelompok");
+var formInputKodeBlok = $("#kode_blok");
 var selectedKelompok;
 var arrayPermintaanPupuk = [];
 var arrayAktivitas = [];
@@ -494,6 +497,52 @@ function addTma(id_kelompok){
   })
 }
 
+function cekAffKebun(id_kelompok){
+  $.ajax({
+    url: js_base_url + "Rdkk_list/getKelompokById",
+    data: {id_kelompok: id_kelompok},
+    dataType: "json",
+    type: "GET",
+    success: function(response){
+      var kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMTR !!!
+      var dataKelompok = response;
+      $.ajax({
+        url: js_base_url + "Biaya_tma/cekAffKebun",
+        data: {kode_blok: kode_blok},
+        dataType: "json",
+        type: "GET",
+        success: function(response){
+          var status_aff = response[0].aff_tebang;
+          if(status_aff == 0){
+            alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
+          } else {
+            /*
+            document.getElementById("id_kelompok").value = 'BANGKE';
+            console.log('Test='+ $("#id_kelompok").value());
+            formKonfirmasi.submit();
+            */
+            window.location.replace( js_base_url + "Aff_kebun/konfirmasi?id_kelompok=" + id_kelompok + "&kode_blok=" + kode_blok);
+            /*
+            $.ajax({
+              url: js_base_url + "Aff_kebun/konfirmasi",
+              data: {
+                id_kelompok: id_kelompok,
+                kode_blok: kode_blok
+              },
+              dataType: "text/html",
+              type: "POST",
+              success: function(response){
+                window.location.replace(response.redirect_url);
+              }
+            })
+            */
+          }
+        }
+      })
+    }
+  })
+}
+
 function resetFeedbackAddPupuk(){
   luasAplikasi.removeClass("is-invalid");
   cbxJenisBahan.removeClass("is-invalid");
@@ -575,7 +624,8 @@ function actionButtonView(id_kelompok, kategori){
             '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
             '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
             menu_bibit +
-            '<a class="dropdown-item" href="" onclick=""><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
+            '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ')"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
+            '<a class="dropdown-item" href="" onclick="" style="display:none"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
           '</div></div>';
 }
 

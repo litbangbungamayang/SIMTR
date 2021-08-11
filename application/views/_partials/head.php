@@ -45,3 +45,5 @@
 <script src="<? //echo base_url('assets/plugins/datatables_2/datatables.min.js') ?>"></script>
 <!-- DatePicker Plugin -->
 <link href="<? echo base_url('assets/plugins/datepicker/bootstrap-datepicker.min.css') ?>" rel="stylesheet" />
+<!-- Redirect Plugin -->
+<!--<script src="<? //echo base_url('assets/plugins/redirect/jquery.redirect.js') ?>"></script>-->

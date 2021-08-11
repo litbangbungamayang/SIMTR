@@ -63,7 +63,7 @@ class Biaya_tma extends CI_Controller{
       $id_kelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($value->kode_blok))->id_kelompok;
       $data_transaksi = [
         "id_bahan" => 0,
-        "id_aktivitas" => $value->id_wilayah,
+        "id_aktivitas" => $id_kelompok,
         "id_kelompoktani" => $id_kelompok,
         "id_vendor" => 0,
         "kode_transaksi" => 2,
@@ -141,7 +141,13 @@ class Biaya_tma extends CI_Controller{
   }
 
   function getCurl($request){
-    $db_server = $request["db_server"];
+    //$db_server = $request["db_server"];
+    $db_server = "";
+    if($this->server_env == "LOCAL"){
+      $db_server = $this->simpg_address_local;
+    } else {
+      $db_server = $this->simpg_address_live;
+    }
     $url = str_replace(" ", "", $request["url"]);
     $curl = curl_init();
     curl_setopt_array($curl, array(
@@ -157,7 +163,16 @@ class Biaya_tma extends CI_Controller{
     $response = curl_exec($curl);
     $error = curl_error($curl);
     curl_close($curl);
+    //var_dump($response);
     return $response; // output as json encoded
+  }
+
+  function cekAffKebun(){
+    $kode_blok = $this->input->get("kode_blok");
+    $request = array(
+      "url" => "cekAffKebun?kode_blok=".$kode_blok
+    );
+    echo ($this->getCurl($request));
   }
 
   function getApiDataTimbangPeriodeGroup(){
@@ -268,13 +283,23 @@ class Biaya_tma extends CI_Controller{
     ';
     $loadingScreen =
     '
-      <div class="modal fade" id="loadingScreen">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="loader"></div>
+    <div class="modal fade" id="loadingScreen">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Permintaan Biaya TMA</h4>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-12 mb-3">Mohon tunggu, permintaan biaya TMA sedang diproses.</div>
+                <div class="col-md-12 mx-auto loader"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
     ';
     return $container.$loadingScreen;
   }

@@ -23,6 +23,25 @@ class Kelompoktani_model extends CI_Model{
   public $id_afd;
   public $zona;
 
+  public function __construct(){
+    parent:: __construct();
+    if ($this->session->userdata('id_user') == false) redirect('login');
+    $this->load->model("kelompoktani_model");
+    $this->load->model("biayatma_model");
+    $this->load->model("transaksitma_model");
+    $this->load->model("transaksi_model");
+    $this->load->model("bahan_model");
+    $this->load->model("dokumen_model");
+    $this->load->model("user_model");
+    $this->load->helper('url');
+    $this->load->helper('form');
+    $this->load->helper('html');
+    $this->load->helper('file');
+    $this->simpg_address_live = "http://simpgbuma.ptpn7.com/index.php/api_bcn/";
+    $this->simpg_address_local = "http://localhost/simpg/index.php/api_bcn/";
+    $this->server_env = "LIVE";
+  }
+
   public function rules(){
     return [
       [
@@ -158,7 +177,10 @@ class Kelompoktani_model extends CI_Model{
   }
 
   public function getKelompokById($id_kelompok = null){
-    if (is_null($id_kelompok)) $id_kelompok = $this->input->get("id_kelompok");
+    if (is_null($id_kelompok)){
+      $id_kelompok = $this->input->get("id_kelompok");
+      if (is_null($id_kelompok)) $id_kelompok = $this->input->post("id_kelompok");
+    }
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, TO_BASE64(KT.scan_ktp) as scan_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.id_wilayah, WIL.nama_wilayah, SUM(PT.luas) as luas,
@@ -204,5 +226,49 @@ class Kelompoktani_model extends CI_Model{
     $this->scan_kk = $post["scan_kk"];
     $this->scan_surat = $post["scan_surat"];
     $this->db->update($this->_table, array('id_kelompok' => $post["id_kelompok"]));
+  }
+
+  function getCurl($request){
+    //$db_server = $request["db_server"];
+    $db_server = "";
+    if($this->server_env == "LOCAL"){
+      $db_server = $this->simpg_address_local;
+    } else {
+      $db_server = $this->simpg_address_live;
+    }
+    $url = str_replace(" ", "", $request["url"]);
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $db_server.$url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => 30,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "GET",
+      CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache"
+      ),
+    ));
+    $response = curl_exec($curl);
+    $error = curl_error($curl);
+    curl_close($curl);
+    //var_dump($response);
+    return $response; // output as json encoded
+  }
+
+  function getDataPetakSimpg(){
+    $kode_blok = $this->input->get("kode_blok");
+    $request = array(
+      "url" => "getDatapetak?kode_blok=".$kode_blok
+    );
+    return ($this->getCurl($request));
+  }
+
+  function getDataTebuBakar($kode_blok = null){
+    if(is_null($kode_blok))
+      $kode_blok = $this->input->get("kode_blok");
+    $request = array(
+      "url" => "getDataTebuBakar?kode_blok=".$kode_blok
+    );
+    return ($this->getCurl($request));
   }
 }
