@@ -32,7 +32,7 @@ class Aff_kebun extends CI_Controller{
   }
 
   public function konfirmasi(){
-    //var_dump($this->input->post());
+    //var_dump($this->input->post());die();
     $kelompoktani = $this->kelompoktani_model;
     $dataKelompok = json_decode($kelompoktani->getKelompokById());
     //var_dump($dataKelompok); die();

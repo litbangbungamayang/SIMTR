@@ -256,7 +256,7 @@ class Kelompoktani_model extends CI_Model{
   }
 
   function getDataPetakSimpg(){
-    $kode_blok = $this->input->get("kode_blok");
+    $kode_blok = $this->input->post("kode_blok");
     $request = array(
       "url" => "getDatapetak?kode_blok=".$kode_blok
     );
@@ -265,7 +265,7 @@ class Kelompoktani_model extends CI_Model{
 
   function getDataTebuBakar($kode_blok = null){
     if(is_null($kode_blok))
-      $kode_blok = $this->input->get("kode_blok");
+      $kode_blok = $this->input->post("kode_blok");
     $request = array(
       "url" => "getDataTebuBakar?kode_blok=".$kode_blok
     );

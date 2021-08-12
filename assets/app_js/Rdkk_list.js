@@ -6,7 +6,7 @@ var btnSimpanPermintaanPupuk = $("#btnSimpanPermintaanPupuk");
 var btnSimpanPermintaanPerawatan = $("#btnSimpanPermintaanPerawatan");
 var formKonfirmasi = $("#formKonfirmasi");
 var formInputIdKelompok = document.getElementById("id_kelompok");
-var formInputKodeBlok = $("#kode_blok");
+var formInputKodeBlok = document.getElementById("kode_blok");
 var selectedKelompok;
 var arrayPermintaanPupuk = [];
 var arrayAktivitas = [];
@@ -497,14 +497,23 @@ function addTma(id_kelompok){
   })
 }
 
+
+/* FOR TESTING PURPOSES ONLY
+formKonfirmasi.on("submit", function(event){
+  event.preventDefault();
+  console.log( $( this ).serialize() );
+})
+*/
+
 function cekAffKebun(id_kelompok){
+  var kode_blok = null;
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
     data: {id_kelompok: id_kelompok},
     dataType: "json",
     type: "GET",
     success: function(response){
-      var kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMTR !!!
+      kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMTR !!!
       var dataKelompok = response;
       $.ajax({
         url: js_base_url + "Biaya_tma/cekAffKebun",
@@ -516,12 +525,13 @@ function cekAffKebun(id_kelompok){
           if(status_aff == 0){
             alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
           } else {
+            formInputIdKelompok.value = id_kelompok;
+            formInputKodeBlok.value = kode_blok;
             /*
-            document.getElementById("id_kelompok").value = 'BANGKE';
             console.log('Test='+ $("#id_kelompok").value());
             formKonfirmasi.submit();
             */
-            window.location.replace( js_base_url + "Aff_kebun/konfirmasi?id_kelompok=" + id_kelompok + "&kode_blok=" + kode_blok);
+            //window.location.replace( js_base_url + "Aff_kebun/konfirmasi?id_kelompok=" + id_kelompok + "&kode_blok=" + kode_blok);
             /*
             $.ajax({
               url: js_base_url + "Aff_kebun/konfirmasi",
@@ -536,6 +546,7 @@ function cekAffKebun(id_kelompok){
               }
             })
             */
+            formKonfirmasi.submit();
           }
         }
       })
