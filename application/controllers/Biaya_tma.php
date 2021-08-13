@@ -175,6 +175,14 @@ class Biaya_tma extends CI_Controller{
     echo ($this->getCurl($request));
   }
 
+  function cekDataCs(){
+    $kode_blok = $this->input->get("kode_blok");
+    $request = array(
+      "url" => "cekDataCs?kode_blok=$kode_blok"
+    );
+    echo ($this->getCurl($request));
+  }
+
   function getApiDataTimbangPeriodeGroup(){
     $tgl_timbang_awal = $this->input->get("tgl_timbang_awal");
     $tgl_timbang_akhir = $this->input->get("tgl_timbang_akhir");

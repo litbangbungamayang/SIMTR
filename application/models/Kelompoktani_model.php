@@ -271,4 +271,13 @@ class Kelompoktani_model extends CI_Model{
     );
     return ($this->getCurl($request));
   }
+
+  function getDataCs(){
+    $kode_blok = $this->input->post("kode_blok");
+    $request = array(
+      "url" => "getDataCs?kode_blok=$kode_blok"
+    );
+    return ($this->getCurl($request));
+  }
+
 }

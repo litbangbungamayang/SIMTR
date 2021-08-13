@@ -32,26 +32,25 @@ class Aff_kebun extends CI_Controller{
   }
 
   public function konfirmasi(){
-    //var_dump($this->input->post());die();
     $kelompoktani = $this->kelompoktani_model;
     $dataKelompok = json_decode($kelompoktani->getKelompokById());
-    //var_dump($dataKelompok); die();
     $dataSimpg = json_decode($kelompoktani->getDataPetakSimpg());
     $tebuBakar = json_decode($kelompoktani->getDataTebuBakar());
-    //var_dump($tebuBakar); die();
+    $dataCs = json_decode($kelompoktani->getDataCs());
     $data['pageTitle'] = "Konfirmasi Selesai Tebang";
-    //$data['content'] = $this->loadKonfirmasi($dataKelompok);
     $dataContent =  array(
       "dataKelompok" => $dataKelompok,
       "dataSimpg" => $dataSimpg,
-      "tebuBakar" => $tebuBakar
+      "tebuBakar" => $tebuBakar,
+      "dataCs" => $dataCs
     );
     $data['content'] = $this->loadKonfirmasi($dataContent);
+    $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
   }
 
   function loadScript(){
-    return '$.getScript("'.base_url("/assets/app_js/Biaya_tma.js").'");';
+    return '$.getScript("'.base_url("/assets/app_js/Aff_kebun.js").'");';
   }
 
   function getCurl($request){
@@ -248,6 +247,21 @@ class Aff_kebun extends CI_Controller{
     $dataKelompok = $dataContent['dataKelompok'];
     $dataSimpg = $dataContent['dataSimpg'][0];
     $tebuBakar = $dataContent['tebuBakar'][0];
+    $dataCs = $dataContent['dataCs'];
+    // Perhitungan rafaksi
+    $ton_takmar = ($dataSimpg->taksasi_pandang*$dataSimpg->luas_tanam);
+    $ton_tebuTimbang = ($dataSimpg->ton_tebu)/1000;
+    $ton_tebuBakar = 0;
+    ($tebuBakar->jumlah_rit == 0 ? $ton_tebuBakar = 0 : $ton_tebuBakar = $tebuBakar->ton_tebu/1000);
+    $ton_pinaltiTrash = 0;
+    $ton_rafaksiBakar = ROUND(0.1*$ton_tebuBakar,2,PHP_ROUND_HALF_UP);
+    $ton_rafaksiCs = ROUND(($dataCs->total_rafaksi)/1000,2,PHP_ROUND_HALF_UP);
+    $ton_rafaksiCs = 0;
+    $ton_totalRafaksi = ($ton_rafaksiBakar + $ton_pinaltiTrash + $ton_rafaksiCs);
+    $ton_tebuHitung = $ton_tebuTimbang - $ton_totalRafaksi;
+    $protas_timbang = ROUND(($ton_tebuTimbang)/$dataKelompok->luas,2,PHP_ROUND_HALF_UP);
+    $persen_rafaksi_thd_takmar = ROUND($ton_totalRafaksi/$ton_takmar*100,2,PHP_ROUND_HALF_UP);
+    //==================================================
     $kode_blok = "";
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($id_afd))->nama_user;
@@ -283,61 +297,139 @@ class Aff_kebun extends CI_Controller{
                 <div class="row"><label>Nomor kontrak</label></div>
                 <div class="row"><label>Kategori</label></div>
                 <div class="row"><label>Luas baku</label></div>
+                <div class="row"><label>Luas tebang</label></div>
                 <div class="row"><label>Jenis tebu</label></div>
                 <div class="row"><label>Masa tanam</label></div>
                 <div class="row"><label>Taksasi Maret</label></div>
                 <div class="row"><label>Berat tebu ditimbang</label></div>
-                <div class="row"><label>Rafaksi tebu bakar</label></div>
+                <div class="row"><label><i>Rafaksi tebu bakar (-)</i></label></div>
+                <div class="row"><label><i>Pinalti trash (-)</i></label></div>
+                <div class="row"><label><i>Rafaksi core sampler (-)</i></label></div>
+                <div class="row"><label><i>Rafaksi lainnya (-)</i></label></div>
+                <div class="row"><label><b><i>Jumlah rafaksi (-)</i></b></label></div>
+                <div class="row"><label>Berat tebu terhitung</label></div>
+                <div class="row"><label>% rafaksi thd Takmar</label></div>
+                <div class="row"><label>Berat tebu terbakar</label></div>
+                <div class="row"><label>Awal timbang</label></div>
+                <div class="row"><label>Akhir timbang</label></div>
               </div>
               <div class="col-lg-4">
                 <div class="row">
                   <div>
-                    <label for="nama_kelompok">:'.$dataKelompok->nama_kelompok.'</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="nama_kelompok">: '.$dataKelompok->nama_kelompok.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="nama_kelompok" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="no_kontrak">:'.$dataKelompok->no_kontrak.'</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="no_kontrak">: '.$dataKelompok->no_kontrak.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="no_kontrak" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="kategori">:'.$kategori.'</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="kategori">: '.$kategori.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="kategori" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="luas">:'.$dataKelompok->luas.' Ha</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="luas">: '.$dataKelompok->luas.' Ha</label> <input class="ml$ton_tebuHitung-2 mb-1" type="checkbox"
                       id="luas" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="varietas">:'.$dataKelompok->nama_varietas.'</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="luas">: '.ROUND($dataSimpg->luas_tebang,2,PHP_ROUND_HALF_UP).' Ha</label> <input class="ml$ton_tebuHitung-2 mb-1" type="checkbox"
+                      id="luas" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="varietas">: '.$dataKelompok->nama_varietas.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="varietas" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="masa_tanam">:'.$dataKelompok->mt.'</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="masa_tanam">: '.$dataKelompok->mt.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="masa_tanam" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="ton_takmar">:'.($dataSimpg->taksasi_pandang*$dataSimpg->luas_tanam).' ton; Produktivitas :
-                      '.$dataSimpg->taksasi_pandang.' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
+                    <label for="ton_takmar">: '.$ton_takmar.' ton; Produktivitas :
+                      '.ROUND($dataSimpg->taksasi_pandang,2,PHP_ROUND_HALF_UP).' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
                       id="ton_takmar" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="ton_timbang">:'.($dataSimpg->ton_tebu/1000).' ton; Produktivitas :
-                      '.(($dataSimpg->ton_tebu/1000)/$dataSimpg->luas_tanam).' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_takmar" style="vertical-align:middle"/>
+                    <label for="ton_timbang">: '.($ton_tebuTimbang).' ton; Produktivitas :
+                      '.$protas_timbang.' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_timbang" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_rafaksi_bakar">: '.$ton_rafaksiBakar.' ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_rafaksi_bakar" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_trash">: 0 ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_trash" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_rafaksiCs">: '.($ton_rafaksiCs).' ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_rafaksiCs" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_rafaksiLain">: </label><input class="ml-2 mb-1" type="text"
+                      id="ton_rafaksiLain" name="ton_rafaksiLain" style="vertical-align:middle"/> ton
+                      <input class="ml-2 mb-1" type="checkbox"
+                        id="cek_rafaksiLain" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_hitung">: <b>'.($ton_totalRafaksi).' ton</b></label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_hitung" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_hitung">: <b>'.($ton_tebuHitung).' ton</b></label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_hitung" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="persen_rafaksi_takmar">: '.$persen_rafaksi_thd_takmar.' %</label><input class="ml-2 mb-1" type="checkbox"
+                      id="persen_rafaksi_takmar" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_bakar">: '.($ton_tebuBakar).' ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_bakar" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="awal_tebang">: '.($dataSimpg->awal_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
+                      id="awal_tebang" style="vertical-align:middle"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="akhir_tebang">: '.($dataSimpg->akhir_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
+                      id="akhir_tebang" style="vertical-align:middle"/>
                   </div>
                 </div>
               </div>

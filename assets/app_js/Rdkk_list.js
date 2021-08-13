@@ -507,6 +507,7 @@ formKonfirmasi.on("submit", function(event){
 
 function cekAffKebun(id_kelompok){
   var kode_blok = null;
+  var data_kelompok = null;
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
     data: {id_kelompok: id_kelompok},
@@ -514,7 +515,7 @@ function cekAffKebun(id_kelompok){
     type: "GET",
     success: function(response){
       kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMTR !!!
-      var dataKelompok = response;
+      dataKelompok = response;
       $.ajax({
         url: js_base_url + "Biaya_tma/cekAffKebun",
         data: {kode_blok: kode_blok},
@@ -525,28 +526,21 @@ function cekAffKebun(id_kelompok){
           if(status_aff == 0){
             alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
           } else {
-            formInputIdKelompok.value = id_kelompok;
-            formInputKodeBlok.value = kode_blok;
-            /*
-            console.log('Test='+ $("#id_kelompok").value());
-            formKonfirmasi.submit();
-            */
-            //window.location.replace( js_base_url + "Aff_kebun/konfirmasi?id_kelompok=" + id_kelompok + "&kode_blok=" + kode_blok);
-            /*
             $.ajax({
-              url: js_base_url + "Aff_kebun/konfirmasi",
-              data: {
-                id_kelompok: id_kelompok,
-                kode_blok: kode_blok
-              },
-              dataType: "text/html",
-              type: "POST",
+              url: js_base_url + "Biaya_tma/cekDataCs",
+              data: {kode_blok: kode_blok},
+              dataType: "json",
+              type: "GET",
               success: function(response){
-                window.location.replace(response.redirect_url);
+                if(response.length == 0){
+                  formInputIdKelompok.value = id_kelompok;
+                  formInputKodeBlok.value = kode_blok;
+                  formKonfirmasi.submit();
+                } else {
+                  alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
+                }
               }
             })
-            */
-            formKonfirmasi.submit();
           }
         }
       })
