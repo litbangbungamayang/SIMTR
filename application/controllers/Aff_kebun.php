@@ -53,6 +53,16 @@ class Aff_kebun extends CI_Controller{
     return '$.getScript("'.base_url("/assets/app_js/Aff_kebun.js").'");';
   }
 
+  public function simpanAffKebun(){
+    /*
+    $tipe_dokumen = "BALT";
+    $id_dokumen = $this->dokumen_model->simpan($tipe_dokumen, "-");
+    var_dump($id_dokumen);
+    */
+    $dataAffKebun = $this->input->post("dataAffKebun");
+    var_dump($dataAffKebun);
+  }
+
   function getCurl($request){
     $db_server = $request["db_server"];
     $url = str_replace(" ", "", $request["url"]);
@@ -290,7 +300,7 @@ class Aff_kebun extends CI_Controller{
     <div class="page">
       <div class="container">
         <div class="card">
-          <div class="card-body">
+          <div class="card-body"><form id="frmSelesaiTebang">
             <div class="row" style="font-size:18px">
               <div class="col-lg-3">
                 <div class="row"><label>Nama kelompok</label></div>
@@ -317,127 +327,145 @@ class Aff_kebun extends CI_Controller{
                 <div class="row">
                   <div>
                     <label for="nama_kelompok">: '.$dataKelompok->nama_kelompok.'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="nama_kelompok" style="vertical-align:middle"/>
+                      id="nama_kelompok" style="vertical-align:middle" /><input type="hidden" id="val_nama_kelompok" name="val_nama_kelompok"
+                      value="'.$dataKelompok->nama_kelompok.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="no_kontrak">: '.$dataKelompok->no_kontrak.'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="no_kontrak" style="vertical-align:middle"/>
+                      id="no_kontrak" style="vertical-align:middle"/><input type="hidden" id="val_no_kontrak" name="val_no_kontrak"
+                      value="'.$dataKelompok->no_kontrak.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="kategori">: '.$kategori.'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="kategori" style="vertical-align:middle"/>
+                      id="kategori" style="vertical-align:middle"/><input type="hidden" id="val_kategori" name="val_kategori"
+                      value="'.$kategori.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="luas">: '.$dataKelompok->luas.' Ha</label> <input class="ml$ton_tebuHitung-2 mb-1" type="checkbox"
-                      id="luas" style="vertical-align:middle"/>
+                      id="luas" style="vertical-align:middle"/><input type="hidden" id="val_luas" name="val_luas"
+                      value="'.$dataKelompok->luas.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="luas">: '.ROUND($dataSimpg->luas_tebang,2,PHP_ROUND_HALF_UP).' Ha</label> <input class="ml$ton_tebuHitung-2 mb-1" type="checkbox"
-                      id="luas" style="vertical-align:middle"/>
+                    <label for="luas_tebang">: '.ROUND($dataSimpg->luas_tebang,2,PHP_ROUND_HALF_UP).' Ha</label> <input class="ml-2 mb-1" type="checkbox"
+                      id="luas_tebang" style="vertical-align:middle"/><input type="hidden" id="val_luasTebang" name="val_luasTebang"
+                      value="'.ROUND($dataSimpg->luas_tebang,2,PHP_ROUND_HALF_UP).'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="varietas">: '.$dataKelompok->nama_varietas.'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="varietas" style="vertical-align:middle"/>
+                      id="varietas" style="vertical-align:middle"/><input type="hidden" id="val_varietas" name="val_varietas"
+                      value="'.$dataKelompok->nama_varietas.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="masa_tanam">: '.$dataKelompok->mt.'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="masa_tanam" style="vertical-align:middle"/>
+                      id="masa_tanam" style="vertical-align:middle"/><input type="hidden" id="val_masaTanam" name="val_masaTanam"
+                      value="'.$dataKelompok->mt.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_takmar">: '.$ton_takmar.' ton; Produktivitas :
                       '.ROUND($dataSimpg->taksasi_pandang,2,PHP_ROUND_HALF_UP).' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_takmar" style="vertical-align:middle"/>
+                      id="ton_takmar" style="vertical-align:middle"/><input type="hidden" id="val_tonTakmar" name="val_tonTakmar"
+                      value="'.$ton_takmar.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_timbang">: '.($ton_tebuTimbang).' ton; Produktivitas :
                       '.$protas_timbang.' ton/ha</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_timbang" style="vertical-align:middle"/>
+                      id="ton_timbang" style="vertical-align:middle"/><input type="hidden" id="val_tonTimbang" name="val_tonTimbang"
+                      value="'.$ton_tebuTimbang.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_rafaksi_bakar">: '.$ton_rafaksiBakar.' ton</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_rafaksi_bakar" style="vertical-align:middle"/>
+                      id="ton_rafaksi_bakar" style="vertical-align:middle"/><input type="hidden" id="val_tonRafaksiBakar" name="val_tonRafaksiBakar"
+                      value="'.$ton_rafaksiBakar.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_trash">: 0 ton</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_trash" style="vertical-align:middle"/>
+                      id="ton_trash" style="vertical-align:middle"/><input type="hidden" id="val_tonTrash" name="val_tonTrash"
+                      value="0"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_rafaksiCs">: '.($ton_rafaksiCs).' ton</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_rafaksiCs" style="vertical-align:middle"/>
+                      id="ton_rafaksiCs" style="vertical-align:middle"/><input type="hidden" id="val_tonRafaksiCs" name="val_tonRafaksiCs"
+                      value="'.$ton_rafaksiCs.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_rafaksiLain">: </label><input class="ml-2 mb-1" type="text"
-                      id="ton_rafaksiLain" name="ton_rafaksiLain" style="vertical-align:middle"/> ton
+                      id="ton_rafaksiLain" name="val_tonRafaksiLain" style="vertical-align:middle" size="3" maxlength="7"/> ton
                       <input class="ml-2 mb-1" type="checkbox"
                         id="cek_rafaksiLain" style="vertical-align:middle"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
-                    <label for="ton_hitung">: <b>'.($ton_totalRafaksi).' ton</b></label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_hitung" style="vertical-align:middle"/>
+                    <label for="ton_totalRafaksi">: <b>'.($ton_totalRafaksi).' ton</b></label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_totalRafaksi" style="vertical-align:middle"/><input type="hidden" id="val_tonTotalRafaksi" name="val_tonTotalRafaksi"
+                      value="'.$ton_totalRafaksi.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_hitung">: <b>'.($ton_tebuHitung).' ton</b></label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_hitung" style="vertical-align:middle"/>
+                      id="ton_hitung" style="vertical-align:middle"/><input type="hidden" id="val_tonTebuHitung" name="val_tonTebuHitung"
+                      value="'.$ton_tebuHitung.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="persen_rafaksi_takmar">: '.$persen_rafaksi_thd_takmar.' %</label><input class="ml-2 mb-1" type="checkbox"
-                      id="persen_rafaksi_takmar" style="vertical-align:middle"/>
+                      id="persen_rafaksi_takmar" style="vertical-align:middle"/><input type="hidden" id="val_persenRafaksi" name="val_persenRafaksi"
+                      value="'.$persen_rafaksi_thd_takmar.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="ton_bakar">: '.($ton_tebuBakar).' ton</label><input class="ml-2 mb-1" type="checkbox"
-                      id="ton_bakar" style="vertical-align:middle"/>
+                      id="ton_bakar" style="vertical-align:middle"/><input type="hidden" id="val_tonTebuBakar" name="val_tonTebuBakar"
+                      value="'.$ton_tebuBakar.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="awal_tebang">: '.($dataSimpg->awal_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="awal_tebang" style="vertical-align:middle"/>
+                      id="awal_tebang" style="vertical-align:middle"/><input type="hidden" id="val_awalTebang" name="val_awalTebang"
+                      value="'.$dataSimpg->awal_tebang.'"/>
                   </div>
                 </div>
                 <div class="row">
                   <div>
                     <label for="akhir_tebang">: '.($dataSimpg->akhir_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
-                      id="akhir_tebang" style="vertical-align:middle"/>
+                      id="akhir_tebang" style="vertical-align:middle"/><input type="hidden" id="val_akhirTebang" name="val_akhirTebang"
+                      value="'.$dataSimpg->akhir_tebang.'"/>
                   </div>
                 </div>
               </div>
             </div>
             <div class="card-options mt-6">
-              <a href="rdkk_all" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-check-circle"></i> Validasi dan Buat Berita Acara </a>
+              <a href="#" class="btn btn-primary" onclick="cekValidasiField()" style="margin-right: 10px;"><i class="fe fe-check-circle"></i> Validasi dan Buat Berita Acara </a>
             </div>
-          </div>
+          </form></div>
         </div>
       </div>
     </div>
