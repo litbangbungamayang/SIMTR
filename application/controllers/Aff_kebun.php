@@ -54,13 +54,16 @@ class Aff_kebun extends CI_Controller{
   }
 
   public function simpanAffKebun(){
-    /*
-    $tipe_dokumen = "BALT";
+    $tipe_dokumen = "BASB";
     $id_dokumen = $this->dokumen_model->simpan($tipe_dokumen, "-");
-    var_dump($id_dokumen);
-    */
-    $dataAffKebun = $this->input->post("dataAffKebun");
-    var_dump($dataAffKebun);
+    if(!is_null($id_dokumen)){
+      $dataAffKebun = ($this->input->post());
+      $request = array(
+        "dataAffKebun" => $dataAffKebun,
+        "id_dokumen" => $id_dokumen
+      );
+      echo ($this->biayatma_model->simpanAffKebun($request));
+    }
   }
 
   function getCurl($request){
@@ -329,6 +332,10 @@ class Aff_kebun extends CI_Controller{
                     <label for="nama_kelompok">: '.$dataKelompok->nama_kelompok.'</label><input class="ml-2 mb-1" type="checkbox"
                       id="nama_kelompok" style="vertical-align:middle" /><input type="hidden" id="val_nama_kelompok" name="val_nama_kelompok"
                       value="'.$dataKelompok->nama_kelompok.'"/>
+                    <input type="hidden" id="val_id_kelompok" name="val_id_kelompok"
+                      value="'.$dataKelompok->id_kelompok.'"/>
+                    <input type="hidden" id="val_kode_blok" name="val_kode_blok"
+                      value="'.$dataKelompok->kode_blok.'"/>
                   </div>
                 </div>
                 <div class="row">

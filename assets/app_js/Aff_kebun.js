@@ -39,16 +39,19 @@ function cekValidasiField(){
     chk_TonRafaksiLain.is(":checked") && chk_TonHitung.is(":checked") && chk_TonTotalRafaksi.is(":checked") && chk_PersenRafaksiTakmar.is(":checked") &&
     chk_TonTebuBakar.is(":checked") && chk_TglAwalTimbang.is(":checked") && chk_TglAkhirTimbang.is(":checked")
   ){
-    //console.log(frm_selesaiTebang.serialize());
     $.ajax({
       url: js_base_url + "Aff_kebun/simpanAffKebun",
-      dataType: "json",
       type: "POST",
-      data: {
-        dataAffKebun:frm_selesaiTebang.serialize()
-      },
+      dataType: "json",
+      data: frm_selesaiTebang.serialize(),
       success: function(response){
-        console.log(response);
+        if(response == 1){
+          alert("Data berhasil disimpan!");
+          window.location.replace(js_base_url + "rdkk_all");
+        }
+      },
+      error: function(xhr, status, error){
+        console.log(xhr.status + ":" + xhr.statusText);
       }
     })
   } else {
