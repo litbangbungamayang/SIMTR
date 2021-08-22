@@ -25,8 +25,13 @@ class Aff_kebun extends CI_Controller{
   public function index(){
     $kelompoktani = $this->kelompoktani_model;
     $dataKelompok = json_decode($kelompoktani->getKelompokById());
+    $dataBeritaAcara = json_decode($this->biayatma_model->getBeritaAcaraTebangByKodeBlok());
+    $dataContent = array(
+      "dataKelompok" => $dataKelompok,
+      "dataBeritaAcara" => $dataBeritaAcara
+    );
     $data['pageTitle'] = "";
-    $data['content'] = $this->loadContent($dataKelompok);
+    $data['content'] = $this->loadContent($dataContent);
     $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
   }
@@ -137,13 +142,16 @@ class Aff_kebun extends CI_Controller{
   }
 
   public function loadContent($dataContent){
+    $dataKelompok = $dataContent["dataKelompok"];
+    $dataBeritaAcara = $dataContent["dataBeritaAcara"];
     $id_afd = $this->session->userdata("afd");
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($id_afd))->nama_user;
     setLocale(LC_TIME, 'id_ID.utf8');
-    $hariIni = new DateTime();
-    $hari = strftime('%A', $hariIni->getTimeStamp());
-    $tanggal = strftime('%d %B %Y', $hariIni->getTimeStamp());
+    //$hariIni = new DateTime();
+    $hariIni = strtotime($dataBeritaAcara->tgl_buat);
+    $hari = strftime('%A', $hariIni);
+    $tanggal = strftime('%d %B %Y', $hariIni);
     $kategori = "";
     switch ($dataKelompok->kategori){
       case 1 :
@@ -173,7 +181,8 @@ class Aff_kebun extends CI_Controller{
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-12 text-center mb-6"><h3>BERITA ACARA SELESAI TEBANG</h3>Nomor BUMA/BA/AFF/069/2021</div>
+              <div class="col-12 text-center mb-6"><h3>BERITA ACARA SELESAI TEBANG</h3>Nomor BUMA/BA/AFF/'.
+              $dataBeritaAcara->id_dokumen.'/'.$dataKelompok->tahun_giling.'</div>
             </div>
             <div class="row">
               <div class="col-12 mb-6">
@@ -206,8 +215,10 @@ class Aff_kebun extends CI_Controller{
                 : '.$dataKelompok->luas.' Ha <br>
                 : '.$dataKelompok->nama_varietas.' <br>
                 : '.$dataKelompok->mt.' <br>
-                :  ton (Rata-rata ton/ha)<br>
-                :  ton (Rata-rata ton/ha)<br>
+                : '.$dataBeritaAcara->ton_taksasi_maret.' ton (Rata-rata '
+                  .$dataBeritaAcara->ton_taksasi_maret/$dataBeritaAcara->luas_baku.' ton/ha)<br>
+                : '.$dataBeritaAcara->ton_tebu_timbang.' ton (Rata-rata '
+                  .$dataBeritaAcara->ton_tebu_timbang/$dataBeritaAcara->luas_tebang.' ton/ha)<br>
                 :  ton <br>
                 :  ton <br>
                 :  % <br>

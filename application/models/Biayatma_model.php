@@ -32,17 +32,32 @@ class Biayatma_model extends CI_Model{
   public function simpanAffKebun($request){
     $dataAffKebun = $request["dataAffKebun"];
     $id_dokumen = $request["id_dokumen"];
-    $query = "insert into tbl_simtr_ba_tebang(id_kelompok, id_dokumen, nama_kelompok, kode_blok, ton_tebu_timbang, luas_tebang,
-    luas_baku, ton_rafaksi_bakar, ton_rafaksi_cs, ton_rafaksi_lain, ton_tebu_hitung, ton_tebu_takmar, ton_tebu_bakar,
-    awal_timbang, akhir_timbang) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    $query = "insert into tbl_simtr_ba_tebang(id_kelompok, id_dokumen, nama_kelompok, kode_blok, ton_tebu_timbang, ton_taksasi_maret,
+    luas_tebang, luas_baku, ton_rafaksi_bakar, ton_rafaksi_cs, ton_rafaksi_lain, ton_tebu_hitung, ton_tebu_takmar, ton_tebu_bakar,
+    awal_timbang, akhir_timbang) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ";
     $this->db->query($query, array(
       $dataAffKebun["val_id_kelompok"], $id_dokumen, $dataAffKebun["val_nama_kelompok"], $dataAffKebun["val_kode_blok"], $dataAffKebun["val_tonTimbang"],
-      $dataAffKebun["val_luasTebang"], $dataAffKebun["val_luas"], $dataAffKebun["val_tonRafaksiBakar"],
+      $dataAffKebun["val_tonTakmar"], $dataAffKebun["val_luasTebang"], $dataAffKebun["val_luas"], $dataAffKebun["val_tonRafaksiBakar"],
       $dataAffKebun["val_tonRafaksiCs"], $dataAffKebun["val_tonRafaksiLain"], $dataAffKebun["val_tonTebuHitung"],
       $dataAffKebun["val_tonTakmar"], $dataAffKebun["val_tonTebuBakar"], $dataAffKebun["val_awalTebang"], $dataAffKebun["val_akhirTebang"]
     ));
     return json_encode($this->db->affected_rows());
+  }
+
+  public function cekBeritaAcaraTebang(){
+    $kode_blok = $this->input->get("kode_blok");
+    $query = "select * from tbl_simtr_ba_tebang where kode_blok = ?";
+    return json_encode($this->db->query($query, array($kode_blok))->num_rows());
+  }
+
+  public function getBeritaAcaraTebangByKodeBlok(){
+    $kode_blok = $this->input->post("kode_blok");
+    $query = "
+    select * from tbl_simtr_ba_tebang ba
+      join tbl_dokumen dok on ba.id_dokumen = dok.id_dokumen
+    where kode_blok = ?";
+    return json_encode($this->db->query($query, array($kode_blok))->row());
   }
 
   public function getAllBiayaTma(){

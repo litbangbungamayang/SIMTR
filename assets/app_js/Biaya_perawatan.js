@@ -15,11 +15,13 @@ function formatTglStr(dateObj){
 $("#btnBuatPbp").on("click", function(){
   var objTglAwal = $("#dtpAwal").datepicker("getDate");
   var strTglAwal = formatTglStr(objTglAwal);
+  var dbTglAwal = formatTgl(objTglAwal);
   var objTglAkhir = $("#dtpAkhir").datepicker("getDate");
   var strTglAkhir = formatTglStr(objTglAkhir);
+  var dbTglAkhir = formatTgl(objTglAkhir);
   if($("#dtpAwal").datepicker("getDate") != null && $("#dtpAkhir").datepicker("getDate") != null &&
     $("#tblListPerawatan").DataTable().data().any()){
-      console.log(strTglAwal);
+    //console.log(dbTglAwal);
     if (confirm("Buat pengajuan biaya perawatan untuk daftar tersebut?")){
       var url_string = $("#tblListPerawatan").DataTable().ajax.url();
       var url = new URL(url_string);
@@ -35,7 +37,7 @@ $("#btnBuatPbp").on("click", function(){
             $("#tblListPerawatan").DataTable().ajax.reload();
           }
         });
-        console.log("StartDate = " + tgl_awal + "; EndDate = " + tgl_akhir);
+        //console.log("StartDate = " + tgl_awal + "; EndDate = " + tgl_akhir);
     }
   }
 })
@@ -48,7 +50,7 @@ $("#tblListPerawatan").DataTable({
   autoWidth: false,
   dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling"><"dtpTglAwal"><"dtpTglAkhir">f>tpl',
   ajax: {
-    url: js_base_url + "Biaya_perawatan/getRekapBiayaPerawatan?tahun_giling=0&tgl_awal=2000-01-01&tgl_akhir=2000-12-31" ,
+    url: js_base_url + "Biaya_perawatan/getRekapBiayaPerawatan?tahun_giling=202&tgl_awal=2000-01-01&tgl_akhir=2030-12-31" ,
     dataSrc: ""
   },
   columns : [
@@ -106,6 +108,10 @@ $("#tblListPerawatan").DataTable({
     for (i=0; i < 4; i++){
       optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
     }
+    // TESTING PURPOSES
+    var underlying_data = $("#tblListPerawatan").DataTable().rows().data().toArray();
+    console.log(underlying_data);
+    //============================================================
     $("div.cbxTahunGiling").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
     $("div.labelTahunGiling").html('<label class="form-label" style="margin: 0px 10px 0px 0px;"></label>');
     $('#tahun_giling').selectize({create: false, sortField: 'value'});

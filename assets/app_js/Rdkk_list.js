@@ -5,8 +5,11 @@ var dialogAddPermintaanBibit = $("#dialogAddPermintaanBibit");
 var btnSimpanPermintaanPupuk = $("#btnSimpanPermintaanPupuk");
 var btnSimpanPermintaanPerawatan = $("#btnSimpanPermintaanPerawatan");
 var formKonfirmasi = $("#formKonfirmasi");
+var formViewBeritaAcaraAff = $("#formViewBeritaAcaraAff");
 var formInputIdKelompok = document.getElementById("id_kelompok");
 var formInputKodeBlok = document.getElementById("kode_blok");
+var formInputIdKelompokView = document.getElementById("id_kelompok_v");
+var formInputKodeBlokView = document.getElementById("kode_blok_v");
 var selectedKelompok;
 var arrayPermintaanPupuk = [];
 var arrayAktivitas = [];
@@ -507,6 +510,7 @@ formKonfirmasi.on("submit", function(event){
 
 function cekAffKebun(id_kelompok){
   var kode_blok = null;
+  var kode_blok_simtr = null;
   var data_kelompok = null;
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
@@ -514,33 +518,49 @@ function cekAffKebun(id_kelompok){
     dataType: "json",
     type: "GET",
     success: function(response){
-      kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMTR !!!
+      kode_blok = (response.kode_blok).substr(2,7); //kode blok versi SIMPG!!!
+      kode_blok_simtr = response.kode_blok;
       dataKelompok = response;
       $.ajax({
-        url: js_base_url + "Biaya_tma/cekAffKebun",
-        data: {kode_blok: kode_blok},
+        url: js_base_url + "Biaya_tma/cekBeritaAcaraTebang",
+        data: {kode_blok: kode_blok_simtr},
         dataType: "json",
         type: "GET",
         success: function(response){
-          var status_aff = response[0].aff_tebang;
-          if(status_aff == 0){
-            alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
-          } else {
+          if(response == 0){
             $.ajax({
-              url: js_base_url + "Biaya_tma/cekDataCs",
+              url: js_base_url + "Biaya_tma/cekAffKebun",
               data: {kode_blok: kode_blok},
               dataType: "json",
               type: "GET",
               success: function(response){
-                if(response.length == 0){
-                  formInputIdKelompok.value = id_kelompok;
-                  formInputKodeBlok.value = kode_blok;
-                  formKonfirmasi.submit();
+                var status_aff = response[0].aff_tebang;
+                if(status_aff == 0){
+                  alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
                 } else {
-                  alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
+                  $.ajax({
+                    url: js_base_url + "Biaya_tma/cekDataCs",
+                    data: {kode_blok: kode_blok},
+                    dataType: "json",
+                    type: "GET",
+                    success: function(response){
+                      if(response.length == 0){
+                        formInputIdKelompok.value = id_kelompok;
+                        formInputKodeBlok.value = kode_blok;
+                        formKonfirmasi.submit();
+                      } else {
+                        alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
+                      }
+                    }
+                  })
                 }
               }
             })
+          } else {
+            alert("Berita Acara Selesai Tebang untuk kelompok " + dataKelompok.nama_kelompok + " ini sudah ada!");
+            formInputKodeBlokView.value = kode_blok_simtr;
+            formInputIdKelompokView.value = id_kelompok;
+            formViewBeritaAcaraAff.submit();
           }
         }
       })

@@ -34,7 +34,7 @@
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-feather"></i> Perawatan</a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/List_bon_perawatan')?>" class="dropdown-item "><i class="fe fe-file-text"></i> Rincian Biaya Perawatan</a>
-              <a href="<? echo site_url('/Biaya_perawatan')?>" class="dropdown-item "><i class="fe fe-feather"></i> Pengajuan Rekap Biaya Perawatan</a>
+              <a href="<? echo site_url('/Biaya_perawatan')?>" class="dropdown-item " style="display: <? echo ($loggedUser->jabatan == 'Kepala Sub Bagian') ? 'none' : ''; ?>"><i class="fe fe-feather"></i> Pengajuan Rekap Biaya Perawatan</a>
               <a href="<? echo site_url('/list_biaya_perawatan')?>" class="dropdown-item "><i class="fe fe-feather"></i> Penelusuran Rekap Biaya Perawatan</a>
             </div>
           </li>

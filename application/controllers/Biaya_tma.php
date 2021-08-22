@@ -175,6 +175,10 @@ class Biaya_tma extends CI_Controller{
     echo ($this->getCurl($request));
   }
 
+  function cekBeritaAcaraTebang(){
+    echo $this->biayatma_model->cekBeritaAcaraTebang();
+  }
+
   function cekDataCs(){
     $kode_blok = $this->input->get("kode_blok");
     $request = array(

@@ -257,6 +257,11 @@ class Transaksi_model extends CI_Model{
     $this->db->query($query, array($id_ppk, $no_transaksi));
   }
 
+  public function updateIdPbp($id_pbp = null, $no_transaksi = null){
+    $query = "update tbl_simtr_transaksi set id_pbp = ? where no_transaksi = ? and id_aktivitas <> 0";
+    $this->db->query($query, array($id_pbp, $no_transaksi));
+  }
+
   public function getHargaSatuanByIdBahan($id_bahan = null){
     if (is_null($id_bahan)) $id_bahan = $this->input->get("id_bahan");
     $query =
@@ -347,6 +352,8 @@ class Transaksi_model extends CI_Model{
   }
 
   public function getRekapBiayaPerawatan($tgl_awal = null, $tgl_akhir = null, $tahun_giling = null){
+    //Tampilkan dokumen Permintaan Perawatan Kebun (PPK) yang sudah divalidasi dan akan disatukan
+    //kedalam dokumen Permintaan Biaya Perawatan (PBP)
     $afdeling = $this->session->userdata('afd');
     if(is_null($tgl_awal) || is_null($tgl_akhir) || is_null($tahun_giling)){
       $tgl_awal = $this->input->get("tgl_awal");
@@ -384,10 +391,12 @@ class Transaksi_model extends CI_Model{
     join tbl_simtr_kelompoktani kt on trans.id_kelompoktani = kt.id_kelompok
     join tbl_aktivitas akt on akt.id_aktivitas = trans.id_aktivitas
     join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    join tbl_dokumen dok on dok.id_dokumen = trans.id_ppk
     where trans.kode_transaksi = 2 and trans.tgl_transaksi >= ?
-    and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat('%', ?, '%')
+    and trans.tgl_transaksi <= date_add(?, interval 1 day) and trans.tahun_giling like concat(?, '%')
     and trans.id_pbp is null and kt.id_afd like concat('%', ?, '%') and trans.id_aktivitas <> 0
-    and akt.tunai = 1
+    and akt.tunai = 1 and STR_TO_DATE(dok.tgl_validasi_bagian, '%Y-%m-%d') IS NOT NULL and
+    STR_TO_DATE(dok.tgl_validasi_kasubbag, '%Y-%m-%d') IS NOT NULL
     group by wil.nama_wilayah, trans.id_kelompoktani
     ";
     return json_encode($this->db->query($query, array($tgl_awal, $tgl_akhir, $tahun_giling, $afdeling))->result());

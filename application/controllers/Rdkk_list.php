@@ -250,6 +250,10 @@
       <input type="hidden" id="id_kelompok" name="id_kelompok" value="">
       <input type="hidden" id="kode_blok" name="kode_blok" value="">
       </form>
+      <form id="formViewBeritaAcaraAff" action="'.site_url('Aff_kebun').'" method="POST">
+      <input type="hidden" id="id_kelompok_v" name="id_kelompok" value="">
+      <input type="hidden" id="kode_blok_v" name="kode_blok" value="">
+      </form>
       ';
       $content_dialogAddPermintaanPupuk =
       '
