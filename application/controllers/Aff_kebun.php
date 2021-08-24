@@ -167,15 +167,19 @@ class Aff_kebun extends CI_Controller{
         $kategori = "RT 3";
         break;
     }
+    $ton_totalRafaksi = ROUND(($dataBeritaAcara->ton_rafaksi_trash +
+      $dataBeritaAcara->ton_rafaksi_bakar +
+      $dataBeritaAcara->ton_rafaksi_cs +
+      $dataBeritaAcara->ton_rafaksi_trash),2,PHP_ROUND_HALF_UP);
     $container =
     '
     <script>var id_afd = '.$id_afd.';</script>
     <div class="page">
       <div class="container">
-        <div class="card">
+        <div class="card" style="font-size:18px">
           <div class="card-header">
             <div class="card-options">
-              <a href="rdkk_all" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+              <a href="#" onclick="history.go(-1)" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
               <a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>
             </div>
           </div>
@@ -186,65 +190,109 @@ class Aff_kebun extends CI_Controller{
             </div>
             <div class="row">
               <div class="col-12 mb-6">
-                Pada hari ini, '.$hari.' tanggal '.$tanggal.' telah dinyatakan selesai tebang kelompok tani sebagai berikut:
+                <div class="row">Pada hari ini, '.$hari.' tanggal '.$tanggal.' telah dinyatakan selesai tebang kelompok tani sebagai berikut:</div>
               </div>
             </div>
-            <div class="row mb-6" >
-              <div class="col-4"><h5>
-                Nama Kelompok <br>
-                No Kontrak <br>
-                Kategori <br>
-                Luas Baku <br>
-                Varietas <br>
-                Masa Tanam <br>
-                Taksasi Maret <br>
-                Tebu Tertimbang <br>
-                Rafaksi <br>
-                Tebu Terhitung <br>
-                Rafaksi % Tebu Tertimbang <br>
-                Rafaksi % Takmar <br>
-                Penalti Trash <br>
-                Tebu Bakar <br>
-                Mulai Tebang <br>
-                Selesai Tebang <br>
-              </h5></div>
-              <div class="col-3"><h5>
-                : '.$dataKelompok->nama_kelompok.' <br>
-                : '.$dataKelompok->no_kontrak.' <br>
-                : '.$kategori.' <br>
-                : '.$dataKelompok->luas.' Ha <br>
-                : '.$dataKelompok->nama_varietas.' <br>
-                : '.$dataKelompok->mt.' <br>
-                : '.$dataBeritaAcara->ton_taksasi_maret.' ton (Rata-rata '
-                  .$dataBeritaAcara->ton_taksasi_maret/$dataBeritaAcara->luas_baku.' ton/ha)<br>
-                : '.$dataBeritaAcara->ton_tebu_timbang.' ton (Rata-rata '
-                  .$dataBeritaAcara->ton_tebu_timbang/$dataBeritaAcara->luas_tebang.' ton/ha)<br>
-                :  ton <br>
-                :  ton <br>
-                :  % <br>
-                :  % <br>
-                :  ton <br>
-                :  ton <br>
-                :  ...<br>
-                :  ...<br>
-              </h5></div>
+            <div class="row mb-6">
+              <div class="col-3">
+                <div class="row">Nama kelompok</div>
+                <div class="row">Nomor kontrak</div>
+                <div class="row">Kategori</div>
+                <div class="row">Luas baku</div>
+                <div class="row">Luas tebang</div>
+                <div class="row">Jenis tebu</div>
+                <div class="row">Masa tanam</div>
+                <div class="row">Taksasi Maret</div>
+                <div class="row">Berat tebu ditimbang</div>
+                <div class="row"><i>Rafaksi tebu bakar (-)</i></div>
+                <div class="row"><i>Pinalti trash (-)</i></div>
+                <div class="row"><i>Rafaksi core sampler (-)</i></div>
+                <div class="row"><i>Rafaksi lainnya (-)</i></div>
+                <div class="row"><b><i>Jumlah rafaksi (-)</i></b></div>
+                <div class="row">Berat tebu terhitung</div>
+                <div class="row">% rafaksi thd Takmar</div>
+                <div class="row">Berat tebu terbakar</div>
+                <div class="row">Awal timbang</div>
+                <div class="row">Akhir timbang</div>
+              </div>
+              <div class="col-4">
+                <div class="row">
+                  <div>: '.$dataKelompok->nama_kelompok.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataKelompok->no_kontrak.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$kategori.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->luas_baku.' ha</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->luas_tebang.' ha</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataKelompok->nama_varietas.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataKelompok->mt.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_tebu_takmar.' ton (Rata-rata '.
+                  $dataBeritaAcara->ton_tebu_takmar/$dataBeritaAcara->luas_baku.' ton/ha)</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_tebu_timbang.' ton (Rata-rata '.
+                  $dataBeritaAcara->ton_tebu_timbang/$dataBeritaAcara->luas_tebang.' ton/ha)</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_rafaksi_bakar.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_rafaksi_trash.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_rafaksi_cs.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_rafaksi_lain.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$ton_totalRafaksi.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_tebu_hitung.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.ROUND($ton_totalRafaksi/$dataBeritaAcara->ton_tebu_takmar,2,PHP_ROUND_HALF_UP).' %</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->ton_tebu_bakar.' ton</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->awal_timbang.'</div>
+                </div>
+                <div class="row">
+                  <div>: '.$dataBeritaAcara->akhir_timbang.'</div>
+                </div>
+              </div>
             </div>
             <div class="row mb-6">
               <div class="col-12">
-                Demikian Berita Acara ini dibuat untuk digunakan sebagaimana mestinya.
+                <div class="row">Demikian Berita Acara ini dibuat untuk digunakan sebagaimana mestinya.</div>
               </div>
             </div>
             <div class="row">
               <div class="col-6"></div>
               <div class="col-6 text-center">
-                Bungayamang, '.$tanggal.'
+                Bungamayang, '.$tanggal.'
               </div>
             </div>
             <div class="row">
               <div class="col-6 text-center">Mengetahui,</div>
             </div>
             <div class="row">
-              <div class="col-6 text-center" style="height:120px">Asisten Manager Afd. '.$id_afd.'</div>
+              <div class="col-6 text-center" style="height:120px">Asisten Manajer Afd. '.$id_afd.'</div>
               <div class="col-6 text-center">Ketua Kelompok</div>
             </div>
             <div class="row">

@@ -838,6 +838,26 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
   }
 
+  public function getAllBasteb(){
+    $priv_level = $this->session->userdata("jabatan");
+    $id_afd = $this->session->userdata("afd");
+    if(is_null($id_afd)){
+      $id_afd = "";
+    }
+    $tahun_giling = $this->input->get("tahun_giling");
+    $query = "
+    select
+      dok.id_dokumen, basteb.id, kt.id_kelompok, dok.no_dokumen, kt.nama_kelompok, wil.nama_wilayah,
+      dok.tgl_buat, kt.no_kontrak, kt.kode_blok
+    from tbl_dokumen dok
+      join tbl_simtr_ba_tebang basteb on dok.id_dokumen = basteb.id_dokumen
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = basteb.id_kelompok
+      join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
+    where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
+    ";
+    return json_encode($this->db->query($query, array($tahun_giling, $id_afd))->result());
+  }
+
   public function getAllPermohonanBibit(){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
