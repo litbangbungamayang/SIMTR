@@ -49,6 +49,7 @@
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-layers"></i> Bagi Hasil</a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/List_ba_tebang')?>" class="dropdown-item "><i class="fe fe-layers"></i> Penelusuran Berita Acara Selesai Tebang</a>
+              <a href="<? echo site_url('/Surat_penjualan')?>" class="dropdown-item "><i class="fe fe-layers"></i> Buat Surat Pernyataan Penjualan Gula</a>
             </div>
           </li>
 

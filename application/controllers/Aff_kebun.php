@@ -328,11 +328,12 @@ class Aff_kebun extends CI_Controller{
     $ton_pinaltiTrash = 0;
     $ton_rafaksiBakar = ROUND(0.1*$ton_tebuBakar,2,PHP_ROUND_HALF_UP);
     $ton_rafaksiCs = ROUND(($dataCs->total_rafaksi)/1000,2,PHP_ROUND_HALF_UP);
-    $ton_rafaksiCs = 0;
+    $ton_rafaksiCs = 0; //GANTI DENGAN DATA ASLI
     $ton_totalRafaksi = ($ton_rafaksiBakar + $ton_pinaltiTrash + $ton_rafaksiCs);
     $ton_tebuHitung = $ton_tebuTimbang - $ton_totalRafaksi;
     $protas_timbang = ROUND(($ton_tebuTimbang)/$dataKelompok->luas,2,PHP_ROUND_HALF_UP);
     $persen_rafaksi_thd_takmar = ROUND($ton_totalRafaksi/$ton_takmar*100,2,PHP_ROUND_HALF_UP);
+    $hablurPtr = ROUND($dataCs->total_hablur,2,PHP_ROUND_HALF_UP);
     //==================================================
     $kode_blok = "";
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($id_afd))->nama_user;
@@ -382,6 +383,7 @@ class Aff_kebun extends CI_Controller{
                 <div class="row"><label>Berat tebu terhitung</label></div>
                 <div class="row"><label>% rafaksi thd Takmar</label></div>
                 <div class="row"><label>Berat tebu terbakar</label></div>
+                <div class="row"><label>Total hablur bagi hasil</label></div>
                 <div class="row"><label>Awal timbang</label></div>
                 <div class="row"><label>Akhir timbang</label></div>
               </div>
@@ -510,6 +512,13 @@ class Aff_kebun extends CI_Controller{
                     <label for="ton_bakar">: '.($ton_tebuBakar).' ton</label><input class="ml-2 mb-1" type="checkbox"
                       id="ton_bakar" style="vertical-align:middle"/><input type="hidden" id="val_tonTebuBakar" name="val_tonTebuBakar"
                       value="'.$ton_tebuBakar.'"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="ton_hablur_ptr">: '.($hablurPtr).' ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_hablur_ptr" style="vertical-align:middle"/><input type="hidden" id="val_tonHablurPtr" name="val_tonHablurPtr"
+                      value="'.$hablurPtr.'"/>
                   </div>
                 </div>
                 <div class="row">

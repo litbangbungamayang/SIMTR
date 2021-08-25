@@ -65,13 +65,19 @@ $("#tblListBasteb").DataTable({
     {
       data: "no_dokumen"
     },
-    {
-      data: "tgl_buat",
-      className: "text-center"
-    },
     { data: "nama_kelompok" },
     { data: "no_kontrak" },
-    { data: "nama_wilayah"},
+    {
+      data: "ton_tebu_hitung",
+      className: "text-right"
+    },
+    {
+      data: "ton_hablur_ptr",
+      className: "text-right"
+    },
+    {
+      data: "tgl_buat"
+    },
     {
       render: function(data, type, row, meta){
         var buttonDetail = '<form id="view_basteb" action="' + js_base_url + "Aff_kebun" + '" method="POST"><input type="hidden" name="id_kelompok" value="'+row.id_kelompok+'"><input type="hidden" name="kode_blok" value="'+row.kode_blok+'"><a class="btn btn-sm btn-cyan" href="#" onclick="document.getElementById(\'view_basteb\').submit();" title="Lihat Detail"><i class="fe fe-book-open"></i></a></form> ';

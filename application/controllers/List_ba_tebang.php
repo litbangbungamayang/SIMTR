@@ -56,10 +56,11 @@ class List_ba_tebang extends CI_Controller{
                     <tr>
                       <th class="w-1">No.</th>
                       <th>No. Dokumen</th>
-                      <th>Tgl. Dibuat</th>
                       <th>Nama Kelompok</th>
                       <th>No. Kontrak</th>
-                      <th>Desa</th>
+                      <th>Netto Tebu (ton)</th>
+                      <th>Hablur PTR (ton)</th>
+                      <th>Tgl. Dibuat</th>
                       <th></th>
                     </tr>
                   </thead>

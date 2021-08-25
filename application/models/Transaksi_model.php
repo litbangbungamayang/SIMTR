@@ -848,7 +848,7 @@ class Transaksi_model extends CI_Model{
     $query = "
     select
       dok.id_dokumen, basteb.id, kt.id_kelompok, dok.no_dokumen, kt.nama_kelompok, wil.nama_wilayah,
-      dok.tgl_buat, kt.no_kontrak, kt.kode_blok
+      DATE_FORMAT(dok.tgl_buat, '%d-%m-%Y') as tgl_buat, kt.no_kontrak, kt.kode_blok, basteb.ton_hablur_ptr, basteb.ton_tebu_hitung
     from tbl_dokumen dok
       join tbl_simtr_ba_tebang basteb on dok.id_dokumen = basteb.id_dokumen
       join tbl_simtr_kelompoktani kt on kt.id_kelompok = basteb.id_kelompok

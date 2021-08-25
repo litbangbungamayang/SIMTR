@@ -16,6 +16,7 @@ var chk_TonHitung = $("#ton_hitung");
 var chk_TonTotalRafaksi = $("#ton_totalRafaksi");
 var chk_PersenRafaksiTakmar = $("#persen_rafaksi_takmar");
 var chk_TonTebuBakar = $("#ton_bakar");
+var chk_TonHablurPtr = $("#ton_hablur_ptr");
 var chk_TglAwalTimbang = $("#awal_tebang");
 var chk_TglAkhirTimbang = $("#akhir_tebang");
 var frm_selesaiTebang = $("#frmSelesaiTebang");
@@ -37,7 +38,7 @@ function cekValidasiField(){
     chk_LuasTebang.is(":checked") && chk_Varietas.is(":checked") && chk_MasaTanam.is(":checked") && chk_TonTakmar.is(":checked") &&
     chk_TonTimbang.is(":checked") && chk_TonRafaksiBakar.is(":checked") && chk_TonTrash.is(":checked") && chk_TonRafaksiCs.is(":checked") &&
     chk_TonRafaksiLain.is(":checked") && chk_TonHitung.is(":checked") && chk_TonTotalRafaksi.is(":checked") && chk_PersenRafaksiTakmar.is(":checked") &&
-    chk_TonTebuBakar.is(":checked") && chk_TglAwalTimbang.is(":checked") && chk_TglAkhirTimbang.is(":checked")
+    chk_TonTebuBakar.is(":checked") && chk_TonHablurPtr.is(":checked") && chk_TglAwalTimbang.is(":checked") && chk_TglAkhirTimbang.is(":checked")
   ){
     $.ajax({
       url: js_base_url + "Aff_kebun/simpanAffKebun",
