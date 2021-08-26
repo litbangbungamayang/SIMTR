@@ -875,7 +875,7 @@ class Transaksi_model extends CI_Model{
       join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
     ".$add_query;
-    
+
     if($id_dokumen != null){
       return json_encode($this->db->query($query, array($tahun_giling, $id_afd, $id_dokumen))->result());
     } else {

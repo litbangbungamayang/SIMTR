@@ -46,7 +46,10 @@ $("#tblListBasteb").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<input type="checkbox" name="id_dokumen[]" value="'+row.id_dokumen+'"> ';
+        var buttonDetail = "";
+        if(row.gula_terjual < row.kg_gula_90 ){
+          buttonDetail = '<input type="checkbox" name="id_dokumen[]" value="'+row.id_dokumen+'"> ';
+        }
         return buttonDetail;
       },
       className: "text-left"
