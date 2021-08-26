@@ -334,6 +334,8 @@ class Aff_kebun extends CI_Controller{
     $protas_timbang = ROUND(($ton_tebuTimbang)/$dataKelompok->luas,2,PHP_ROUND_HALF_UP);
     $persen_rafaksi_thd_takmar = ROUND($ton_totalRafaksi/$ton_takmar*100,2,PHP_ROUND_HALF_UP);
     $hablurPtr = ROUND($dataCs->total_hablur,2,PHP_ROUND_HALF_UP);
+    $kgGulaPtr = ROUND(($hablurPtr*1000*1.003)/50,0,PHP_ROUND_HALF_UP)*50;
+    $kgTetesPtr = ROUND($ton_tebuHitung*0.03*1000,0,PHP_ROUND_HALF_UP);
     //==================================================
     $kode_blok = "";
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($id_afd))->nama_user;
@@ -397,6 +399,10 @@ class Aff_kebun extends CI_Controller{
                       value="'.$dataKelompok->id_kelompok.'"/>
                     <input type="hidden" id="val_kode_blok" name="val_kode_blok"
                       value="'.$dataKelompok->kode_blok.'"/>
+                    <input type="hidden" id="val_kgGulaPtr" name="val_kgGulaPtr"
+                      value="'.$kgGulaPtr.'"/>
+                    <input type="hidden" id="val_kgTetesPtr" name="val_kgTetesPtr"
+                      value="'.$kgTetesPtr.'"/>
                   </div>
                 </div>
                 <div class="row">

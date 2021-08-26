@@ -838,24 +838,49 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
   }
 
-  public function getAllBasteb(){
+  public function getAllBasteb($tahun_giling = null, $id_dokumen = null){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
+    $add_query = "";
     if(is_null($id_afd)){
       $id_afd = "";
     }
-    $tahun_giling = $this->input->get("tahun_giling");
+    if($tahun_giling == null) $tahun_giling = $this->input->get("tahun_giling");
+    if($id_dokumen != null){
+      $add_query = " and dok.id_dokumen = ?";
+    }
     $query = "
     select
       dok.id_dokumen, basteb.id, kt.id_kelompok, dok.no_dokumen, kt.nama_kelompok, wil.nama_wilayah,
-      DATE_FORMAT(dok.tgl_buat, '%d-%m-%Y') as tgl_buat, kt.no_kontrak, kt.kode_blok, basteb.ton_hablur_ptr, basteb.ton_tebu_hitung
+      DATE_FORMAT(dok.tgl_buat, '%d-%m-%Y') as tgl_buat, kt.no_kontrak, kt.kode_blok, basteb.ton_hablur_ptr,
+      basteb.ton_tebu_hitung, basteb.kg_gula_ptr, basteb.kg_tetes_ptr,
+      ROUND((basteb.kg_gula_ptr*0.9/50),0)*50 as kg_gula_90,
+      CAST(IF ((
+  		select kuanta from tbl_simtr_transaksi trans
+          where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 3
+        ), (
+  		select kuanta from tbl_simtr_transaksi trans
+          where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 3
+        ), 0) as UNSIGNED) as gula_terjual,
+      CAST(IF ((
+  		select kuanta from tbl_simtr_transaksi trans
+          where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 4
+        ), (
+  		select kuanta from tbl_simtr_transaksi trans
+          where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 4
+        ), 0) as UNSIGNED) as tetes_terjual
     from tbl_dokumen dok
       join tbl_simtr_ba_tebang basteb on dok.id_dokumen = basteb.id_dokumen
       join tbl_simtr_kelompoktani kt on kt.id_kelompok = basteb.id_kelompok
       join tbl_simtr_wilayah wil on wil.id_wilayah = kt.id_desa
     where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%')
-    ";
-    return json_encode($this->db->query($query, array($tahun_giling, $id_afd))->result());
+    ".$add_query;
+    
+    if($id_dokumen != null){
+      return json_encode($this->db->query($query, array($tahun_giling, $id_afd, $id_dokumen))->result());
+    } else {
+      return json_encode($this->db->query($query, array($tahun_giling, $id_afd))->result());
+    }
   }
 
   public function getAllPermohonanBibit(){
