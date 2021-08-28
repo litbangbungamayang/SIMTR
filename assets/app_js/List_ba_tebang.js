@@ -12,38 +12,6 @@ function formatTglStr(dateObj){
   return "";
 }
 
-function approve(id_dokumen){
-  $.ajax({
-    url: js_base_url + "List_bon_perawatan/validasiDokumen",
-    dataType: "text",
-    type: "POST",
-    data: "id_dokumen=" + id_dokumen,
-    success: function(response){
-      if (response = "SUCCESS"){
-        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0").load();
-        alert("Dokumen berhasil divalidasi!");
-      }
-    }
-  });
-}
-
-function approveAskep(id_dokumen){
-  $.ajax({
-    url: js_base_url + "List_bon_perawatan/validasiDokumenAskep",
-    dataType: "text",
-    type: "POST",
-    data: "id_dokumen=" + id_dokumen,
-    success: function(response){
-      if (response = "SUCCESS"){
-        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-        $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0").load();
-        alert("Dokumen berhasil divalidasi!");
-      }
-    }
-  });
-}
-
 $("#tblListBasteb").DataTable({
   bFilter: true,
   bPaginate: false,

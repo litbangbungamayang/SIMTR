@@ -247,6 +247,11 @@ class Transaksi_model extends CI_Model{
     $this->db->query($query, array($id_au58, $no_transaksi));
   }
 
+  public function updateIdGptr($id_gptr, $id_transaksi){
+    $query = "update tbl_simtr_transaksi set id_gptr = ? where id_transaksi = ? and kuanta > 0";
+    $this->db->query($query, array($id_gptr, $id_transaksi));
+  }
+
   public function updateIdPbtma($id_pbtma = null, $no_transaksi = null){
     $query = "update tbl_simtr_transaksi set id_pbtma = ? where no_transaksi = ? and kuanta > 0";
     $this->db->query($query, array($id_pbtma, $no_transaksi));
@@ -838,6 +843,52 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($priv_level, $tahun_giling, $id_afd, $tgl_awal, $tgl_akhir))->result());
   }
 
+  public function getAllPembeli(){
+    $query = "select * from tbl_simtr_pembeli";
+    return json_encode($this->db->query($query)->result());
+  }
+
+  public function addPembeli(){
+    $nama_pembeli = strtoupper($this->input->post("nama_pembeli"));
+    $no_identitas = $this->input->post("no_identitas");
+    $alamat = strtoupper($this->input->post("alamat"));
+    $query = "insert into tbl_simtr_pembeli (no_identitas,nama,alamat) values(?,?,?)";
+    return json_encode($this->db->query($query, array($no_identitas, $nama_pembeli, $alamat)));
+  }
+
+  public function addPenjualanGula($data){
+    $id_dokumen = $data["id_dokumen"];
+    $id_pembeli = $data["id_pembeli"];
+    $harga_jual = $data["harga_jual"];
+    $total_kuanta = $data["total_kuanta"];
+    $query =
+    "
+      insert into tbl_simtr_penjualan_gula (id_dokumen, id_pembeli, harga_jual, total_kuanta)
+      values(?,?,?,?)
+    ";
+    return json_encode($this->db->query($query, array($id_dokumen, $id_pembeli, $harga_jual, $total_kuanta)));
+  }
+
+  public function getAllPenjualanGula($tahun_giling = null){
+    $priv_level = $this->session->userdata("jabatan");
+    $id_afd = $this->session->userdata("afd");
+    if(is_null($tahun_giling)){
+      $tahun_giling = $this->input->get("tahun_giling");
+    }
+    $query =
+    "
+      select
+      dok.id_dokumen, dok.no_dokumen, DATE_FORMAT(dok.tgl_buat, '%d-%m-%Y') as tgl_buat,
+        kt.nama_kelompok, kt.no_kontrak,
+        trans.kuanta, trans.rupiah
+      from tbl_dokumen dok
+      join tbl_simtr_transaksi trans on dok.id_dokumen = trans.id_gptr
+        join tbl_simtr_kelompoktani kt on kt.id_kelompok = trans.id_kelompoktani
+      where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%');
+    ";
+    return json_encode($this->db->query($query, array($tahun_giling, $id_afd))->result());
+  }
+
   public function getAllBasteb($tahun_giling = null, $id_dokumen = null){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
@@ -856,17 +907,17 @@ class Transaksi_model extends CI_Model{
       basteb.ton_tebu_hitung, basteb.kg_gula_ptr, basteb.kg_tetes_ptr,
       ROUND((basteb.kg_gula_ptr*0.9/50),0)*50 as kg_gula_90,
       CAST(IF ((
-  		select kuanta from tbl_simtr_transaksi trans
+  		select sum(kuanta) from tbl_simtr_transaksi trans
           where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 3
         ), (
-  		select kuanta from tbl_simtr_transaksi trans
+  		select sum(kuanta) from tbl_simtr_transaksi trans
           where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 3
         ), 0) as UNSIGNED) as gula_terjual,
       CAST(IF ((
-  		select kuanta from tbl_simtr_transaksi trans
+  		select sum(kuanta) from tbl_simtr_transaksi trans
           where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 4
         ), (
-  		select kuanta from tbl_simtr_transaksi trans
+  		select sum(kuanta) from tbl_simtr_transaksi trans
           where trans.id_kelompoktani = kt.id_kelompok and trans.kode_transaksi = 4
         ), 0) as UNSIGNED) as tetes_terjual
     from tbl_dokumen dok
