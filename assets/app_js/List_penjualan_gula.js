@@ -129,8 +129,8 @@ function actionButtonView(id_dokumen){
           '<i class="fe fe-file-text mr-2"></i>' +
           '</button>' +
           '<div class="dropdown-menu dropdown-menu-right">' +
-            '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_dokumen + '"><i class="fe fe-file-text"></i> Surat Pernyataan Penjualan</a>' +
-            '<a class="dropdown-item" href="Transaksi_list?id_kelompok='+id_dokumen+'"><i class="fe fe-file-text"></i> </a>' +
+            '<a class="dropdown-item" href="Penjualan_gula/view_sppg?id_dokumen=' + id_dokumen + '"><i class="fe fe-file-text"></i> Surat Pernyataan Penjualan Gula</a>' +
+            '<a class="dropdown-item" href="Penjualan_gula/view_spjbg?id_dokumen='+id_dokumen+'"><i class="fe fe-file-text"></i> Surat Perjanjian Jual Beli Gula</a>' +
           '</div></div>';
 }
 

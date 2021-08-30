@@ -37,9 +37,6 @@ class Kelompoktani_model extends CI_Model{
     $this->load->helper('form');
     $this->load->helper('html');
     $this->load->helper('file');
-    $this->simpg_address_live = "http://simpgbuma.ptpn7.com/index.php/api_bcn/";
-    $this->simpg_address_local = "http://localhost/simpg/index.php/api_bcn/";
-    $this->server_env = "LIVE";
   }
 
   public function rules(){
@@ -230,11 +227,14 @@ class Kelompoktani_model extends CI_Model{
 
   function getCurl($request){
     //$db_server = $request["db_server"];
+    $simpg_address_live = "http://simpgbuma.ptpn7.com/index.php/api_bcn/";
+    $simpg_address_local = "http://localhost/simpg/index.php/api_bcn/";
+    $server_env = "LIVE";
     $db_server = "";
-    if($this->server_env == "LOCAL"){
-      $db_server = $this->simpg_address_local;
+    if($server_env == "LOCAL"){
+      $db_server = $simpg_address_local;
     } else {
-      $db_server = $this->simpg_address_live;
+      $db_server = $simpg_address_live;
     }
     $url = str_replace(" ", "", $request["url"]);
     $curl = curl_init();

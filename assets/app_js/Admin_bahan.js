@@ -99,6 +99,7 @@ function editData(id){
     data: "idBahan=" + id,
     dataType: "json",
     success: function(response){
+      console.log(response);
       namaBahan.val(response.nama_bahan);
       jenisBahan[0].selectize.setValue(response.jenis_bahan, true);
       satuan[0].selectize.setValue(response.satuan, true);
@@ -106,6 +107,8 @@ function editData(id){
       tahunGiling[0].selectize.disable();
       dosisBahan.val(response.dosis_per_ha);
       dosisBahan[0].disabled = true;
+      biaya_angkut.val(response.biaya_angkut);
+      biaya_muat.val(response.biaya_muat);
       $("#btnSimpanBahan").on("click", function(){simpanEditData(response.id_bahan)});
       edit = true;
     }
@@ -155,7 +158,6 @@ function simpanEditData(id){
     (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
     (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
   }
-  edit = false;
 }
 
 $("#btnSimpanBahan").on("click", function(){
@@ -262,7 +264,7 @@ $("#tblBahan").DataTable({
     var currYear = parseInt(new Date().getFullYear());
     var i;
     var optionTahun = '<option value="0">Pilih tahun giling</option>';
-    for (i=0; i < 4; i++){
+    for (i=-1; i < 4; i++){
       optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
     }
     $("div.cbxTahunGilingList").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
@@ -293,5 +295,6 @@ $("#relasi_aktivitas").selectize({
 $("#tahun_giling").selectize({
   sortField: "text",
   maxItems: 1,
-  create: false
+  create: false,
+  placeholder: "Pilih status gudang"
 });

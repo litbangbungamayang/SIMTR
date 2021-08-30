@@ -11,6 +11,7 @@ var txtCatatan = $("#catatan");
 var btnSimpanTransaksi = $("#btnSimpanTransaksi");
 var dialogAddTransaksi = $("#dialogAddTransaksi");
 var tblTransaksi = $("#tblTransaksi");
+var cbxNamaGudang = $("#nama_gudang");
 
 txtKuantaBahan.bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^0-9]/g,""));
@@ -21,6 +22,27 @@ txtRupiahBahan.bind("keyup blur", function(){
   $(this).val($(this).val().replace(/[^0-9]/g,""));
   ($(this).val() != "") ? $(this).val("Rp " + parseInt($(this).val()).toLocaleString()) : "";
 });
+
+$.ajax({
+  url: js_base_url + "Admin_gudang/getAllGudang",
+  type: "GET",
+  dataType: "json",
+  success: function(response){
+    $("#nama_gudang").selectize({
+      valueField: "id_gudang",
+      labelField: "nama_gudang",
+      sortField: "nama_gudang",
+      searchField: "nama_gudang",
+      maxItems: 1,
+      create: false,
+      placeholder: "Pilih gudang",
+      options: response,
+      onChange: function(value){
+
+      }
+    });
+  }
+})
 
 cbxTahunGiling.selectize({
   onChange: function(value){
@@ -109,6 +131,7 @@ dialogAddTransaksi.on("hide.bs.modal", function(){
 function validasiForm(){
   var idBahan = cbxNamaBahan.selectize()[0].selectize.getValue();
   var idVendor = cbxNamaVendor.selectize()[0].selectize.getValue();
+  var idGudang = cbxNamaGudang.selectize()[0].selectize.getValue();
   var kuanta = txtKuantaBahan.val().replace(/[^0-9]/g,"");
   var rupiah = txtRupiahBahan.val().replace(/[^0-9]/g,"");
   var tahunGiling = cbxTahunGiling.val();
@@ -116,7 +139,7 @@ function validasiForm(){
   if (idBahan != "" && idVendor != "" && kuanta != "" && rupiah != ""
     && tahunGiling != "" && catatan != ""){
     var formValue = {id_bahan : idBahan, id_vendor : idVendor, kuanta_bahan : kuanta,
-      rupiah_bahan : rupiah, tahun_giling : tahunGiling, catatan : catatan};
+      rupiah_bahan : rupiah, tahun_giling : tahunGiling, catatan : catatan, id_gudang: idGudang};
     return formValue;
   } else {
     (idBahan == "") ? cbxNamaBahan.addClass("is-invalid") : "";
@@ -201,6 +224,9 @@ tblTransaksi.DataTable({
       className: "text-center"
     },
     {
+      data: "gudang"
+    },
+    {
       data: "tahun_giling",
       className: "text-center"
     }
@@ -217,7 +243,7 @@ tblTransaksi.DataTable({
     var currYear = parseInt(new Date().getFullYear());
     var i;
     var optionTahun = '<option value="0">Pilih tahun giling</option>';
-    for (i=0; i < 4; i++){
+    for (i=-1; i < 4; i++){
       optionTahun += '<option value="' + parseInt(currYear + i) + '">' + parseInt(currYear + i) + '</option>';
     }
     $("div.cbxTahunGilingList").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');

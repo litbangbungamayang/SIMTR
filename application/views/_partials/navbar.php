@@ -63,6 +63,7 @@
               <a href="<? echo site_url('/admin_aktivitas')?>" class="dropdown-item "><i class="fe fe-activity"></i> Master Aktivitas</a>
               <a href="<? echo site_url('/admin_tma')?>" class="dropdown-item "><i class="fe fe-zap"></i> Master Biaya TMA</a>
               <a href="<? echo site_url('/transaksi_bahan')?>" class="dropdown-item "><i class="fe fe-tag"></i> Transaksi Bahan</a>
+              <a href="<? echo site_url('/admin_gudang')?>" class="dropdown-item "><i class="fe fe-package"></i> Pengelolaan Gudang Material</a>
             </div>
           </li>
         </ul>

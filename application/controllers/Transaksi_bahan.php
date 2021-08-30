@@ -53,6 +53,10 @@ class Transaksi_bahan extends CI_Controller{
     echo $this->transaksi_model->cekStokBahanByIdBahan();
   }
 
+  public function cekStokBahanByTahunGiling(){
+    echo $this->transaksi_model->cekStokBahanByTahunGiling();
+  }
+
   public function loadContent(){
     $content_header =
     '
@@ -73,8 +77,8 @@ class Transaksi_bahan extends CI_Controller{
                 <button type="button" id="btnTambahTransaksi" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddTransaksi"> + Buat Transaksi Barang Masuk</button>
               </div>
               <div class="row">
-                <div class="table-responsive col-md-12">
-                  <table id="tblTransaksi" class="table card-table table-vcenter text-nowrap datatable table-sm">
+                <div class="table-responsive col-md-12" style="font-size:13px">
+                  <table id="tblTransaksi" class="table card-table table-vcenter text-nowrap datatable table-sm table-striped">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
@@ -85,6 +89,7 @@ class Transaksi_bahan extends CI_Controller{
                         <th class="text-center">Kuanta</th>
                         <th class="text-center">Nilai</th>
                         <th class="text-center">Tanggal</th>
+                        <th class="text-center">Lokasi</th>
                         <th class="text-center">Tahun Giling</th>
                       </tr>
                     </thead>
@@ -144,7 +149,6 @@ class Transaksi_bahan extends CI_Controller{
                       </div>
                       <div class="invalid-feedback">Kuanta bahan belum diisi!</div>
                     </div>
-
                   </div>
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNamaVendor">
@@ -158,6 +162,16 @@ class Transaksi_bahan extends CI_Controller{
                       <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="rupiah_bahan" name="rupiah_bahan" placeholder="Nilai bahan">
                       <div class="invalid-feedback">Rupiah bahan belum diisi!</div>
                     </div>
+                    <div class="form-group" id="grNamaGudang">
+                      <label class="form-label">Nama Gudang</label>
+                      <select name="id_gudang" id="nama_gudang" class="custom-control custom-select" placeholder="Pilih gudang">
+                      </select>
+                      <div class="invalid-feedback">Nama gudang belum dipilih!</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-lg-12">
                     <div class="form-group" id="grNomor">
                       <label class="form-label">Nomor Tanda Terima</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control text-right" id="catatan" name="catatan" placeholder="Nomor tanda terima bahan">

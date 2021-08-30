@@ -123,10 +123,12 @@ class Admin_bahan extends CI_Controller{
         </div>
       </div>
     ';
+    //2020 s.d. 2025
+    //-1 s.d. +4
     $currYear = strval(date("Y"));
     $optionText = "";
-    for ($x = $currYear; $x <= $currYear + 4; $x++){
-      $optionText .= '<option value="'.$x.'">'.$x.'</option>';
+    for ($x = -1; $x <= 4; $x++){
+      $optionText .= '<option value="'.($currYear + $x).'">'.($currYear + $x).'</option>';
     }
     $content_dialogAddBahan =
     '

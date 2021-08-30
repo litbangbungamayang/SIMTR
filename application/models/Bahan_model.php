@@ -8,6 +8,8 @@ class Bahan_model extends CI_Model{
   public $satuan;
   public $dosis_per_ha;
   public $tahun_giling;
+  public $biaya_angkut;
+  public $biaya_muat;
 
   public function rules(){
     return [
@@ -52,6 +54,8 @@ class Bahan_model extends CI_Model{
     $this->satuan = $post["satuan"];
     $this->dosis_per_ha = $post["dosis"];
     $this->tahun_giling = $post["tahun_giling"];
+    $this->biaya_angkut = $post["biaya_angkut"];
+    $this->biaya_muat = $post["biaya_muat"];
     return $this->db->where("id_bahan", $post["id_bahan"])->update($this->_table, $this);
   }
 

@@ -18,6 +18,11 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_bahan = ?", array($id_bahan))->result());
   }
 
+  public function getTransaksiByIdGudang($id_gudang = null){
+    if (is_null($id_gudang)) $id_gudang = $this->input->get("id_gudang");
+    return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_gudang=?", array($id_gudang))->result());
+  }
+
   public function getTransaksiByIdVendor($id_vendor = null){
     if (is_null($id_vendor)) $id_vendor = $this->input->get("id_vendor");
     return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_vendor = ?", array($id_vendor))->result());
@@ -60,7 +65,10 @@ class Transaksi_model extends CI_Model{
     $query =
     "select
 	     INV.id_transaksi, BAHAN.nama_bahan, INV.kode_transaksi, INV.kuanta, BAHAN.satuan,
-       INV.rupiah, INV.tgl_transaksi, INV.tahun_giling, VENDOR.nama_vendor, INV.catatan
+       INV.rupiah, DATE_FORMAT(INV.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi, INV.tahun_giling, VENDOR.nama_vendor, INV.catatan,
+       (
+		       select nama_gudang from tbl_simtr_gudang where id_gudang = INV.id_gudang
+       ) as gudang
     from tbl_simtr_transaksi INV
     join tbl_simtr_vendor VENDOR on VENDOR.id_vendor = INV.id_vendor
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
@@ -136,6 +144,21 @@ class Transaksi_model extends CI_Model{
       group by id_bahan
     ";
     return json_encode($this->db->query($query, array($id_bahan))->result());
+  }
+
+  public function cekStokBahanByTahunGiling(){
+    $tahun_giling = $this->input->get("tahun_giling");
+    $query =
+    "
+    select
+	     INV.id_bahan, BAHAN.nama_bahan, sum(case kode_transaksi when 1 then kuanta when 2 then -kuanta end) as total_kuanta,
+       BAHAN.satuan, BAHAN.jenis_bahan
+    from tbl_simtr_transaksi INV
+      join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
+    where INV.tahun_giling=?
+    group by id_bahan
+    ";
+    return json_encode($this->db->query($query, array($tahun_giling))->result());
   }
 
   public function getTransaksiKeluarByIdKelompok(){
@@ -222,11 +245,13 @@ class Transaksi_model extends CI_Model{
   }
 
   public function simpan($data_transaksi = null){
+    //var_dump($this->input->post()); die();
     if (is_null($data_transaksi)){
       $post = $this->input->post();
     } else {
       $post = $data_transaksi;
     }
+    if(isset($post["id_gudang"]))$this->id_gudang = $post["id_gudang"];
     $this->id_bahan = $post["id_bahan"];
     $this->id_aktivitas = $post["id_aktivitas"];
     $this->id_kelompoktani = $post["id_kelompoktani"];
@@ -348,7 +373,10 @@ class Transaksi_model extends CI_Model{
     $query =
     "select
 	     INV.id_transaksi, BAHAN.nama_bahan, INV.kode_transaksi, INV.kuanta, BAHAN.satuan,
-       INV.rupiah, INV.tgl_transaksi, INV.tahun_giling, VENDOR.nama_vendor, INV.catatan
+       INV.rupiah, DATE_FORMAT(INV.tgl_transaksi, '%d-%m-%Y') as tgl_transaksi, INV.tahun_giling, VENDOR.nama_vendor, INV.catatan,
+       (
+		       select nama_gudang from tbl_simtr_gudang where id_gudang = INV.id_gudang
+       ) as gudang
     from tbl_simtr_transaksi INV
     join tbl_simtr_vendor VENDOR on VENDOR.id_vendor = INV.id_vendor
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
@@ -887,6 +915,21 @@ class Transaksi_model extends CI_Model{
       where kt.tahun_giling like concat('%', ?, '%') and kt.id_afd like concat('%', ?, '%');
     ";
     return json_encode($this->db->query($query, array($tahun_giling, $id_afd))->result());
+  }
+
+  public function getGptr(){
+    $request = $this->input->get("id_dokumen");
+    $query =
+    "
+    select *, DATE_FORMAT(dok.tgl_buat, '%d-%m-%Y') as tgl_dokumen
+    from bcn.tbl_simtr_penjualan_gula pg
+    	join tbl_simtr_transaksi trans on pg.id_dokumen = trans.id_gptr
+      join tbl_dokumen dok on dok.id_dokumen = pg.id_dokumen
+      join tbl_simtr_kelompoktani kt on kt.id_kelompok = trans.id_kelompoktani
+      join tbl_simtr_pembeli pemb on pemb.id_pembeli = pg.id_pembeli
+    where dok.id_dokumen = ?;
+    ";
+    return json_encode($this->db->query($query, array($request))->result());
   }
 
   public function getAllBasteb($tahun_giling = null, $id_dokumen = null){

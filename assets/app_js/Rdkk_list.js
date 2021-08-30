@@ -332,7 +332,6 @@ function hapusPermintaanPerawatan(index){
 }
 
 function addPerawatan(id_kelompok){
-  dialogAddPerawatan.modal("toggle");
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
     type: "GET",
@@ -341,6 +340,7 @@ function addPerawatan(id_kelompok){
       id_kelompok: id_kelompok
     },
     success: function(response){
+      var tahun_giling = response.tahun_giling;
       selectedKelompok = response;
       $("#perawatan_namaKelompok").val(response.nama_kelompok);
       $("#perawatan_luas").val(parseFloat(response.luas).toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha");
@@ -350,21 +350,26 @@ function addPerawatan(id_kelompok){
         type: "GET",
         dataType: "json",
         data: {
-          tahun_giling: response.tahun_giling,
+          tahun_giling: tahun_giling,
           kategori: response.kategori
         },
         success: function(response){
-          $("#jenis_aktivitas").selectize();
-          $("#jenis_aktivitas").selectize()[0].selectize.clear();
-          $("#jenis_aktivitas").selectize()[0].selectize.clearOptions();
-          $("#jenis_aktivitas").selectize()[0].selectize.load(function(callback){
-            callback(response);
-          });
-          arrayAktivitas = response;
-          arrayPermintaanPerawatanMaks = [];
-          var luas_maks = parseFloat($("#perawatan_luas").val().replace(/[^0-9. ]/g,""));
-          for (i = 0; i < arrayAktivitas.length; i ++){
-            arrayPermintaanPerawatanMaks.push({id_aktivitas: arrayAktivitas[i].id_aktivitas, req_maks: luas_maks});
+          if(response.length > 0){
+            $("#jenis_aktivitas").selectize();
+            $("#jenis_aktivitas").selectize()[0].selectize.clear();
+            $("#jenis_aktivitas").selectize()[0].selectize.clearOptions();
+            $("#jenis_aktivitas").selectize()[0].selectize.load(function(callback){
+              callback(response);
+            });
+            arrayAktivitas = response;
+            arrayPermintaanPerawatanMaks = [];
+            var luas_maks = parseFloat($("#perawatan_luas").val().replace(/[^0-9. ]/g,""));
+            for (i = 0; i < arrayAktivitas.length; i ++){
+              arrayPermintaanPerawatanMaks.push({id_aktivitas: arrayAktivitas[i].id_aktivitas, req_maks: luas_maks});
+            }
+            dialogAddPerawatan.modal("toggle");
+          } else {
+            alert("Master data aktivitas perawatan belum ada untuk tahun giling " + tahun_giling + " !\nSilahkan hubungi Admin.");
           }
         }
       });
@@ -373,7 +378,6 @@ function addPerawatan(id_kelompok){
 }
 
 function addBibit(id_kelompok, kategori){
-  dialogAddPermintaanBibit.modal("toggle");
   dialogAddPermintaanBibit.on("hide.bs.modal", function(){
     resetFeedbackAddBibit();
   });
@@ -403,27 +407,34 @@ function addBibit(id_kelompok, kategori){
     type: "GET",
     dataType: "json",
     success: function(response){
-      asalBibit.selectize();
-      asalBibit.selectize()[0].selectize.clear();
-      asalBibit.selectize()[0].selectize.clearOptions();
-      asalBibit.selectize()[0].selectize.load(function(callback){
-        callback(response);
-      });
-      arrayAsalBibit = response;
+      if(response.length > 0){
+        dialogAddPermintaanBibit.modal("toggle");
+        asalBibit.selectize();
+        asalBibit.selectize()[0].selectize.clear();
+        asalBibit.selectize()[0].selectize.clearOptions();
+        asalBibit.selectize()[0].selectize.load(function(callback){
+          callback(response);
+        });
+        arrayAsalBibit = response;
+      } else {
+        alert("Master data aktivitas permintaan bibit belum ada untuk tahun giling " + tahun_giling + " !\nSilahkan hubungi Admin.");
+      }
     }
   });
 }
 
 function addPupuk(id_kelompok){
-  dialogAddPermintaanPupuk.modal("toggle");
   $.ajax({
     url: js_base_url + "Landing/loadDataGudang",
     dataType: "json",
     type: "GET",
     success: function(response){
       arrayStokBahan = response;
+      console.log(arrayStokBahan);
     }
   });
+
+  //CEK DULU TAHUN GILING BERAPA, KEMUDIAN TENTUKAN STOK BAHAN PADA TAHUN GILING YBS
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
     type: "GET",
@@ -433,9 +444,11 @@ function addPupuk(id_kelompok){
     },
     success: function(response){
       selectedKelompok = response;
+      var tahun_giling_pupuk = selectedKelompok.tahun_giling;
       $("#namaKelompok").val(response.nama_kelompok);
       $("#luas").val(parseFloat(response.luas).toLocaleString(undefined, {maximumFractionDigits:2}) + " Ha");
-      $("#tblPupuk").DataTable().ajax.url(js_base_url + "Transaksi_bahan/getTransaksiKeluarByIdKelompok?id_kelompok=" + response.id_kelompok).load(function(callback){
+      $("#tblPupuk").DataTable().ajax.url(js_base_url + "Transaksi_bahan/getTransaksiKeluarByIdKelompok?id_kelompok=" +
+        response.id_kelompok).load(function(callback){
         arrayPermintaanPupukExisting = callback;
       });
       $.ajax({
@@ -447,28 +460,33 @@ function addPupuk(id_kelompok){
           tahun_giling: response.tahun_giling
         },
         success: function(response){
-          $("#jenis_pupuk").selectize();
-          $("#jenis_pupuk").selectize()[0].selectize.clear();
-          $("#jenis_pupuk").selectize()[0].selectize.clearOptions();
-          $("#jenis_pupuk").selectize()[0].selectize.load(function(callback){
-            callback(response);
-            arrayBahan = response;
-            //perhitungan permintaan pupuk maksimal
-            arrayPermintaanPupukMaks = [];
-            for (i = 0; i < arrayBahan.length; i++){
-              arrayPermintaanPupukMaks.push({
-                id_bahan: arrayBahan[i].id_bahan,
-                maks: Math.round((arrayBahan[i].dosis_per_ha*selectedKelompok.luas)/50)*50
-              });
-            }
-            console.log("Limit :");
-            console.log(arrayPermintaanPupukMaks);
-            for (i = 0; i < arrayPermintaanPupukExisting.length; i++){
-              var jmlEksisting = arrayPermintaanPupukExisting[i].kuanta;
-              var indexBahan = arrayPermintaanPupukMaks.findIndex(x => x.id_bahan === arrayPermintaanPupukExisting[i].id_bahan);
-              arrayPermintaanPupukMaks[indexBahan].maks = parseInt(arrayPermintaanPupukMaks[indexBahan].maks) - parseInt(jmlEksisting);
-            }
-          });
+          if(response.length > 0){
+            dialogAddPermintaanPupuk.modal("toggle");
+            $("#jenis_pupuk").selectize();
+            $("#jenis_pupuk").selectize()[0].selectize.clear();
+            $("#jenis_pupuk").selectize()[0].selectize.clearOptions();
+            $("#jenis_pupuk").selectize()[0].selectize.load(function(callback){
+              callback(response);
+              arrayBahan = response;
+              //perhitungan permintaan pupuk maksimal
+              arrayPermintaanPupukMaks = [];
+              for (i = 0; i < arrayBahan.length; i++){
+                arrayPermintaanPupukMaks.push({
+                  id_bahan: arrayBahan[i].id_bahan,
+                  maks: Math.round((arrayBahan[i].dosis_per_ha*selectedKelompok.luas)/50)*50
+                });
+              }
+              console.log("Limit :");
+              console.log(arrayPermintaanPupukMaks);
+              for (i = 0; i < arrayPermintaanPupukExisting.length; i++){
+                var jmlEksisting = arrayPermintaanPupukExisting[i].kuanta;
+                var indexBahan = arrayPermintaanPupukMaks.findIndex(x => x.id_bahan === arrayPermintaanPupukExisting[i].id_bahan);
+                arrayPermintaanPupukMaks[indexBahan].maks = parseInt(arrayPermintaanPupukMaks[indexBahan].maks) - parseInt(jmlEksisting);
+              }
+            });
+          } else {
+            alert("Master data pupuk belum ada untuk tahun giling " + tahun_giling + " !\n Silahkan hubungi Admin.");
+          }
         }
       });
     },
