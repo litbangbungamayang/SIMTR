@@ -24,7 +24,7 @@ txtRupiahBahan.bind("keyup blur", function(){
 });
 
 $.ajax({
-  url: js_base_url + "Admin_gudang/getAllGudang",
+  url: js_base_url + "Admin_gudang/getAllGudangAktif",
   type: "GET",
   dataType: "json",
   success: function(response){

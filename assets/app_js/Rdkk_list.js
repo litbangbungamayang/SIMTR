@@ -129,6 +129,7 @@ btnSimpanPermintaanPupuk.on("click", function(){
           console.log(arrayPermintaanPupukMaks);
           refreshTablePermintaan();
           resetFeedbackAddPupuk();
+          dialogAddPermintaanPupuk.modal("toggle");
         }
       }
     });
@@ -311,6 +312,7 @@ btnTambahPupuk.on("click", function(){
               */
               arrayPermintaanPupuk.push(permintaanBaru);
               cbxJenisBahan.selectize()[0].selectize.setValue("");
+              cbxNamaGudang.selectize()[0].selectize.setValue("");
               luasAplikasi.val("");
               refreshTablePermintaan();
             } else {
@@ -739,7 +741,7 @@ $("#asalBibit").selectize({
 });
 
 $.ajax({
-  url: js_base_url + "Admin_gudang/getAllGudang",
+  url: js_base_url + "Admin_gudang/getAllGudangAktif",
   type: "GET",
   dataType: "json",
   success: function(response){

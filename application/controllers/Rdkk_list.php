@@ -125,7 +125,6 @@
 
     public function getArrayPermintaanPupuk(){
       $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
-      var_dump($arrayPermintaanPupuk);
       date_default_timezone_set('Asia/Jakarta');
       $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
       $transPostData = array();

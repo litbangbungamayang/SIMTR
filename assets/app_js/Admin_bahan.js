@@ -15,6 +15,7 @@ var formAddBahan = $("#formAddBahan");
 var dialogAddBahan = $("#dialogAddBahan");
 var btnTambahBahan = $("#btnTambahBahan");
 var edit = false;
+var edit_id = null;
 
 /*
 tahunGiling.on("change", function(){
@@ -122,8 +123,9 @@ function editData(id){
       biaya_angkut.val(response.biaya_angkut);
       biaya_muat.val(response.biaya_muat);
       kemasanBahan.val(response.kemasan);
-      $("#btnSimpanBahan").on("click", function(){simpanEditData(response.id_bahan)});
+      //$("#btnSimpanBahan").on("click", function(){simpanEditData(id)});
       edit = true;
+      edit_id = id;
     }
   });
 }
@@ -177,41 +179,89 @@ function simpanEditData(id){
 }
 
 $("#btnSimpanBahan").on("click", function(){
-  console.log("klik");
-  if (namaBahan.val() != "" && jenisBahan.val() != "" && satuan.val() != "" && dosisBahan.val() != "" && tahunGiling.val() != "" && !edit){
-    namaBahan.removeClass("is-invalid");
-    jenisBahan.removeClass("is-invalid");
-    satuan.removeClass("is-invalid");
-    dosisBahan.removeClass("is-invalid");
-    tahunGiling.removeClass("is-invalid");
-    kemasanBahan.removeClass("is-invalid");
-    $.ajax({
-      url: js_base_url + "Admin_bahan/addBahan",
-      type: "POST",
-      dataType: "text",
-      data: formAddBahan.serialize(),
-      success: function(data){
-        namaBahan.val("");
-        jenisBahan[0].selectize.clear();
-        satuan[0].selectize.clear();
-        tahunGiling[0].selectize.clear();
-        dosisBahan.val("");
-        biaya_angkut.val("");
-        biaya_muat.val("");
-        kemasanBahan.val("");
-        tblBahan.DataTable().ajax.reload();
-      },
-      error: function(textStatus){
-        console.log(textStatus);
-      }
-    });
+  if(!edit){
+    if (namaBahan.val() != "" && jenisBahan.val() != "" && satuan.val() != "" && dosisBahan.val() != "" && tahunGiling.val() != "" && !edit){
+      namaBahan.removeClass("is-invalid");
+      jenisBahan.removeClass("is-invalid");
+      satuan.removeClass("is-invalid");
+      dosisBahan.removeClass("is-invalid");
+      tahunGiling.removeClass("is-invalid");
+      kemasanBahan.removeClass("is-invalid");
+      $.ajax({
+        url: js_base_url + "Admin_bahan/addBahan",
+        type: "POST",
+        dataType: "text",
+        data: formAddBahan.serialize(),
+        success: function(data){
+          namaBahan.val("");
+          jenisBahan[0].selectize.clear();
+          satuan[0].selectize.clear();
+          tahunGiling[0].selectize.clear();
+          dosisBahan.val("");
+          biaya_angkut.val("");
+          biaya_muat.val("");
+          kemasanBahan.val("");
+          tblBahan.DataTable().ajax.reload();
+        },
+        error: function(textStatus){
+          console.log(textStatus);
+        }
+      });
+    } else {
+      (namaBahan.val() == "") ? namaBahan.addClass("is-invalid") : "";
+      (jenisBahan.val() == "") ? jenisBahan.addClass("is-invalid") : "";
+      (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
+      (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
+      (tahunGiling.val() == "") ? tahunGiling.addClass("is-invalid") : "";
+      (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
+    }
   } else {
-    (namaBahan.val() == "") ? namaBahan.addClass("is-invalid") : "";
-    (jenisBahan.val() == "") ? jenisBahan.addClass("is-invalid") : "";
-    (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
-    (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
-    (tahunGiling.val() == "") ? tahunGiling.addClass("is-invalid") : "";
-    (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
+    console.log("Simpan edit = " + edit_id);
+    if (namaBahan.val() != "" && jenisBahan.val() != "" && satuan.val() != "" && edit){
+      namaBahan.removeClass("is-invalid");
+      jenisBahan.removeClass("is-invalid");
+      satuan.removeClass("is-invalid");
+      dosisBahan.removeClass("is-invalid");
+      $.ajax({
+        url: js_base_url + "Admin_bahan/editBahan",
+        type: "POST",
+        dataType: "text",
+        data: {
+          id_bahan: edit_id,
+          nama_bahan: namaBahan.val(),
+          jenis_bahan: jenisBahan.val(),
+          satuan: satuan.val(),
+          dosis: dosisBahan.val(),
+          tahun_giling: tahunGiling.val(),
+          biaya_angkut: biaya_angkut.val(),
+          biaya_muat: biaya_muat.val(),
+          kemasan: kemasanBahan.val()
+        },
+        success: function(data){
+          namaBahan.val("");
+          jenisBahan[0].selectize.clear();
+          satuan[0].selectize.clear();
+          tahunGiling[0].selectize.clear();
+          dosisBahan.val("");
+          biaya_angkut.val("");
+          biaya_muat.val("");
+          kemasanBahan.val("");
+          tblBahan.DataTable().ajax.reload();
+          edit = false;
+          edit_id = null
+          dialogAddBahan.modal("toggle");
+        },
+        error: function(textStatus){
+          console.log(textStatus);
+        }
+      });
+    } else {
+      (namaBahan.val() == "") ? namaBahan.addClass("is-invalid") : "";
+      (jenisBahan.val() == "") ? jenisBahan.addClass("is-invalid") : "";
+      (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
+      (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
+      (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
+    }
   }
 })
 

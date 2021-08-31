@@ -39,6 +39,12 @@ class Gudang_model extends CI_Model{
     ")->result());
   }
 
+  public function getAllGudangAktif(){
+    return json_encode($this->db->query("
+      select * from tbl_simtr_gudang where status=?
+    ", array(1))->result());
+  }
+
   public function getGudangById(){
     $id_gudang = $this->input->get("id_gudang");
     $query = "select * from tbl_simtr_gudang where id_gudang = ?";

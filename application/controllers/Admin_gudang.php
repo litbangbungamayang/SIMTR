@@ -38,6 +38,10 @@ class Admin_gudang extends CI_Controller{
     echo $this->gudang_model->getAllGudang();
   }
 
+  public function getAllGudangAktif(){
+    echo $this->gudang_model->getAllGudangAktif();
+  }
+
   public function getGudangById(){
       echo $this->gudang_model->getGudangById();
   }
