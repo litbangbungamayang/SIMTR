@@ -4,6 +4,7 @@ $('#satuan').selectize({create: false, sortField: 'text'});
 var namaBahan = $("#nama_bahan");
 var jenisBahan = $("#jenis_bahan");
 var dosisBahan = $("#dosis");
+var kemasanBahan = $("#kemasan");
 var tahunGiling = $("#tahun_giling");
 var biaya_angkut = $("#biaya_angkut");
 var biaya_muat = $("#biaya_muat");
@@ -58,12 +59,22 @@ dosisBahan.on("blur", function(){
   }
 })
 
+kemasanBahan.bind("keyup blur", function(){
+  $(this).val($(this).val().replace(/[^0-9. ]/g,""));
+});
+kemasanBahan.on("blur", function(){
+  if ($(this).val() != ""){
+    $(this).val(parseInt($(this).val()));
+  }
+})
+
 dialogAddBahan.on("hide.bs.modal", function(){
   namaBahan.val("");
   jenisBahan[0].selectize.clear();
   satuan[0].selectize.clear();
   tahunGiling[0].selectize.clear();
   dosisBahan.val("");
+  kemasanBahan.val("");
   tblBahan.DataTable().ajax.reload();
 })
 
@@ -81,6 +92,7 @@ function hapusData(id){
           dataType: "text",
           data: {id_bahan: id},
           success: function(result){
+            console.log("id=" + id);
             console.log(result);
             alert(result);
             tblBahan.DataTable().ajax.reload();
@@ -109,6 +121,7 @@ function editData(id){
       dosisBahan[0].disabled = true;
       biaya_angkut.val(response.biaya_angkut);
       biaya_muat.val(response.biaya_muat);
+      kemasanBahan.val(response.kemasan);
       $("#btnSimpanBahan").on("click", function(){simpanEditData(response.id_bahan)});
       edit = true;
     }
@@ -134,7 +147,8 @@ function simpanEditData(id){
         dosis: dosisBahan.val(),
         tahun_giling: tahunGiling.val(),
         biaya_angkut: biaya_angkut.val(),
-        biaya_muat: biaya_muat.val()
+        biaya_muat: biaya_muat.val(),
+        kemasan: kemasanBahan.val()
       },
       success: function(data){
         namaBahan.val("");
@@ -144,6 +158,7 @@ function simpanEditData(id){
         dosisBahan.val("");
         biaya_angkut.val("");
         biaya_muat.val("");
+        kemasanBahan.val("");
         tblBahan.DataTable().ajax.reload();
         edit = false;
         dialogAddBahan.modal("toggle");
@@ -157,6 +172,7 @@ function simpanEditData(id){
     (jenisBahan.val() == "") ? jenisBahan.addClass("is-invalid") : "";
     (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
     (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
+    (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
   }
 }
 
@@ -168,6 +184,7 @@ $("#btnSimpanBahan").on("click", function(){
     satuan.removeClass("is-invalid");
     dosisBahan.removeClass("is-invalid");
     tahunGiling.removeClass("is-invalid");
+    kemasanBahan.removeClass("is-invalid");
     $.ajax({
       url: js_base_url + "Admin_bahan/addBahan",
       type: "POST",
@@ -181,6 +198,7 @@ $("#btnSimpanBahan").on("click", function(){
         dosisBahan.val("");
         biaya_angkut.val("");
         biaya_muat.val("");
+        kemasanBahan.val("");
         tblBahan.DataTable().ajax.reload();
       },
       error: function(textStatus){
@@ -193,6 +211,7 @@ $("#btnSimpanBahan").on("click", function(){
     (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
     (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
     (tahunGiling.val() == "") ? tahunGiling.addClass("is-invalid") : "";
+    (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
   }
 })
 
@@ -296,5 +315,5 @@ $("#tahun_giling").selectize({
   sortField: "text",
   maxItems: 1,
   create: false,
-  placeholder: "Pilih status gudang"
+  placeholder: "Pilih tahun giling"
 });

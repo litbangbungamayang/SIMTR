@@ -23,7 +23,6 @@ class Dashboard_model extends CI_Model{
        BAHAN.satuan, BAHAN.jenis_bahan
     from tbl_simtr_transaksi INV
     join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
-    join tbl_simtr_umum UMUM on UMUM.tahun_giling = INV.tahun_giling
     group by id_bahan";
     $result = $this->db->query($query)->result();
     return json_encode($result);

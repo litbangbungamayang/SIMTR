@@ -46,6 +46,10 @@ class Admin_bahan extends CI_Controller{
     $this->bahan_model->edit();
   }
 
+  public function getStokGudangByIdGudang(){
+    echo $this->bahan_model->getStokGudangByIdGudang();
+  }
+
   public function hapusBahan(){
     $id_bahan = $this->input->post("id_bahan");
     $transaksi = json_decode($this->transaksi_model->getTransaksiByIdBahan($id_bahan));
@@ -181,6 +185,11 @@ class Admin_bahan extends CI_Controller{
                       <label class="form-label">Dosis per Ha.</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="dosis" name="dosis" placeholder="Dosis Bahan">
                       <div class="invalid-feedback" id="fbNamaBahan">Dosis bahan belum diinput!</div>
+                    </div>
+                    <div class="form-group" id="grKemasan">
+                      <label class="form-label">Ukuran kemasan</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="kemasan" name="kemasan" placeholder="Ukuran kemasan">
+                      <div class="invalid-feedback" id="fbNamaBahan">Ukuran kemasan bahan belum diinput!</div>
                     </div>
                   </div>
                 </div>

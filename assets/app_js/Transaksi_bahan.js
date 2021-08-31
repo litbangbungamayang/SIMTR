@@ -48,7 +48,8 @@ cbxTahunGiling.selectize({
   onChange: function(value){
     if (value != ""){
       $.ajax({
-        url: js_base_url + "Admin_bahan/getBahanByTahunGiling",
+        //url: js_base_url + "Admin_bahan/getBahanByTahunGiling",
+        url: js_base_url + "Admin_bahan/getAllBahan",
         type: "GET",
         dataType: "json",
         data: {tahun_giling: value},
@@ -109,6 +110,7 @@ btnSimpanTransaksi.on("click", function(){
 function resetForm(){
   cbxNamaBahan.selectize()[0].selectize.setValue("");
   cbxNamaVendor.selectize()[0].selectize.setValue("");
+  cbxNamaGudang.selectize()[0].selectize.setValue("");
   txtKuantaBahan.val("");
   txtRupiahBahan.val("");
   txtCatatan.val("");
@@ -120,6 +122,7 @@ function resetFeedback(){
   txtKuantaBahan.removeClass("is-invalid");
   txtRupiahBahan.removeClass("is-invalid");
   cbxTahunGiling.removeClass("is-invalid");
+  cbxNamaGudang.removeClass("is-invalid");
   txtCatatan.removeClass("is-invalid");
 }
 
@@ -143,6 +146,7 @@ function validasiForm(){
     return formValue;
   } else {
     (idBahan == "") ? cbxNamaBahan.addClass("is-invalid") : "";
+    (idGudang == "") ? cbxNamaGudang.addClass("is-invalid") : "";
     (idVendor == "") ? cbxNamaVendor.addClass("is-invalid") : "";
     (kuanta == "") ? txtKuantaBahan.addClass("is-invalid") : "";
     (rupiah == "") ? txtRupiahBahan.addClass("is-invalid") : "";

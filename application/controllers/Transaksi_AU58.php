@@ -45,7 +45,7 @@ class Transaksi_AU58 extends CI_Controller{
     $contentBahan = "";
     $nomor = 1;
     foreach($dataTransaksi as $bahan){
-      $contentBahan .= '<tr><td style="text-align: center; border-width: 1px 0px 1px 0px;">'.$nomor.'</td><td>'.$bahan->jenis_bahan.' '.$bahan->nama_bahan.'</td><td>'.$bahan->satuan.'</td><td style="text-align: right; border-width: 0px 0px 1px 0px;">'.number_format($bahan->kuanta,2,".",",").'</td></tr>';
+      $contentBahan .= '<tr><td style="text-align: center; border-width: 1px 0px 1px 0px;">'.$nomor.'</td><td>'.$bahan->jenis_bahan.' '.$bahan->nama_bahan.' ('.$bahan->nama_gudang.')</td><td>'.$bahan->satuan.'</td><td style="text-align: right; border-width: 0px 0px 1px 0px;">'.number_format($bahan->kuanta,2,".",",").'</td></tr>';
       $nomor ++;
     }
     $container =
@@ -229,7 +229,8 @@ class Transaksi_AU58 extends CI_Controller{
                 </div>
                 <div class="row">
                   <div class="col-12 text-left" style="border-width: 0px 1px 1px 1px; border-color: black; border-style: solid;">
-                    Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.'; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha
+                    Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.
+                      '; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha
                   </div>
                 </div>
                 <div class="row">

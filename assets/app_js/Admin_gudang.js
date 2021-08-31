@@ -38,7 +38,7 @@ function hapusData(id){
           data: {id_gudang: id},
           success: function(result){
             alert(result);
-            tblBahan.DataTable().ajax.reload();
+            tblGudang.DataTable().ajax.reload();
           }
         });
       }

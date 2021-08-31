@@ -35,6 +35,7 @@ var objTransaksi = function(id_aktivitas, id_bahan, id_kelompok, kode_transaksi,
   return obj;
 }
 var cbxJenisBahan = $("#jenis_pupuk");
+var cbxNamaGudang = $("#nama_gudang");
 var luasAplikasi = $("#luas_aplikasi");
 var btnTambahPupuk = $("#btnTambahPupuk");
 var btnTambahPerawatan = $("#btnTambahPerawatan");
@@ -250,57 +251,82 @@ btnTambahPupuk.on("click", function(){
     var hargaSatuan;
     var luasValue = parseFloat(luasAplikasi.val());
     var bahanSelected = cbxJenisBahan.selectize()[0].selectize.options[cbxJenisBahan.selectize()[0].selectize.getValue()];
+    var kemasan = bahanSelected.kemasan;
     var dosisBahan = bahanSelected.dosis_per_ha;
     var kuanta_req = dosisBahan * luasValue;
-    var kuanta = Math.round(kuanta_req/50)*50;
-    // OBJECT : function(id_bahan, id_kelompok, kode_transaksi, tahun_giling, nama_bahan, kuanta_req, luas_aplikasi, satuan, rupiah)
+    var kuanta = Math.round(kuanta_req/kemasan)*kemasan;
+    var id_gudang = cbxNamaGudang.selectize()[0].selectize.getValue();
+    var id_bahan = cbxJenisBahan.selectize()[0].selectize.getValue();
+    //ARRAY STOK BAHAN DISINI
     $.ajax({
-      url: js_base_url + "Rdkk_list/getHargaSatuan",
-      data: {id_bahan: bahanSelected.id_bahan},
+      url: js_base_url + "Admin_bahan/getStokGudangByIdGudang",
       dataType: "json",
-      async: false,
+      data: {id_gudang: id_gudang},
       type: "GET",
       success: function(response){
-        hargaSatuan = response[0].harga_unit;
+        arrayStokBahan = response;
+        console.log("Stok tersedia di gudang :");
+        console.log(arrayStokBahan);
+
+        // OBJECT : function(id_bahan, id_kelompok, kode_transaksi, tahun_giling, nama_bahan, kuanta_req, luas_aplikasi, satuan, rupiah)
+        $.ajax({
+          url: js_base_url + "Rdkk_list/getHargaSatuan",
+          data: {id_bahan: bahanSelected.id_bahan},
+          dataType: "json",
+          async: false,
+          type: "GET",
+          success: function(response){
+            hargaSatuan = response[0].harga_unit;
+          }
+        });
+        var objTransaksiPupuk =
+        function(id_aktivitas, id_bahan, id_kelompok, kode_transaksi, tahun_giling, nama_bahan, kuanta, luas_aplikasi, satuan, rupiah){
+          var obj = {}
+          obj.id_aktivitas = id_aktivitas;
+          obj.id_bahan = id_bahan;
+          obj.id_kelompok = id_kelompok;
+          obj.kode_transaksi = kode_transaksi;
+          obj.kuanta = kuanta;
+          obj.tahun_giling = tahun_giling;
+          obj.nama_bahan = nama_bahan;
+          obj.rupiah = Math.round(kuanta*rupiah);
+          obj.luas_aplikasi = luas_aplikasi;
+          obj.satuan = satuan;
+          obj.id_gudang = id_gudang;
+          return obj;
+        }
+        var permintaanBaru = objTransaksiPupuk(0,bahanSelected.id_bahan, selectedKelompok.id_kelompok, 2,
+          selectedKelompok.tahun_giling, bahanSelected.nama_bahan, kuanta, luasValue, bahanSelected.satuan, hargaSatuan, id_gudang);
+        var indexBahan = arrayPermintaanPupukMaks.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
+        var indexStokBahan = arrayStokBahan.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
+        if (indexStokBahan != -1){
+          if (permintaanBaru.kuanta <= arrayStokBahan[indexStokBahan].total_kuanta){
+            if (permintaanBaru.kuanta <= arrayPermintaanPupukMaks[indexBahan].maks){
+              arrayPermintaanPupukMaks[indexBahan].maks = arrayPermintaanPupukMaks[indexBahan].maks - permintaanBaru.kuanta;
+              /*
+              let arrayRequest = {
+                "objTransaksi": permintaanBaru,
+                "id_gudang": id_gudang
+              }
+              */
+              arrayPermintaanPupuk.push(permintaanBaru);
+              cbxJenisBahan.selectize()[0].selectize.setValue("");
+              luasAplikasi.val("");
+              refreshTablePermintaan();
+            } else {
+              alert("Permintaan bahan " + permintaanBaru.nama_bahan + " tidak bisa melebihi " +
+                parseInt(arrayPermintaanPupukMaks[indexBahan].maks).toLocaleString({maximumFractionDigits:2}) + " kg atau " +
+                parseFloat(arrayPermintaanPupukMaks[indexBahan].maks/bahanSelected.dosis_per_ha).toLocaleString({maximumFractionDigits:2}) + " Ha!");
+            }
+          } else {
+            alert("Stok bahan " + permintaanBaru.nama_bahan + " tidak mencukupi! Diminta = " + parseInt(permintaanBaru.kuanta).toLocaleString({maximumFractionDigits: 2, minimumFractionDigits: 2}) + " kg," +
+              " Bahan tersedia = " + parseInt(arrayStokBahan[indexStokBahan].total_kuanta).toLocaleString({maximumFractionDigits:2}) + " kg");
+          }
+        } else {
+          alert("Stok bahan " + permintaanBaru.nama_bahan + " belum diinput!");
+        }
       }
     });
-    /*
-    function(id_aktivitas, id_bahan, id_kelompok, kode_transaksi, tahun_giling, nama_bahan, kuanta, luas_aplikasi, satuan, rupiah)
-    obj.id_aktivitas = id_aktivitas;
-    obj.id_bahan = id_bahan;
-    obj.id_kelompok = id_kelompok;
-    obj.kode_transaksi = kode_transaksi;
-    obj.kuanta = kuanta;
-    obj.tahun_giling = tahun_giling;
-    obj.nama_bahan = nama_bahan;
-    obj.rupiah = Math.round(kuanta*rupiah);
-    obj.luas_aplikasi = luas_aplikasi;
-    obj.satuan = satuan;
-    */
-    var permintaanBaru = objTransaksi(0,bahanSelected.id_bahan, selectedKelompok.id_kelompok, 2,
-      selectedKelompok.tahun_giling, bahanSelected.nama_bahan, kuanta, luasValue, bahanSelected.satuan, hargaSatuan);
-    var indexBahan = arrayPermintaanPupukMaks.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
-    var indexStokBahan = arrayStokBahan.findIndex(x => x.id_bahan === permintaanBaru.id_bahan);
-    if (indexStokBahan != -1){
-      if (permintaanBaru.kuanta <= arrayStokBahan[indexStokBahan].total_kuanta){
-        if (permintaanBaru.kuanta <= arrayPermintaanPupukMaks[indexBahan].maks){
-          arrayPermintaanPupukMaks[indexBahan].maks = arrayPermintaanPupukMaks[indexBahan].maks - permintaanBaru.kuanta;
-          arrayPermintaanPupuk.push(permintaanBaru);
-          cbxJenisBahan.selectize()[0].selectize.setValue("");
-          luasAplikasi.val("");
-          refreshTablePermintaan();
-        } else {
-          alert("Permintaan bahan " + permintaanBaru.nama_bahan + " tidak bisa melebihi " +
-            parseInt(arrayPermintaanPupukMaks[indexBahan].maks).toLocaleString({maximumFractionDigits:2}) + " kg atau " +
-            parseFloat(arrayPermintaanPupukMaks[indexBahan].maks/bahanSelected.dosis_per_ha).toLocaleString({maximumFractionDigits:2}) + " Ha!");
-        }
-      } else {
-        alert("Stok bahan " + permintaanBaru.nama_bahan + " tidak mencukupi! Diminta = " + parseInt(permintaanBaru.kuanta).toLocaleString({maximumFractionDigits: 2, minimumFractionDigits: 2}) + " kg," +
-          " Bahan tersedia = " + parseInt(arrayStokBahan[indexStokBahan].total_kuanta).toLocaleString({maximumFractionDigits:2}) + " kg");
-      }
-    } else {
-      alert("Stok bahan " + permintaanBaru.nama_bahan + " belum diinput!");
-    }
   }
 })
 
@@ -430,6 +456,7 @@ function addPupuk(id_kelompok){
     type: "GET",
     success: function(response){
       arrayStokBahan = response;
+      console.log("Stok tersedia:");
       console.log(arrayStokBahan);
     }
   });
@@ -452,7 +479,8 @@ function addPupuk(id_kelompok){
         arrayPermintaanPupukExisting = callback;
       });
       $.ajax({
-        url: js_base_url + "Admin_bahan/getBahanByJenisTahunGiling",
+        //url: js_base_url + "Admin_bahan/getBahanByJenisTahunGiling",
+        url: js_base_url + "Admin_bahan/getBahanByJenis",
         type: "GET",
         dataType: "json",
         data: {
@@ -468,12 +496,15 @@ function addPupuk(id_kelompok){
             $("#jenis_pupuk").selectize()[0].selectize.load(function(callback){
               callback(response);
               arrayBahan = response;
+              console.log("Array bahan : ");
+              console.log(arrayBahan);
               //perhitungan permintaan pupuk maksimal
               arrayPermintaanPupukMaks = [];
               for (i = 0; i < arrayBahan.length; i++){
+                let satuan_kemasan = arrayBahan[i].kemasan;
                 arrayPermintaanPupukMaks.push({
                   id_bahan: arrayBahan[i].id_bahan,
-                  maks: Math.round((arrayBahan[i].dosis_per_ha*selectedKelompok.luas)/50)*50
+                  maks: Math.round((arrayBahan[i].dosis_per_ha*selectedKelompok.luas)/satuan_kemasan)*satuan_kemasan
                 });
               }
               console.log("Limit :");
@@ -706,6 +737,27 @@ $("#asalBibit").selectize({
   placeholder: "Pilih asal bibit",
   options: []
 });
+
+$.ajax({
+  url: js_base_url + "Admin_gudang/getAllGudang",
+  type: "GET",
+  dataType: "json",
+  success: function(response){
+    $("#nama_gudang").selectize({
+      valueField: "id_gudang",
+      labelField: "nama_gudang",
+      sortField: "nama_gudang",
+      searchField: "nama_gudang",
+      maxItems: 1,
+      create: false,
+      placeholder: "Pilih gudang",
+      options: response,
+      onChange: function(value){
+
+      }
+    });
+  }
+})
 
 /************************ DATATABLE SECTION ***********************************/
 

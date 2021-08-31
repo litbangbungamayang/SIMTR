@@ -106,8 +106,8 @@ class Transaksi_bahan extends CI_Controller{
     ';
     $currYear = strval(date("Y"));
     $optionText = "";
-    for ($x = $currYear; $x <= $currYear + 4; $x++){
-      $optionText .= '<option value="'.$x.'">'.$x.'</option>';
+    for ($x = -1; $x < 4; $x++){
+      $optionText .= '<option value="'.($x + $currYear).'">'.($x + $currYear).'</option>';
     }
     $content_dialogAddTransaksi =
     '

@@ -125,6 +125,7 @@
 
     public function getArrayPermintaanPupuk(){
       $arrayPermintaanPupuk = json_decode($this->input->post("pupuk"));
+      var_dump($arrayPermintaanPupuk);
       date_default_timezone_set('Asia/Jakarta');
       $no_transaksi = "TR"."-".$arrayPermintaanPupuk[0]->id_kelompok."-".$arrayPermintaanPupuk[0]->tahun_giling."-".date("YmdHis");
       $transPostData = array();
@@ -144,6 +145,7 @@
           "rupiah_bahan" => $permintaanPupuk->rupiah,
           "no_transaksi" => $no_transaksi,
           "tahun_giling" => $permintaanPupuk->tahun_giling,
+          "id_gudang" => $permintaanPupuk->id_gudang,
           "catatan" => NULL
         );
         $biayaAngkut = array(
@@ -317,6 +319,11 @@
                       <label class="form-label">Luas aplikasi pupuk</label>
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="luas_aplikasi">
                       <div class="invalid-feedback">Luas aplikasi pupuk belum diisi!</div>
+                    </div>
+                    <div class="form-group" id="grNamaGudang"">
+                      <label class="form-label">Lokasi gudang</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="nama_gudang">
+                      <div class="invalid-feedback">Lokasi gudang belum dipilih!</div>
                     </div>
                   </div>
                 </div>

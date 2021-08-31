@@ -10,6 +10,7 @@ class Bahan_model extends CI_Model{
   public $tahun_giling;
   public $biaya_angkut;
   public $biaya_muat;
+  public $kemasan;
 
   public function rules(){
     return [
@@ -43,6 +44,7 @@ class Bahan_model extends CI_Model{
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya_muat = $post["biaya_muat"];
     $this->biaya_angkut = $post["biaya_angkut"];
+    $this->kemasan = $post["kemasan"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -56,6 +58,7 @@ class Bahan_model extends CI_Model{
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya_angkut = $post["biaya_angkut"];
     $this->biaya_muat = $post["biaya_muat"];
+    $this->kemasan = $post["kemasan"];
     return $this->db->where("id_bahan", $post["id_bahan"])->update($this->_table, $this);
   }
 
@@ -87,6 +90,21 @@ class Bahan_model extends CI_Model{
   public function getBahanByJenis(){
     $jenis_bahan = $this->input->get("jenis_bahan");
     return json_encode($this->db->from("tbl_simtr_bahan")->where("jenis_bahan", $jenis_bahan)->get()->result());
+  }
+
+  public function getStokGudangByIdGudang(){
+    $id_gudang = $this->input->get("id_gudang");
+    $query =
+    "select
+	     INV.id_bahan, BAHAN.nama_bahan, sum(case kode_transaksi when 1 then kuanta when 2 then -kuanta end) as total_kuanta,
+       BAHAN.satuan, BAHAN.jenis_bahan
+    from tbl_simtr_transaksi INV
+      join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
+      join tbl_simtr_gudang gud on gud.id_gudang = INV.id_gudang
+    where gud.id_gudang = ?
+    group by id_bahan";
+    $result = $this->db->query($query, array($id_gudang))->result();
+    return json_encode($result);
   }
 
   public function hapus($id_bahan = null){

@@ -86,7 +86,7 @@ class Transaksi_model extends CI_Model{
               when KT.kategori = 4 then 'RT3' end) as kategori,
         KT.id_afd, PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi,
         BAHAN.jenis_bahan, BAHAN.nama_bahan, TRANS.kuanta, BAHAN.satuan,
-        TRANS.id_au58, dok.tgl_validasi_bagian
+        TRANS.id_au58, dok.tgl_validasi_bagian, gud.nama_gudang
       from tbl_simtr_kelompoktani KT
       join
       	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
@@ -96,6 +96,7 @@ class Transaksi_model extends CI_Model{
       join tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
       join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
       join tbl_dokumen dok on dok.id_dokumen = TRANS.id_au58
+      join tbl_simtr_gudang gud on gud.id_gudang = TRANS.id_gudang
       where TRANS.no_transaksi = ? and TRANS.kuanta > 0
       group by TRANS.id_transaksi";
       return json_encode($this->db->query($query, array($id_kelompok, $no_transaksi))->result());
@@ -139,7 +140,6 @@ class Transaksi_model extends CI_Model{
          BAHAN.satuan, BAHAN.jenis_bahan
       from tbl_simtr_transaksi INV
       join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = INV.id_bahan
-      join tbl_simtr_umum UMUM on UMUM.tahun_giling = INV.tahun_giling
       where INV.id_bahan = ?
       group by id_bahan
     ";
