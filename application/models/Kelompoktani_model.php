@@ -123,13 +123,48 @@ class Kelompoktani_model extends CI_Model{
     return $lastId;
   }
 
+  public function simpanSkk($request){
+    $id_user = $this->session->userdata("id_user");
+    $scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
+    $post = $request["dataSkk"];
+    $id_dokumen = $request["id_dokumen"];
+    //PARSING TANGGAL SURVEY
+    $tgl_survey = new DateTime($post["tgl_survey"]);
+    $tgl_survey = $tgl_survey->format("Y-m-d");
+    //======================
+    $query =
+    "
+    insert into tbl_simtr_skk(id_kelompok,id_dokumen,tgl_survey,keterangan_survey,status,user_id,dokumen) values
+    (?,?,?,?,?,?,?)
+    ";
+    $param = array(
+      $post["id_kelompok"],
+      $request["id_dokumen"],
+      $tgl_survey,
+      $post["keterangan_survey"],
+      0,
+      $id_user,
+      $scan_surat
+    );
+    $this->db->query($query, $param);
+    if($this->db->affected_rows() == 1){
+      $this->updateStatusSkk($post["id_kelompok"],$post["status_skk"]);
+      return json_encode($this->db->affected_rows());
+    }
+  }
+
+  public function updateStatusSkk($id_kelompok, $status){
+    $query = "update tbl_simtr_kelompoktani set status = ? where id_kelompok = ?";
+    return json_encode($this->db->query($query, array($status, $id_kelompok)));
+  }
+
   public function getAllKelompok(){
     $afdeling = $this->session->userdata('afd');
     if (empty($afdeling))$afdeling = "%";
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
-        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
         JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
@@ -139,6 +174,32 @@ class Kelompoktani_model extends CI_Model{
         AND KT.no_kontrak LIKE CONCAT(?,'-%')
       GROUP BY KT.id_kelompok
     ", array($afdeling))->result());
+  }
+
+  public function prosesSkk(){
+    $step = $this->input->get("step");
+    $id_kelompok = $this->input->get("id_kelompok");
+    $query = "update tbl_simtr_kelompoktani KT set KT.status=? where KT.id_kelompok=?";
+    return json_encode($this->db->query($query, array($step, $id_kelompok)));
+  }
+
+  public function getAllRequest(){
+    $priv_level = $this->session->userdata("jabatan");
+    $afdeling = $this->session->userdata('afd');
+    if (empty($afdeling))$afdeling = "%%";
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status, ? as priv_level
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.id_afd LIKE ? AND KT.no_kontrak IS NULL
+      GROUP BY KT.id_kelompok
+    ",array($priv_level, $afdeling))->result());
   }
 
   public function getAllKelompokOrderDesa(){

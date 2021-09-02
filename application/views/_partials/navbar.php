@@ -12,7 +12,8 @@
           <li class="nav-item dropdown" style="display: ">
             <a href="javascript:void(0)" class="nav-link <? echo ($this->uri->segment(1) == 'rdkk_add')||($this->uri->segment(1) == 'rdkk_all') ? 'active' : '' ?>" data-toggle="dropdown"><i class="fe fe-book-open"></i> Data Kelompok Tani</a>
             <div class="dropdown-menu dropdown-menu-arrow">
-              <a href="<? echo site_url('/rdkk_add')?>" class="dropdown-item " style="<? echo ($this->session->userdata('afd') == '') ? 'display:none' : ''; ?>"><i class="fe fe-search"></i> Pendaftaran RDKK</a>
+              <a href="<? echo site_url('/rdkk_add')?>" class="dropdown-item " style="<? echo ($this->session->userdata('afd') == '') ? 'display:none' : ''; ?>"><i class="fe fe-file-plus"></i> Pendaftaran RDKK</a>
+              <a href="<? echo site_url('/List_skk')?>" class="dropdown-item "><i class="fe fe-check-square"></i> Survey Kelayakan</a>
               <a href="<? echo site_url('/rdkk_all')?>" class="dropdown-item "><i class="fe fe-edit"></i> Penelusuran Data</a>
             </div>
           </li>

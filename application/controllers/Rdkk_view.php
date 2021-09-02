@@ -56,14 +56,14 @@ class Rdkk_view extends CI_Controller{
           <div class="card">
             <div class="card-header">
               <div class="card-options">
-                <a href="rdkk_all" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                <a href="#" class="btn btn-primary" onclick="history.go(-1)" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
                 <a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>
               </div>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-6">
-                  <h3>'.$dataKelompok->nama_kelompok.' / '.$dataKelompok->no_kontrak.'</h3>
+                  <h3>'.$dataKelompok->nama_kelompok.'  '.$dataKelompok->no_kontrak.'</h3>
                   <p>
                     '.$dataKelompok->no_ktp.'<br>
                     <b>DESA '.$dataKelompok->nama_wilayah.' '.$kecamatan.' '.$kabupaten.'</b><br>
