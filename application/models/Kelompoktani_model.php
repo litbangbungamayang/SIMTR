@@ -22,6 +22,7 @@ class Kelompoktani_model extends CI_Model{
   public $id_user;
   public $id_afd;
   public $zona;
+  PUBLIC $status;
 
   public function __construct(){
     parent:: __construct();
@@ -101,19 +102,23 @@ class Kelompoktani_model extends CI_Model{
     $this->id_varietas = $post["varietas"];
     $this->scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
     $this->scan_kk = file_get_contents($_FILES["scanKk"]["tmp_name"]);
-    $this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
+    /* SKIP SURAT PERNYATAAN
+    //$this->scan_surat = file_get_contents($_FILES["scanSurat"]["tmp_name"]);
+    */
     $afdeling = $this->session->userdata('afd');
     $id_user = $this->session->userdata('id_user');
-    $zona = 0;
+    $this->zona = $post["zona"];
     $this->id_user = $id_user;
     $this->id_afd = $afdeling;
+    $this->status = 0;
     //$this->db->trans_begin();
     $this->db->insert($this->_table, $this);
     $lastId = $this->db->insert_id();
     $tahun_giling = substr($this->tahun_giling,2);
-    $noKontrak = $afdeling."-".$this->kategori.$tahun_giling."-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
+    /* SKIP NO KONTRAK
+    //$noKontrak = $afdeling."-".$this->kategori.$tahun_giling."-".str_pad($lastId, 4, "0", STR_PAD_LEFT);
+    */
     $kode_blok = $tahun_giling.$afdeling.$this->kategori.str_pad($lastId, 4, "0", STR_PAD_LEFT);
-    //$this->db->set('no_kontrak', $noKontrak)->where('id_kelompok', $lastId)->update($this->_table);
     $this->db->set(array('no_kontrak' => $noKontrak, 'kode_blok' => $kode_blok))->where('id_kelompok', $lastId)->update($this->_table);
     return $lastId;
   }

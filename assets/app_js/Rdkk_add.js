@@ -5,6 +5,7 @@ $('#tahun_giling').selectize({create: false, sortField: 'text'});
 
 $("#errMsg").hide();
 $("#iconLoading").hide();
+$("#iconLoading_2").hide();
 var MAX_IMAGE_SIZE = 200;
 
 $("#namaKelompok").bind("keyup blur", function(){
@@ -22,6 +23,7 @@ $.ajax({
   type: "GET",
   dataType: "json",
   success: function(response){
+    console.log("1");
     $namaDesa = $("#namaDesa").selectize();
     namaDesa = $namaDesa[0].selectize;
     $("#namaKab").selectize({
@@ -45,8 +47,8 @@ $.ajax({
           dataType: "json",
           data: "idKab=" + value,
           success: function(response){
-            //console.log(response);
-            namaDesa.options = response;
+            console.log("2");
+            //namaDesa.options = response;
             namaDesa.enable();
             namaDesa.clear();
             namaDesa.clearOptions();
@@ -60,6 +62,17 @@ $.ajax({
     });
   }
 });
+
+$zona = $("#zona").selectize({
+  valueField: "zona",
+  labelField: "label_zona",
+  sortField: "zona",
+  searchField: "label_zona",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih zona TMA"
+});
+
 
 $("#namaDesa").selectize({
   valueField: "id_wilayah",
@@ -107,11 +120,30 @@ $("#namaDesa").selectize({
     }
   },
   onChange: function(value){
-    console.log(value);
+    zona.clearOptions();
+    zona.disable();
+    $.ajax({
+      url: js_base_url + "Rdkk_add/getZonaByDesa",
+      type: "GET",
+      dataType: "json",
+      data: {id_wilayah: value},
+      success: function(response){
+        console.log(response);
+        if(response.length > 0){
+          for(let i = 0; i < response.length; i++){
+            zona.addOption(response[i]);
+          }
+          zona.enable();
+          zona.refreshOptions();
+        }
+      }
+    })
   }
 });
 
 $("#namaDesa")[0].selectize.disable();
+zona = $zona[0].selectize;
+zona.disable();
 
 function readOpenLayers(gpxFile){
   var reader = new FileReader();

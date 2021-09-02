@@ -50,6 +50,10 @@ class Rdkk_add extends CI_Controller{
     echo $wilayah->getDesaByKabupaten($this->input->get("idKab"));
   }
 
+  public function getZonaByDesa(){
+    echo $this->wilayah_model->getZonaByDesa();
+  }
+
   public function getAllKabupaten(){
     $wilayah = $this->wilayah_model;
     echo $wilayah->getAllKabupaten();
@@ -90,9 +94,10 @@ class Rdkk_add extends CI_Controller{
     $validation->set_rules($kelompoktani->rules());
     if (empty($_FILES["scanKtp"]["name"])) $validation->set_rules("scanKtp", "Scan KTP", "required", ["required"=>"Scan KTP belum ada!"]);
     if (empty($_FILES["scanKk"]["name"])) $validation->set_rules("scanKk", "Scan KK", "required", ["required"=>"Scan KK belum ada!"]);
-    if (empty($_FILES["scanSurat"]["name"])) $validation->set_rules("scanSurat", "Scan KTP", "required", ["required"=>"Scan Surat Pernyataan belum ada!"]);
+    //if (empty($_FILES["scanSurat"]["name"])) $validation->set_rules("scanSurat", "Scan KTP", "required", ["required"=>"Scan Surat Pernyataan belum ada!"]);
     if ($validation->run() && !empty($arrayPetani)){
-      if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"]) && !empty($_FILES["scanSurat"]["name"])) {
+      //if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"]) && !empty($_FILES["scanSurat"]["name"])) {
+      if (!empty($_FILES["scanKtp"]["name"]) && !empty($_FILES["scanKk"]["name"])) {
         $errSize = '';
         $errType = '';
         foreach($_FILES as $key=>$file){
@@ -108,16 +113,19 @@ class Rdkk_add extends CI_Controller{
               $namaFile = "Scan Surat Pernyataan";
               break;
           }
-          if (($_FILES[$key]["size"]) > $MAX_IMAGE_SIZE*1024){
-            //array_push($errArray, "Ukuran file ".$namaFile." tidak sesuai!");
-            var_dump(mime_content_type($_FILES[$key]["tmp_name"]));
-            $errSize .= "<div> File ".$namaFile." melebihi ukuran file maksimum (200kB)! </div>";
+          //skip scan Surat
+          if($key != "scanSurat"){
+            if (($_FILES[$key]["size"]) > $MAX_IMAGE_SIZE*1024){
+              //array_push($errArray, "Ukuran file ".$namaFile." tidak sesuai!");
+              //var_dump(mime_content_type($_FILES[$key]["tmp_name"]));
+              $errSize .= "<div> File ".$namaFile." melebihi ukuran file maksimum (200kB)! </div>";
+            }
+            if (mime_content_type($_FILES[$key]["tmp_name"]) != "image/jpeg"){
+              $errType .= "<div> Format ".$namaFile." tidak sesuai! Format diinput : ".mime_content_type($_FILES[$key]["tmp_name"]) ."</div>";
+            }
+            $this->session->set_flashdata('error_message', $errType.$errSize);
+            $this->session->set_flashdata('error_div', '');
           }
-          if (mime_content_type($_FILES[$key]["tmp_name"]) != "image/jpeg"){
-            $errType .= "<div> Format ".$namaFile." tidak sesuai! Format diinput : ".mime_content_type($_FILES[$key]["tmp_name"]) ."</div>";
-          }
-          $this->session->set_flashdata('error_message', $errType.$errSize);
-          $this->session->set_flashdata('error_div', '');
         }
         if ($errType.$errSize == ""){
           $this->db->trans_begin();
@@ -207,6 +215,11 @@ class Rdkk_add extends CI_Controller{
                     <select name="namaDesa" id="namaDesa" class="custom-control custom-select loading '.(form_error('namaDesa') != NULL ? "is-invalid" : "").'" placeholder=""></select>
                     <div class="invalid-feedback">'.form_error('namaDesa').'</div>
                   </div>
+                  <div class="form-group" id="grZonaTma">
+                    <label class="form-label">Zona TMA<i id="iconLoading_2" style="margin-left: 10px" class="fa fa-spinner fa-spin"></i></label>
+                    <select name="zona" id="zona" class="custom-control custom-select loading '.(form_error('zona') != NULL ? "is-invalid" : "").'" placeholder=""></select>
+                    <div class="invalid-feedback">'.form_error('zona').'</div>
+                  </div>
                   <div class="form-group" id="grTahunGiling">
                     <label class="form-label">Tahun Giling</label>
                     <select name="tahun_giling" id="tahun_giling" class="custom-control custom-select '.(form_error('tahun_giling') != NULL ? "is-invalid" : "").'" placeholder="Pilih tahun giling">
@@ -261,7 +274,7 @@ class Rdkk_add extends CI_Controller{
                       <div style="" class="invalid-feedback" id="fbScanKk">'.form_error('scanKk').'</div>
                     </div>
                   </div>
-                  <div class="form-group" id="grUploadPernyataan">
+                  <div class="form-group" id="grUploadPernyataan" hidden>
                     <div class="form-label">Scan Image Surat Pernyataan</div>
                     <div class="custom-file">
                       <input id="scanSurat" type="file" accept=".jpeg,.jpg" class="custom-file-input '.(form_error('scanSurat') != NULL ? "is-invalid" : "").'" name="scanSurat">

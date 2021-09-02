@@ -34,6 +34,15 @@ class Wilayah_model extends CI_Model{
     return json_encode($this->db->from($this->_table)->where("level = 3 AND id_wilayah like '".substr($idDesa, 0, 6)."%'")->get()->result());
   }
 
+  public function getZonaByDesa(){
+    $id_wilayah = $this->input->get("id_wilayah");
+    $query =
+    "
+    select *, concat('ZONA ', zona, ' ', deskripsi_zona) as label_zona from tbl_simtr_biayatma where id_wilayah=?
+    ";
+    return json_encode($this->db->query($query, array($id_wilayah))->result());
+  }
+
   public function getDeskripsiDesaByIdKabupaten($idKab){
     $query =
     "
