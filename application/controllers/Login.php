@@ -25,6 +25,8 @@ class Login extends CI_Controller {
       $pwd = md5($this->input->post('pwd'));
       $salted = $uname.$pwd;
       $hashedPwd = hash('sha256', $salted);
+      //var_dump($salted);
+      //var_dump($hashedPwd); die();
       $loggedUser = $user->login($uname,$hashedPwd);
       if ($loggedUser !== NULL){
         $nama_afd = $afd->getAfdByIdUser($loggedUser->id_user)->nama_afd;

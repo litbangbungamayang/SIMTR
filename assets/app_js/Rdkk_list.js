@@ -684,25 +684,37 @@ function refreshTablePermintaanPerawatan(){
   tblPermintaanPerawatan.draw();
 }
 
-function actionButtonView(id_kelompok, kategori){
+function actionButtonView(id_kelompok, kategori, priv_level){
   var menu_bibit = "";
-  if(kategori == 1){
-    menu_bibit = '<a class="dropdown-item" href="#" onclick="addBibit(' + id_kelompok + ')"><i class="fe fe-loader"></i> Buat Permintaan Bibit</a>'
+  if(priv_level == "Asisten Bagian" || priv_level == "Administrasi Sub Bagian"){
+    if(kategori == 1){
+      menu_bibit = '<a class="dropdown-item" href="#" onclick="addBibit(' + id_kelompok + ')"><i class="fe fe-loader"></i> Buat Permintaan Bibit</a>'
+    }
+    return  '<div class="btn-group"><button style="width: 80px" type="button" class="btn btn-secondary btn-sm btn-cyan dropdown-toggle" data-toggle="dropdown" aria-haspopup="menu" aria-expanded="false">' +
+            '<i class="fe fe-settings mr-2"></i> Opsi' +
+            '</button>' +
+            '<div class="dropdown-menu">' +
+              '<a class="dropdown-item" href="Resume_skk/viewBa?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat SKK</a>' +
+              '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
+              '<a class="dropdown-item" href="Transaksi_list?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Semua Transaksi</a>' +
+              '<a class="dropdown-item" href="Bagi_hasil?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Data Rendemen</a>' +
+              '<div class="dropdown-divider"></div>' +
+              '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
+              '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
+              menu_bibit +
+              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ')"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
+              '<a class="dropdown-item" href="" onclick="" style="display:none"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
+            '</div></div>';
+  } else {
+    return  '<div class="btn-group"><button style="width: 80px" type="button" class="btn btn-secondary btn-sm btn-cyan dropdown-toggle" data-toggle="dropdown" aria-haspopup="menu" aria-expanded="false">' +
+            '<i class="fe fe-settings mr-2"></i> Opsi' +
+            '</button>' +
+            '<div class="dropdown-menu">' +
+              '<a class="dropdown-item" href="Resume_skk/viewBa?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat SKK</a>' +
+              '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
+              '<a class="dropdown-item" href="Transaksi_list?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Semua Transaksi</a>' +
+            '</div></div>';
   }
-  return  '<div class="btn-group"><button style="width: 80px" type="button" class="btn btn-secondary btn-sm btn-cyan dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-          '<i class="fe fe-settings mr-2"></i> Opsi' +
-          '</button>' +
-          '<div class="dropdown-menu dropdown-menu-right">' +
-            '<a class="dropdown-item" href="Rdkk_view?id_kelompok=' + id_kelompok + '"><i class="fe fe-file-text"></i> Lihat Data Kelompok</a>' +
-            '<a class="dropdown-item" href="Transaksi_list?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Semua Transaksi</a>' +
-            '<a class="dropdown-item" href="Bagi_hasil?id_kelompok='+id_kelompok+'"><i class="fe fe-file-text"></i> Lihat Data Rendemen</a>' +
-            '<div class="dropdown-divider"></div>' +
-            '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
-            '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
-            menu_bibit +
-            '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ')"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
-            '<a class="dropdown-item" href="" onclick="" style="display:none"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
-          '</div></div>';
 }
 
 /********************* COMBO BOX SECTIONS *************************************/
@@ -768,7 +780,7 @@ $("#tblList").DataTable({
   bPaginate: true,
   bSort: false,
   bInfo: false,
-  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling">f>tpl',
+  dom: '<"row"<"labelTahunGiling"><"cbxTahunGiling">f>t<"spacer">pl',
   ajax: {
     url: js_base_url + "Rdkk_list/getAllKelompok",
     dataSrc: ""
@@ -825,7 +837,7 @@ $("#tblList").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return actionButtonView(row.id_kelompok, row.kategori);
+        return actionButtonView(row.id_kelompok, row.kategori, row.priv_level);
       }
     }
   ],
@@ -847,6 +859,7 @@ $("#tblList").DataTable({
       var str_tahuntanam = tahun_tanam.toString().substr(2,2);
       optionTahun += '<option value="' + parseInt(currYear + i) + '">' + 'KTG ' + str_tahuntanam + '/' + str_tahungiling + '</option>';
     }
+    $("div.spacer").html('<div class="row" style="height:120px"></div>')
     $("div.cbxTahunGiling").html('<select style="width: 150px;" name="tahun_giling" id="tahun_giling" class="custom-control custom-select" placeholder="Pilih tahun giling">' + optionTahun + '</select>');
     $("div.labelTahunGiling").html('<label class="form-label" style="margin: 0px 10px 0px 0px;"></label>');
     $('#tahun_giling').selectize({create: false, sortField: 'value'});

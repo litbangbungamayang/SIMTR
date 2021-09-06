@@ -66,21 +66,18 @@ class Dokumen_model extends CI_Model{
     return $last_id;
   }
 
-  public function validasi(){
-    $id_dokumen = $this->input->post("id_dokumen");
+  public function validasi($id_dokumen = null){
+    if(is_null($id_dokumen))$id_dokumen = $this->input->post("id_dokumen");
     $query = "select * from tbl_dokumen where id_dokumen = ?";
     $data_dokumen = $this->db->query($query, array($id_dokumen))->row();
     if($this->session->userdata("jabatan") == "Asisten Bagian"){
       $query = "update tbl_dokumen set tgl_validasi_bagian = now() where id_dokumen = ?";
       $this->db->query($query, array($id_dokumen));
-      echo "SUCCESS";
-    } else {
-      echo "FAILED";
     }
   }
 
-  public function validasiAskep(){
-    $id_dokumen = $this->input->post("id_dokumen");
+  public function validasiAskep($id_dokumen = null){
+    if(is_null($id_dokumen))$id_dokumen = $this->input->post("id_dokumen");
     $query = "select * from tbl_dokumen where id_dokumen = ?";
     $data_dokumen = $this->db->query($query, array($id_dokumen))->row();
     if($this->session->userdata("jabatan") == "Kepala Sub Bagian"){
@@ -89,6 +86,16 @@ class Dokumen_model extends CI_Model{
       echo "SUCCESS";
     } else {
       echo "FAILED";
+    }
+  }
+
+  public function validasiGm($id_dokumen = null){
+    if(is_null($id_dokumen))$id_dokumen = $this->input->post("id_dokumen");
+    $query = "select * from tbl_dokumen where id_dokumen = ?";
+    $data_dokumen = $this->db->query($query, array($id_dokumen))->row();
+    if($this->session->userdata("jabatan") == "GM"){
+      $query = "update tbl_dokumen set tgl_validasi_gm = now() where id_dokumen = ?";
+      $this->db->query($query, array($id_dokumen));
     }
   }
 

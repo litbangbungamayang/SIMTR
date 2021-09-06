@@ -86,7 +86,7 @@ class Transaksi_model extends CI_Model{
               when KT.kategori = 4 then 'RT3' end) as kategori,
         KT.id_afd, PT.luas, WIL.nama_wilayah, TRANS.no_transaksi, TRANS.tgl_transaksi,
         BAHAN.jenis_bahan, BAHAN.nama_bahan, TRANS.kuanta, BAHAN.satuan,
-        TRANS.id_au58, dok.tgl_validasi_bagian, gud.nama_gudang
+        TRANS.id_au58, dok.tgl_validasi_bagian, gud.nama_gudang, dok.tgl_validasi_kasubbag
       from tbl_simtr_kelompoktani KT
       join
       	(select distinct PT.id_kelompok, sum(PT.luas) as luas from tbl_simtr_petani PT
@@ -814,6 +814,8 @@ class Transaksi_model extends CI_Model{
       date_format(dok.tgl_buat, '%d-%m-%Y %H:%s') as tgl_buat,
       dok.id_user,
       dok.tgl_validasi_bagian,
+      dok.tgl_validasi_kasubbag,
+      dok.tgl_validasi_gm,
       sum(trn.kuanta) as jml_kuanta,
       sum(trn.rupiah) as jml_rupiah,
       trn.tahun_giling,

@@ -23,6 +23,7 @@ function approve(id_dokumen){
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
         $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0").load();
         alert("Dokumen berhasil divalidasi!");
+        location.reload();
       }
     }
   });
@@ -39,6 +40,7 @@ function approveAskep(id_dokumen){
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
         $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0").load();
         alert("Dokumen berhasil divalidasi!");
+        location.reload();
       }
     }
   });
@@ -132,11 +134,11 @@ $("#tblListPpk").DataTable({
     },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Transaksi_aktivitas?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Transaksi_aktivitas?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '&id_dokumen=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         if(row.priv_level == "Asisten Bagian"){
           var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ';
           if(row.tgl_validasi_bagian == null){
-            return buttonDetail + buttonApproval;
+            return buttonDetail;
           } else {
             return buttonDetail;
           }
@@ -144,7 +146,7 @@ $("#tblListPpk").DataTable({
           if(row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_bagian != null){
             var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ';
             if(row.tgl_validasi_kasubbag == null){
-              return buttonDetail + buttonApproval;
+              return buttonDetail;
             } else {
               return buttonDetail;
             }

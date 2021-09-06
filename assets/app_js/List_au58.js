@@ -9,6 +9,25 @@ function approve(id_dokumen){
         tahun_giling = parseInt($("#tahun_giling").val()) || 0;
         $("#tblListAu58").DataTable().ajax.url(js_base_url + "List_au58/getAllAu58?tahun_giling=" + tahun_giling).load();
         alert("Dokumen berhasil divalidasi!");
+        //window.location.replace(js_base_url + "List_au58");
+        location.reload();
+      }
+    }
+  });
+}
+
+function approveAskep(id_dokumen){
+  $.ajax({
+    url: js_base_url + "List_bon_perawatan/validasiDokumenAskep",
+    dataType: "text",
+    type: "POST",
+    data: "id_dokumen=" + id_dokumen,
+    success: function(response){
+      if (response = "SUCCESS"){
+        tahun_giling = parseInt($("#tahun_giling").val()) || 0;
+        $("#tblListPpk").DataTable().ajax.url(js_base_url + "List_bon_perawatan/getAllPpk?tahun_giling=0").load();
+        alert("Dokumen berhasil divalidasi!");
+        location.reload();
       }
     }
   });
@@ -48,6 +67,7 @@ $("#tblListAu58").DataTable({
       },
       className: "text-right"
     },
+    /*
     {
       data: "",
       render: function(data, type, row, meta){
@@ -58,13 +78,66 @@ $("#tblListAu58").DataTable({
       },
       className: "text-center"
     },
+    */
+    {
+      data: "",
+      render: function(data, type, row, meta){
+        /*
+        if((row.tgl_validasi_bagian == null && row.priv_level == "Asisten Bagian") || (row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_kasubbag == null)){
+          return "<span class='tag tag-red'>Belum Divalidasi</span>";
+        } else {
+          if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-red'>Belum Divalidasi</span>";
+          } else {
+            if(row.tgl_validasi_bagian == null || row.tgl_validasi_kasubbag == null){
+              return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+            }
+          }
+        }
+        return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+        */
+        if(row.priv_level == "Asisten Bagian"){
+          if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-red'>Belum Divalidasi</span>";
+          } else {
+            if(row.tgl_validasi_bagian != null && row.tgl_validasi_kasubbag == null){
+              return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+            } else {
+              return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+            }
+          }
+        } else {
+          if(row.priv_level == "Kepala Sub Bagian"){
+            if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+              return "<span class='tag tag-red'>Belum Divalidasi</span>";
+            } else {
+              if(row.tgl_validasi_bagian != null && row.tgl_validasi_kasubbag == null){
+                return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+              } else {
+                return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+              }
+            }
+          }
+        }
+        if(row.tgl_validasi_bagian == null && row.tgl_validasi_kasubbag == null){
+          return "<span class='tag tag-red'>Belum Divalidasi</span>";
+        } else {
+          if(row.tgl_validasi_bagian == null || row.tgl_validasi_kasubbag == null){
+            return "<span class='tag tag-orange'>Validasi Belum Lengkap</span>";
+          } else {
+            return "<span class='tag tag-green'>Sudah Divalidasi</span>";
+          }
+        }
+      },
+      className: "text-center"
+    },
     {
       render: function(data, type, row, meta){
-        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Transaksi_AU58?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '"title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
+        var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Transaksi_AU58?no_transaksi=' + row.no_transaksi + '&id_kelompok=' + row.id_kelompok + '&id_dokumen=' + row.id_dokumen + '"title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
         var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Validasi" ><i class="fe fe-check-circle"></i></button> '
         if(row.priv_level == "Asisten Bagian"){
           if(row.tgl_validasi_bagian == null){
-            return buttonDetail + buttonApproval;
+            return buttonDetail;
           } else {
             return buttonDetail;
           }

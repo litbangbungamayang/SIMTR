@@ -222,7 +222,7 @@
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="table-responsive col-md-12">
+                <div class="table-responsive col-md-12 mb-8">
                   <table id="tblList" class="table card-table table-vcenter text-nowrap datatable table-md compact">
                     <thead>
                       <tr>

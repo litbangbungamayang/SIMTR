@@ -146,10 +146,50 @@ class Kelompoktani_model extends CI_Model{
       $id_user,
       $scan_surat
     );
+    $query_status_tim = "update tbl_simtr_skk set validasi_tim = ? where id_kelompok = ? and validasi_tim IS NULL";
+    $validasi_tim = 0;
+    $post["status_skk"] == 2 ? $validasi_tim = 1 : $validasi_tim = 0;
     $this->db->query($query, $param);
     if($this->db->affected_rows() == 1){
       $this->updateStatusSkk($post["id_kelompok"],$post["status_skk"]);
+      $this->db->query($query_status_tim, array($validasi_tim,$post["id_kelompok"]));
+      $this->dokumen_model->validasi($request["id_dokumen"]);
       return json_encode($this->db->affected_rows());
+    }
+  }
+
+  public function updateSkk(){
+    $post = $this->input->post();
+    $id_dokumen = $post["id_dokumen"];
+    $query =
+    "
+      update tbl_simtr_skk set catatan_gm = ?, status = 1 where id_dokumen = ? AND status = 0
+    ";
+    $query_kelompok =
+    "
+      update tbl_simtr_kelompoktani set status = ? where id_kelompok = ?
+    ";
+    $query_acc =
+    "
+    update tbl_simtr_kelompoktani SET no_kontrak = concat(id_afd,'-',kategori,right(tahun_giling,2),'-',LPAD(id_kelompok,4,'0'))
+    where id_kelompok = ? and no_kontrak IS NULL;
+    ";
+    $query_status_gm = "update tbl_simtr_skk set validasi_gm = ? where id_kelompok = ? and validasi_gm IS NULL";
+    $validasi_gm = 0;
+    $post["status_skk"] == 3 ? $validasi_gm = 1 : $validasi_gm = 0;
+    $this->dokumen_model->validasiGm($id_dokumen);
+    $this->db->query($query, array($post["review_gm"], $id_dokumen));
+    if($this->db->affected_rows() == 1){
+      //return json_encode($this->db->query($query_kelompok, array($post["status_skk"], $post["id_kelompok"])));
+      $this->db->query($query_kelompok, array($post["status_skk"], $post["id_kelompok"]));
+      if($this->db->affected_rows() == 1){
+        if($post["status_skk"] == 3){
+          $this->db->query($query_status_gm, array($validasi_gm,$post["id_kelompok"]));
+          return json_encode($this->db->query($query_acc, array($post["id_kelompok"])));
+        } else {
+          return $this->db->query($query_status_gm, array($validasi_gm,$post["id_kelompok"]));
+        }
+      }
     }
   }
 
@@ -160,11 +200,12 @@ class Kelompoktani_model extends CI_Model{
 
   public function getAllKelompok(){
     $afdeling = $this->session->userdata('afd');
+    $priv_level = $this->session->userdata('jataban');
     if (empty($afdeling))$afdeling = "%";
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
-        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status, ? as priv_level
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
         JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
@@ -173,7 +214,7 @@ class Kelompoktani_model extends CI_Model{
   	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
         AND KT.no_kontrak LIKE CONCAT(?,'-%')
       GROUP BY KT.id_kelompok
-    ", array($afdeling))->result());
+    ", array($priv_level, $afdeling))->result());
   }
 
   public function prosesSkk(){
@@ -200,6 +241,32 @@ class Kelompoktani_model extends CI_Model{
         AND KT.id_afd LIKE ? AND KT.no_kontrak IS NULL
       GROUP BY KT.id_kelompok
     ",array($priv_level, $afdeling))->result());
+  }
+
+  public function viewSkk($id_kelompok = null){
+    $priv_level = $this->session->userdata("jabatan");
+    $afdeling = $this->session->userdata('afd');
+    if (empty($afdeling))$afdeling = "%%";
+    is_null($id_kelompok)?$id_kelompok = $this->input->get("id_kelompok") : "";
+    //$param = array($priv_level, $afdeling, 0, $id_kelompok);
+    //var_dump($param); die();
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status, ? as priv_level,
+        skk.keterangan_survey, skk.id_skk, DATE_FORMAT(skk.tgl_survey, '%d-%m-%Y')as tgl_survey, skk.id_dokumen,
+        TO_BASE64(skk.dokumen) as scan_skk, skk.catatan_gm, skk.tgl_buat
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        JOIN tbl_simtr_skk skk on skk.id_kelompok = KT.id_kelompok
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.id_afd LIKE ?
+        AND KT.id_kelompok = ?
+      GROUP BY KT.id_kelompok
+    ",array($priv_level, $afdeling, $id_kelompok))->result());
   }
 
   public function getAllKelompokOrderDesa(){
@@ -247,7 +314,7 @@ class Kelompoktani_model extends CI_Model{
     return json_encode($this->db->query("
       SELECT DISTINCT
         KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, TO_BASE64(KT.scan_ktp) as scan_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.id_wilayah, WIL.nama_wilayah, SUM(PT.luas) as luas,
-        VAR.nama_varietas, KT.tahun_giling, KT.kode_blok
+        VAR.nama_varietas, KT.tahun_giling, KT.kode_blok, KT.status, KT.id_afd
       FROM tbl_simtr_kelompoktani KT
         JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
         JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas

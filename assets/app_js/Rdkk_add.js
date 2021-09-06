@@ -156,39 +156,44 @@ function readOpenLayers(gpxFile){
     });
     var sourceProjection = gpxFormat.readProjection(evt.target.result);
     //console.log("Source proj. = " + sourceProjection.getCode());
-    var geom = gpxFeatures.getGeometry();
-    var poly = new ol.geom.Polygon(geom.getCoordinates());
-    //console.log("Geom type = " + geom.getType());
-    //console.log("Length = " + ol.sphere.getLength(geom));
-    //console.log("Area = " + ol.sphere.getArea(geom));
-    //console.log("Coordinates = " + geom.getCoordinates());
-    //console.log("Poly Area = " + poly.getArea(poly)*1000000 + " Ha.");
-    //console.log("Sphere Area = " + ol.sphere.getArea(poly, {projection: "EPSG:4326"})/10000 + " Ha.");
-    //console.log("Poly Length = " + ol.sphere.getLength(poly, {projection: "EPSG:4326"}) + " m.");
-    var luasLahan =  ol.sphere.getArea(poly, {
-      projection: "EPSG:4326"
-    });
-    var indexScanPetani = arrayScanPetani.length - 1;
-    var petani = objPetani(
-      null,
-      null,
-      $("#namaPetani").val().toUpperCase(),
-      luasLahan/10000,
-      geom.getCoordinates(),
-      arrayScanPetani[indexScanPetani].scanKtpPetani,
-      arrayScanPetani[indexScanPetani].scanKkPetani
-    );
-    $("#lblFileGpxKebun").text("Pilih file");
-    $("#lblScanKtpPetani").text("Pilih file");
-    $("#lblScanKkPetani").text("Pilih file");
-    $("#fileGpxKebun").val("");
-    $("#fileScanKtpPetani").val("");
-    $("#fileScanKkPetani").val("");
-    arrayPetani.push(petani);
-    refreshData();
-    //console.log(petani);
-    //console.log(arrayScanPetani);
-    formAddPetani.reset();
+    try{
+      var geom = gpxFeatures.getGeometry();
+      var poly = new ol.geom.Polygon(geom.getCoordinates());
+      //console.log("Geom type = " + geom.getType());
+      //console.log("Length = " + ol.sphere.getLength(geom));
+      //console.log("Area = " + ol.sphere.getArea(geom));
+      //console.log("Coordinates = " + geom.getCoordinates());
+      //console.log("Poly Area = " + poly.getArea(poly)*1000000 + " Ha.");
+      //console.log("Sphere Area = " + ol.sphere.getArea(poly, {projection: "EPSG:4326"})/10000 + " Ha.");
+      //console.log("Poly Length = " + ol.sphere.getLength(poly, {projection: "EPSG:4326"}) + " m.");
+      var luasLahan =  ol.sphere.getArea(poly, {
+        projection: "EPSG:4326"
+      });
+      var indexScanPetani = arrayScanPetani.length - 1;
+      var petani = objPetani(
+        null,
+        null,
+        $("#namaPetani").val().toUpperCase(),
+        luasLahan/10000,
+        geom.getCoordinates(),
+        arrayScanPetani[indexScanPetani].scanKtpPetani,
+        arrayScanPetani[indexScanPetani].scanKkPetani
+      );
+      $("#lblFileGpxKebun").text("Pilih file");
+      $("#lblScanKtpPetani").text("Pilih file");
+      $("#lblScanKkPetani").text("Pilih file");
+      $("#fileGpxKebun").val("");
+      $("#fileScanKtpPetani").val("");
+      $("#fileScanKkPetani").val("");
+      arrayPetani.push(petani);
+      refreshData();
+      //console.log(petani);
+      //console.log(arrayScanPetani);
+      formAddPetani.reset();
+    } catch(err){
+      alert("File GPX error! Cek kembali format file!");
+      formAddPetani.reset();
+    }
   }
 }
 
@@ -237,7 +242,10 @@ $("#fileGpxKebun").change(function(e){
   var lblGpxKebun = $("#lblFileGpxKebun");
   var fbFileGpx = $("#fbFileGpx");
   lblGpxKebun.text(selectedFile.name);
-  if (selectedFile.type != "application/gpx+xml"){
+  //console.log(selectedFile.type);
+  //if (selectedFile.type != "application/gpx+xml"){
+  /*
+  if(1 > 0){
     fbFileGpx.show();
     fbFileGpx.html("Format GPX tidak sesuai!");
     $(this).addClass("is-invalid");
@@ -247,6 +255,7 @@ $("#fileGpxKebun").change(function(e){
     fbFileGpx.hide();
     $(this).removeClass("is-invalid");
   }
+  */
 })
 
 function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedBackLabel){

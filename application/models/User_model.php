@@ -77,4 +77,8 @@ class User_model extends CI_Model {
     return json_encode($this->db->query($query, array($id_afd, "Kepala Sub Bagian"))->row());
   }
 
+  public function getNamaGm(){
+    return json_encode($this->db->query("select * from tbl_user where jabatan=?", array("GM"))->row());
+  }
+
 }

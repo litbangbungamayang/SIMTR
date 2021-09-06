@@ -32,6 +32,10 @@ function prosesUsulan(id_kelompok, nama_kelompok){
   }
 }
 
+function viewSkk(id_kelompok){
+  window.location.replace(js_base_url + "Resume_skk/view?id_kelompok=" + id_kelompok);
+}
+
 function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedBackLabel){
   var inputFile = $fileInput;
   var selectedFile = $fileInput[0].files[0];
@@ -64,24 +68,39 @@ function validasiFile($fileInput, $lblFileInput, $maxFileSize, $fileType, $feedB
   }
 };
 
-function validasiForm(){
-  if(cbxTglSurat.val() != "" && txtKeterangan.val() != "" && scanSurat.val() != ""){
-    return true;
+function validasiForm(status_skk){
+  if(cbxTglSurat.val() != "" && txtKeterangan.val() != ""){
+    if(status_skk == 2 || status_skk == 4){
+      if(scanSurat.val() != ""){
+        return true;
+      } else {
+        if(scanSurat.val() == "") alert("Scan SKK harus diinput!");
+      }
+    } else {
+      return true;
+    }
   } else{
     if(cbxTglSurat.val() == "") alert("Tanggal survey tidak boleh kosong!");
     if(txtKeterangan.val() == "") alert("Keterangan survey harus diisi!");
-    if(scanSurat.val() == "") alert("Scan SKK harus diinput!");
   }
   return false;
 }
 
 function setRdkk(id_kelompok,status_skk){
-  var formData = new FormData(frmSurvey[0]);
+  let formData = new FormData(frmSurvey[0]);
+  let resume_action = "";
   formData.append("status_skk",status_skk);
   formData.append("id_kelompok",id_kelompok);
-  if(validasiForm()){
+  if(status_skk == 3 || status_skk == 5){
+    resume_action = "Resume_skk/update";
+  } else {
+    if(status_skk == 2 || status_skk == 4){
+      resume_action = "Resume_skk/simpan";
+    }
+  }
+  if(validasiForm(status_skk)){
     $.ajax({
-      url: js_base_url + "Resume_skk/simpan",
+      url: js_base_url + resume_action,
       enctype: "multipart/form-data",
       data: formData,
       processData: false,
@@ -176,10 +195,10 @@ $("#tblList").DataTable({
             label_status = "<span class='tag tag-green'>RDKK disetujui</span>";
             break;
           case "4":
-            label_status = "<span class='tag tag-red'>Tidak layak</span>";
+            label_status = "<span class='tag text-white bg-dark'>Menunggu validasi GM</span>";
             break;
           case "5":
-            label_status = "<span class='tag text-white bg-dark'>RDKK ditolak</span>";
+            label_status = "<span class='tag tag-red'>Tidak layak</span>";
             break;
         }
         return label_status;
@@ -193,16 +212,24 @@ $("#tblList").DataTable({
         btn_aksi = "<a class='btn btn-sm btn-cyan' href='Rdkk_view?id_kelompok=" + row.id_kelompok + "' title='Lihat data'><i class='fe fe-user'></i></a> "
         switch(row.status){
           case "0":
-            return btn_aksi + '<a class="btn btn-sm btn-cyan" href="#" onclick="prosesUsulan('+
-              row.id_kelompok+','+'\x27'+row.nama_kelompok+'\x27'+');"><i class="fe fe-settings"></i> Proses usulan</a>';
+            if(priv_level == "Asisten Bagian"){
+              return btn_aksi + '<a class="btn btn-sm btn-cyan" href="#" onclick="prosesUsulan('+
+                row.id_kelompok+','+'\x27'+row.nama_kelompok+'\x27'+');"><i class="fe fe-settings"></i> Proses usulan</a>';
+            }
             break;
           case "1":
-            return btn_aksi + '<a class="btn btn-sm btn-cyan" href="'+js_base_url+"Resume_skk?id_kelompok="+row.id_kelompok+'" onclick=""><i class="fe fe-settings"></i> Buat resume survey</a>';
+            if(priv_level == "Asisten Bagian"){
+              return btn_aksi + '<a class="btn btn-sm btn-cyan" href="'+js_base_url+"Resume_skk?id_kelompok="+row.id_kelompok+'" onclick=""><i class="fe fe-settings"></i> Buat resume survey</a>';
+            }
             break;
           case "2":
-            if(priv_level == "GM"){
+            if(priv_level == "GM" || priv_level == "Asisten Bagian"){
               return btn_aksi + "<a class='btn btn-sm btn-cyan' href='#' onclick=viewSkk('"+row.id_kelompok+"') title='Lihat SKK'><i class='fe fe-settings'></i> Lihat SKK</a>";
+              //return btn_aksi + '<form id="view_resume" action="' + js_base_url + "Resume_skk/view" + '" method="POST"><input type="hidden" name="id_kelompok" value="'+row.id_kelompok+'"><a class="btn btn-sm btn-cyan" href="#" onclick="document.getElementById(\'view_resume\').submit();" title="Lihat Detail"><i class="fe fe-book-open"></i></a></form>';
             }
+            break;
+          default:
+            return btn_aksi + "<a class='btn btn-sm btn-cyan' href='#' onclick=viewSkk('"+row.id_kelompok+"') title='Lihat SKK'><i class='fe fe-settings'></i> Lihat SKK</a>";
             break;
         }
         return btn_aksi;

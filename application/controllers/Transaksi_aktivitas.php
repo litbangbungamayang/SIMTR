@@ -25,11 +25,16 @@ class Transaksi_aktivitas extends CI_Controller{
     } else {
       $data['content'] = $this->loadContent($dataTransaksi);
     }
+    $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
   }
 
   public function getTransaksiAktivitasByIdKelompok(){
     echo $this->transaksi_model->getTransaksiAktivitasByIdKelompok();
+  }
+
+  public function loadScript(){
+    return '$.getScript("'.base_url("/assets/app_js/List_bon_perawatan.js").'");';
   }
 
   public function generateQr($data){
@@ -46,17 +51,36 @@ class Transaksi_aktivitas extends CI_Controller{
   public function loadContent($dataTransaksi){
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $id_dokumen = $this->input->get("id_dokumen");
+    $jabatan = $this->session->userdata("jabatan");
+    //var_dump($jabatan); die();
     $qrAsisten = '';
     $qrAskep = '';
     $opsiCetak = '';
-    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+    $btn_validasi_asisten = "";
+    $btn_validasi_askep = "";
+    $status_validasi_asisten = !is_null($dataTransaksi[0]->tgl_validasi_bagian);
+    $status_validasi_askep = !is_null($dataTransaksi[0]->tgl_validasi_kasubbag);
+    if($status_validasi_asisten)$btn_validasi_asisten = "display:none";
+    if($status_validasi_askep)$btn_validasi_askep = "display:none";
+    if($status_validasi_askep && $status_validasi_asisten){
       $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    } else {
+      if($jabatan == "Asisten Bagian"){
+        $btn_validasi_askep = "display:none";
+      }
+      if($jabatan == "Kepala Sub Bagian"){
+        $btn_validasi_asisten = "display:none";
+        if(!$status_validasi_asisten)$btn_validasi_askep = "display:none";
+      }
     }
+    //SUDAH DIVALIDASI ASISTEN
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
       $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian;
       $qrAsisten = $this->generateQr($dataQr);
       $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
     }
+    //SUDAH DIVALIDASI ASKEP
     if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
       $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_ppk.'&tgl_validasi_kasubbag='.$dataTransaksi[0]->tgl_validasi_kasubbag;
       $qrAskep = $this->generateQr($dataQr);
@@ -87,6 +111,8 @@ class Transaksi_aktivitas extends CI_Controller{
           <div class="card">
             <div class="card-header">
               <div class="card-options">
+                <div class="mr-2" style="'.$btn_validasi_asisten.'"><button class="btn btn-green" title="Validasi" onclick="approve('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
+                <div class="mr-2" style="'.$btn_validasi_askep.'"><button class="btn btn-green" title="Validasi" onclick="approveAskep('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
                 <a href="#" class="btn btn-primary" onclick="javascript:history.back();" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
                 '.$opsiCetak.'
               </div>

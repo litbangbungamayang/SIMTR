@@ -16,8 +16,10 @@ class Transaksi_AU58 extends CI_Controller{
   public function index(){
     date_default_timezone_set('Asia/Jakarta');
     $dataTransaksi =  json_decode($this->transaksi_model->getAu58ByNoTransaksi());
+    //var_dump($dataTransaksi); die();
     $data['pageTitle'] = "";
     $data['content'] = $this->loadContent($dataTransaksi);
+    $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
   }
 
@@ -25,12 +27,65 @@ class Transaksi_AU58 extends CI_Controller{
     echo $this->transaksi_model->getAu58ByNoTransaksi();
   }
 
+  public function loadScript(){
+    return '$.getScript("'.base_url("/assets/app_js/List_au58.js").'");';
+  }
+
+  public function generateQr($data){
+    $params['data'] = $data;
+    $params['level'] = 'H'; //H=High
+    $params['size'] = 1;
+    ob_start();
+    $this->ciqrcode->generate($params);
+    $qrcode = ob_get_contents();
+    ob_end_clean();
+    return $qrcode;
+  }
+
   public function loadContent($dataTransaksi){
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $nama_gm = json_decode($this->user_model->getNamaGm());
+    $id_dokumen = $this->input->get("id_dokumen");
+    $jabatan = $this->session->userdata("jabatan");
+    //var_dump($jabatan); die();
+    $qrAsisten = '';
+    $qrAskep = '';
+    $opsiCetak = '';
+    $btn_validasi_asisten = "";
+    $btn_validasi_askep = "";
+    $status_validasi_asisten = !is_null($dataTransaksi[0]->tgl_validasi_bagian);
+    $status_validasi_askep = !is_null($dataTransaksi[0]->tgl_validasi_kasubbag);
+    if($status_validasi_asisten)$btn_validasi_asisten = "display:none";
+    if($status_validasi_askep)$btn_validasi_askep = "display:none";
+    if($status_validasi_askep && $status_validasi_asisten){
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    } else {
+      if($jabatan == "Asisten Bagian"){
+        $btn_validasi_askep = "display:none";
+      }
+      if($jabatan == "Kepala Sub Bagian"){
+        $btn_validasi_asisten = "display:none";
+        if(!$status_validasi_asisten)$btn_validasi_askep = "display:none";
+      }
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_au58.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
+      $qrAsisten = $this->generateQr($dataQr);
+      $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_au58.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_kasubbag; //data yang akan di jadikan QR CODE
+      $qrAskep = $this->generateQr($dataQr);
+      $qrAskep = '<img src="data:image/png;base64,'.base64_encode($qrAskep).'" />';
+    }
+    /*
     $validasiQr = '';
     $opsiCetak = '';
+    $btn_validasi = "";
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
       $validasi = true;
+      $btn_validasi = "display:none";
       $params['data'] = site_url().'/Verifikasi?id_dokumen='.$dataTransaksi[0]->id_au58.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
       $params['level'] = 'H'; //H=High
       $params['size'] = 1;
@@ -41,7 +96,7 @@ class Transaksi_AU58 extends CI_Controller{
       $validasiQr = '<img src="data:image/png;base64,'.base64_encode($qrcode).'" />';
       $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
     }
-
+    */
     $contentBahan = "";
     $nomor = 1;
     foreach($dataTransaksi as $bahan){
@@ -68,8 +123,12 @@ class Transaksi_AU58 extends CI_Controller{
           <div class="card">
             <div class="card-header">
               <div class="card-options">
-                <a href="javascript:history.back()" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
-                '.$opsiCetak.'
+                <div class="row">
+                <div class="mr-2" style="'.$btn_validasi_asisten.'"><button class="btn btn-green" title="Validasi" onclick="approve('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
+                <div class="mr-2" style="'.$btn_validasi_askep.'"><button class="btn btn-green" title="Validasi" onclick="approveAskep('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
+                  <a href="javascript:history.back()" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
+                  '.$opsiCetak.'
+                </div>
               </div>
             </div>
             <div class="card-body">
@@ -115,15 +174,18 @@ class Transaksi_AU58 extends CI_Controller{
               </div>
               <div class="row">
                 <div class="col-3 text-center" style="border-width: 1px 0px 1px 1px; border-color: black; border-style: solid; height: 120px">
-                  Diminta oleh<br>'.$nama_asisten.'<br>'.$validasiQr.'
+                  Diminta oleh<br>'.$nama_asisten.'<br>'.$qrAsisten.'
                 </div>
-                <div class="col-3 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
+                <div class="col-2 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
                   Diterima oleh
                 </div>
-                <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
-                  Disetujui oleh
+                <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                  Diketahui oleh<br>'.$nama_askep.'<br>'.$qrAskep.'
                 </div>
                 <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                  Disetujui oleh<br>General Manager<br>
+                </div>
+                <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
                   Dikeluarkan oleh
                 </div>
               </div>
@@ -174,15 +236,18 @@ class Transaksi_AU58 extends CI_Controller{
                 </div>
                 <div class="row">
                   <div class="col-3 text-center" style="border-width: 1px 0px 1px 1px; border-color: black; border-style: solid; height: 120px">
-                    Diminta oleh<br>'.$nama_asisten.'<br>'.$validasiQr.'
+                    Diminta oleh<br>'.$nama_asisten.'<br>'.$qrAsisten.'
                   </div>
-                  <div class="col-3 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
                     Diterima oleh
                   </div>
-                  <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
-                    Disetujui oleh
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                    Diketahui oleh<br>'.$nama_askep.'<br>'.$qrAskep.'
                   </div>
                   <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                    Disetujui oleh<br>General Manager<br>
+                  </div>
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
                     Dikeluarkan oleh
                   </div>
                 </div>
@@ -235,15 +300,18 @@ class Transaksi_AU58 extends CI_Controller{
                 </div>
                 <div class="row">
                   <div class="col-3 text-center" style="border-width: 1px 0px 1px 1px; border-color: black; border-style: solid; height: 120px">
-                    Diminta oleh<br>'.$nama_asisten.'<br>'.$validasiQr.'
+                    Diminta oleh<br>'.$nama_asisten.'<br>'.$qrAsisten.'
                   </div>
-                  <div class="col-3 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 1px; border-color: black; border-style: solid;">
                     Diterima oleh
                   </div>
-                  <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
-                    Disetujui oleh
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                    Diketahui oleh<br>'.$nama_askep.'<br>'.$qrAskep.'
                   </div>
                   <div class="col-3 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
+                    Disetujui oleh<br>General Manager<br>
+                  </div>
+                  <div class="col-2 text-center" style="border-width: 1px 1px 1px 0px; border-color: black; border-style: solid;">
                     Dikeluarkan oleh
                   </div>
                 </div>
