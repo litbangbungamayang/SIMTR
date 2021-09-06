@@ -48,6 +48,7 @@ class Transaksi_AU58 extends CI_Controller{
     $nama_gm = json_decode($this->user_model->getNamaGm());
     $id_dokumen = $this->input->get("id_dokumen");
     $jabatan = $this->session->userdata("jabatan");
+    $id_afd = $dataTransaksi[0]->id_afd;
     //var_dump($jabatan); die();
     $qrAsisten = '';
     $qrAskep = '';
@@ -169,7 +170,8 @@ class Transaksi_AU58 extends CI_Controller{
               </div>
               <div class="row">
                 <div class="col-12 text-left" style="border-width: 0px 1px 1px 1px; border-color: black; border-style: solid;">
-                  Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.'; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha
+                  Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.'; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha<br>
+                  <b>No. Perk : 131.902.'.$id_afd.'</b>
                 </div>
               </div>
               <div class="row">
@@ -231,7 +233,8 @@ class Transaksi_AU58 extends CI_Controller{
                 </div>
                 <div class="row">
                   <div class="col-12 text-left" style="border-width: 0px 1px 1px 1px; border-color: black; border-style: solid;">
-                    Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.'; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha
+                    Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.'; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha <br>
+                    <b>No. Perk : 131.902.'.$id_afd.'</b>
                   </div>
                 </div>
                 <div class="row">
@@ -295,7 +298,8 @@ class Transaksi_AU58 extends CI_Controller{
                 <div class="row">
                   <div class="col-12 text-left" style="border-width: 0px 1px 1px 1px; border-color: black; border-style: solid;">
                     Barang untuk dikirim kepada Kelompok Tani : <b>'.$dataTransaksi[0]->nama_kelompok.'</b>; No. Kontrak : '.$dataTransaksi[0]->no_kontrak.'; Desa '.$dataTransaksi[0]->nama_wilayah.
-                      '; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha
+                      '; Luas : '.number_format($dataTransaksi[0]->luas,2,".",",").' Ha<br>
+                    <b>No. Perk : 131.902.'.$id_afd.'</b>
                   </div>
                 </div>
                 <div class="row">
