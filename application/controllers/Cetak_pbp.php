@@ -17,9 +17,15 @@ class Cetak_pbp extends CI_Controller{
     $dataTransaksi = json_decode($this->transaksi_model->detailPbp());
     $data['pageTitle'] = "";
     $data['content'] = $this->loadContent($dataTransaksi);
+    $data['script'] = $this->loadScript();
     $this->load->view('main_view', $data);
     //print_r($dataTransaksi[0]->id_pbp);
   }
+
+  public function loadScript(){
+    return '$.getScript("'.base_url("/assets/app_js/List_biaya_perawatan.js").'");';
+  }
+
 
   public function generateQr($data){
     $params['data'] = $data;
@@ -33,6 +39,7 @@ class Cetak_pbp extends CI_Controller{
   }
 
   public function loadContent($dataTransaksi){
+    /*
     $qrAsisten = '';
     $qrAskep = '';
     $opsiCetak = '';
@@ -50,9 +57,46 @@ class Cetak_pbp extends CI_Controller{
     if(!is_null($dataTransaksi[0]->tgl_validasi_bagian) && !is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
       $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
     }
+    */
     $dataDesa = json_decode($this->transaksi_model->getDesaByIdPbp($dataTransaksi[0]->id_pbp)); //BISA DIPAKAI JUGA UNTUK PBP
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($dataTransaksi[0]->id_afd))->nama_user;
     $nama_askep = json_decode($this->user_model->getNamaAskepByAfd($dataTransaksi[0]->id_afd))->nama_user;
+    $id_dokumen = $dataTransaksi[0]->id_pbp;
+    $nama_gm = json_decode($this->user_model->getNamaGm());
+    $jabatan = $this->session->userdata("jabatan");
+    $id_afd = $dataTransaksi[0]->id_afd;
+    //var_dump($jabatan); die();
+    $qrAsisten = '';
+    $qrAskep = '';
+    $opsiCetak = '';
+    $btn_validasi_asisten = "";
+    $btn_validasi_askep = "";
+    $status_validasi_asisten = !is_null($dataTransaksi[0]->tgl_validasi_bagian);
+    $status_validasi_askep = !is_null($dataTransaksi[0]->tgl_validasi_kasubbag);
+    if($status_validasi_asisten)$btn_validasi_asisten = "display:none";
+    if($status_validasi_askep)$btn_validasi_askep = "display:none";
+    if($status_validasi_askep && $status_validasi_asisten){
+      $opsiCetak = '<a href="#" class="btn btn-primary" onclick="javascript:window.print();"><i class="fe fe-printer"></i> Cetak </a>';
+    } else {
+      if($jabatan == "Asisten Bagian"){
+        $btn_validasi_askep = "display:none";
+      }
+      if($jabatan == "Kepala Sub Bagian"){
+        $btn_validasi_asisten = "display:none";
+        if(!$status_validasi_asisten)$btn_validasi_askep = "display:none";
+      }
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_bagian)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$id_dokumen.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_bagian; //data yang akan di jadikan QR CODE
+      $qrAsisten = $this->generateQr($dataQr);
+      $qrAsisten = '<img src="data:image/png;base64,'.base64_encode($qrAsisten).'" />';
+    }
+    if(!is_null($dataTransaksi[0]->tgl_validasi_kasubbag)){
+      $dataQr = site_url().'/Verifikasi?id_dokumen='.$id_dokumen.'&tgl_validasi_bagian='.$dataTransaksi[0]->tgl_validasi_kasubbag; //data yang akan di jadikan QR CODE
+      $qrAskep = $this->generateQr($dataQr);
+      $qrAskep = '<img src="data:image/png;base64,'.base64_encode($qrAskep).'" />';
+    }
+
     $tblContent = '';
     $nomor = 1;
     $subPerawatan = 0;
@@ -98,6 +142,8 @@ class Cetak_pbp extends CI_Controller{
           <div class="card">
             <div class="card-header">
               <div class="card-options">
+              <div class="mr-2" style="'.$btn_validasi_asisten.'"><button class="btn btn-green" title="Validasi" onclick="approve('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
+              <div class="mr-2" style="'.$btn_validasi_askep.'"><button class="btn btn-green" title="Validasi" onclick="approveAskep('.$id_dokumen.');"><i class="fe fe-check-circle"></i> Validasi</button></div>
                 <a href="List_biaya_perawatan" class="btn btn-primary" onclick="" style="margin-right: 10px;"><i class="fe fe-corner-down-left"></i> Kembali </a>
                 '.$opsiCetak.'
               </div>

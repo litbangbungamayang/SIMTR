@@ -200,7 +200,7 @@ class Kelompoktani_model extends CI_Model{
 
   public function getAllKelompok(){
     $afdeling = $this->session->userdata('afd');
-    $priv_level = $this->session->userdata('jataban');
+    $priv_level = $this->session->userdata('jabatan');
     if (empty($afdeling))$afdeling = "%";
     return json_encode($this->db->query("
       SELECT DISTINCT

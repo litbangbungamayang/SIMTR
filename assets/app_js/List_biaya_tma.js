@@ -18,6 +18,7 @@ function approve(id_dokumen){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
           $("#tblListBiayaTma").DataTable().ajax.url(js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil divalidasi!");
+          location.reload();
         }
       }
     });
@@ -36,6 +37,7 @@ function approveAskep(id_dokumen){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
           $("#tblListBiayaTma").DataTable().ajax.url(js_base_url + "List_biaya_tma/getAllPbtma?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil divalidasi!");
+          location.reload();
         }
       }
     });
@@ -149,7 +151,7 @@ $("#tblListBiayaTma").DataTable({
           var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
           '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
           if(row.tgl_validasi_bagian == null){
-            return buttonDetail + buttonApproval;
+            return buttonDetail;
           } else {
             return buttonDetail;
           }
@@ -158,7 +160,7 @@ $("#tblListBiayaTma").DataTable({
             var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju"><i class="fe fe-check-circle"></i></button> ' +
             '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
             if(row.tgl_validasi_kasubbag == null){
-              return buttonDetail + buttonApproval;
+              return buttonDetail;
             } else {
               return buttonDetail;
             }

@@ -838,6 +838,7 @@ $("#tblList").DataTable({
     {data: "button",
       render: function(data, type, row, meta){
         return actionButtonView(row.id_kelompok, row.kategori, row.priv_level);
+        //return row.kategori;
       }
     }
   ],

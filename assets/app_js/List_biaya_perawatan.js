@@ -11,6 +11,7 @@ function approve(id_dokumen){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
           $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=" + tahun_giling).load();
           alert("Dokumen berhasil divalidasi!");
+          location.reload();
         }
       }
     });
@@ -29,6 +30,7 @@ function approveAskep(id_dokumen){
           tahun_giling = parseInt($("#tahun_giling").val()) || 0;
           $("#tblListPerawatan").DataTable().ajax.url(js_base_url + "List_biaya_perawatan/getAllPbp?tahun_giling=0").load();
           alert("Dokumen berhasil divalidasi!");
+          location.reload();
         }
       }
     });
@@ -130,27 +132,26 @@ $("#tblListPerawatan").DataTable({
     },
     {
       render: function(data, type, row, meta){
+        var buttonDelete = '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
         var buttonDetail = '<a class="btn btn-sm btn-cyan" href="Cetak_pbp?id_pbp=' + row.id_dokumen + '" title="Lihat Detail"><i class="fe fe-book-open"></i></a> ';
+        var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ';
         if(row.priv_level == "Asisten Bagian"){
-          var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approve(' + row.id_dokumen +') title="Setuju" ><i class="fe fe-check-circle"></i></button> ' +
-          '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
           if(row.tgl_validasi_bagian == null){
-            return buttonDetail + buttonApproval;
+            return buttonDetail + buttonDelete;
           } else {
             return buttonDetail;
           }
         } else {
           if(row.priv_level == "Kepala Sub Bagian" && row.tgl_validasi_bagian != null){
-            var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju"><i class="fe fe-check-circle"></i></button> ' +
-            '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
+            var buttonDelete = '<button type="button" class="btn btn-sm btn-red" onclick = cancel(' + row.id_dokumen + ') title="Batalkan"><i class="fe fe-trash-2"></i></button>';
+            var buttonApproval = '<button class="btn btn-sm btn-primary" onclick = approveAskep(' + row.id_dokumen +') title="Setuju"><i class="fe fe-check-circle"></i></button> ';
             if(row.tgl_validasi_kasubbag == null){
-              return buttonDetail + buttonApproval;
+              return buttonDetail + buttonDelete;
             } else {
               return buttonDetail;
             }
           }
         }
-        return buttonDetail;
       },
       className: "text-left"
     }
