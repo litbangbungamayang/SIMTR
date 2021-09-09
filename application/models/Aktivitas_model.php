@@ -50,11 +50,12 @@ class Aktivitas_model extends CI_Model{
 
   public function getAktivitasByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
-    //$kategori = $this->input->get("kategori");
-    //($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
+    $kategori = $this->input->get("kategori");
+    //var_dump($kategori); die();
+    ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
     $tstr = "TR";
     $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = ?
-      and tstr = ?", array($tahun_giling,$tstr));
+      and tstr = ? and (kategori = ? OR kategori = ?)", array($tahun_giling,$tstr, $kategori, "ALL"));
     return json_encode($query->result());
   }
 
