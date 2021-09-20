@@ -460,13 +460,13 @@
                           <th></th>
                         </tr>
                       </thead>
-                      <tfoot>
+                      <tfoot class="bg-secondary">
                         <tr>
                           <th class="w-1"></th>
                           <th></th>
                           <th></th>
-                          <th>Total Biaya</th>
-                          <th></th>
+                          <th><font color="white" size="3">Total biaya</font></th>
+                          <th><font color="white" size="3"></font></th>
                           <th></th>
                         </tr>
                       </tfoot>

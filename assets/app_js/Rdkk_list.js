@@ -1015,7 +1015,7 @@ $("#tblPermintaanPerawatan").DataTable({
     total = api.column(4).data().reduce( function (a, b) {
         return intVal(a) + intVal(b);
     },0);
-    $(api.column(4).footer()).html('Rp '+ total.toLocaleString({maximumFractionDigits: 2}));
+    $(api.column(4).footer()).html('<font size="3" color="white">' + 'Rp '+ total.toLocaleString({maximumFractionDigits: 2}) + '</font>');
   }
 });
 
