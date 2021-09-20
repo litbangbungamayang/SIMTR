@@ -33,7 +33,14 @@ class Admin_aktivitas extends CI_Controller{
   }
 
   public function updateAktivitas(){
-    echo $this->aktivitas_model->updateAktivitas();
+    $id_aktivitas = $this->input->post("id_aktivitas");
+    $transaksi = json_decode($this->transaksi_model->getTransaksiByIdAktivitas($id_aktivitas));
+    if (sizeof($transaksi) == 0){
+      if ($this->aktivitas_model->updateAktivitas()) echo "Data aktivitas berhasil disimpan!";
+    } else {
+      echo "Terdapat transaksi dengan nama aktivitas yang akan diubah. Proses mengubah dibatalkan.";
+    }
+    //echo $this->aktivitas_model->updateAktivitas();
   }
 
   public function hapusAktivitas(){

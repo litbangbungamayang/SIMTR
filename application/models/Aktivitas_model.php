@@ -28,7 +28,14 @@ class Aktivitas_model extends CI_Model{
     $this->tahun_giling = $post["tahun_giling"];
     $this->biaya = $post["biaya"];
     $this->kategori = $post["kategori"];
+    $this->jenis_aktivitas = $post["jenis_aktivitas"];
     return $this->db->where("id_aktivitas", $post["id_aktivitas"])->update($this->_table, $this);
+  }
+
+  public function cekTransaksi($id_aktivitas){
+    $query = "select * from tbl_simtr_transaksi where id_aktivitas = ?";
+    $row = $this->db->query($query, array($id_aktivitas))->row();
+    var_dump($row); die();
   }
 
   public function hapusAktivitas($id_aktivitas = null){

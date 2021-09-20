@@ -44,10 +44,12 @@ btnSimpanAktivitas.on("click", function(){
     var controller = "";
     if (edit) formValue.id_aktivitas = edit_id;
     (edit) ? controller = "Admin_aktivitas/updateAktivitas" : controller = "Admin_aktivitas/addAktivitas";
+    /*
     console.log("Edit = " + edit);
     console.log("Controller = " + controller);
     console.log("ID = " + edit_id);
     console.log("Form Value = " + formValue);
+    */
     $.ajax({
       url: js_base_url + controller,
       dataType: "text",
@@ -55,7 +57,7 @@ btnSimpanAktivitas.on("click", function(){
       data: formValue,
       success: function(data){
         if (data != ""){
-          alert("Data telah tersimpan!");
+          alert(data);
           dialogAddAktivitas.modal("toggle");
           edit_id = null;
           edit = false;
@@ -155,6 +157,8 @@ function editData(id_aktivitas){
     success: function(response){
       txtNamaAktivitas.val(response.nama_aktivitas);
       cbxTahunGiling.selectize()[0].selectize.setValue(response.tahun_giling);
+      cbxJenisAktivitas.selectize()[0].selectize.setValue(response.jenis_aktivitas);
+      cbxKategori.selectize()[0].selectize.setValue(response.kategori);
       txtBiaya.val("Rp " + parseInt(response.biaya).toLocaleString());
       edit_id = id_aktivitas;
     }
