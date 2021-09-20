@@ -1,3 +1,5 @@
+var tahun_giling;
+
 function formatTgl(dateObj){
   if(dateObj != null){
     return dateObj.getFullYear() + "-" + ("0" + (dateObj.getMonth()+1)) + "-" + ("0" + dateObj.getDate()).slice(-2);
@@ -31,7 +33,7 @@ $("#btnBuatPbp").on("click", function(){
           url: js_base_url + "Biaya_perawatan/buatPbp",
           dataType: "text",
           type: "POST",
-          data: "tipe_dokumen=PBP&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir + "&catatan=" + strTglAwal + " s.d " + strTglAkhir,
+          data: "tipe_dokumen=PBP&tgl_awal=" + tgl_awal + "&tgl_akhir=" + tgl_akhir + "&catatan=" + strTglAwal + " s.d " + strTglAkhir + "&tahun_giling=" + tahun_giling,
           success: function(response){
             alert("Pengajuan biaya perawatan berhasil disimpan.");
             $("#tblListPerawatan").DataTable().ajax.reload();

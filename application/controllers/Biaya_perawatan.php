@@ -32,6 +32,7 @@ class Biaya_perawatan extends CI_Controller{
 
   public function buatPbp(){
     $post = $this->input->post();
+    $tahun_giling = $post["tahun_giling"];
     $tgl_awal = $post["tgl_awal"];
     $tgl_akhir = $post["tgl_akhir"];
     $tipe_dokumen = $post["tipe_dokumen"];
@@ -39,7 +40,7 @@ class Biaya_perawatan extends CI_Controller{
     $id_afd = $this->session->userdata("afd");
     $this->db->trans_begin();
     $id_dokumen =  $this->dokumen_model->simpan($tipe_dokumen);
-    $this->transaksi_model->postPbp($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd);
+    $this->transaksi_model->postPbp($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd, $tahun_giling);
     if($this->db->trans_status()){
       $this->db->trans_commit();
       echo "SUCCESS";

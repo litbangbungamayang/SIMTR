@@ -47,16 +47,19 @@ class Transaksi_model extends CI_Model{
     }
   }
 
-  public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null, $id_afd = null){
+  public function postPbp($id_dokumen = null, $tgl_awal = null, $tgl_akhir = null, $id_afd = null, $tahun_giling = null){
     if(!is_null($id_dokumen) && !is_null($tgl_awal) && !is_null($tgl_akhir) && !is_null($id_afd)){
       $query =
       "update tbl_simtr_transaksi trn
       join tbl_simtr_kelompoktani kt on kt.id_kelompok = trn.id_kelompoktani
+      join tbl_dokumen dok on dok.id_dokumen = trn.id_ppk
       set trn.id_pbp=?
       where trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
+      and STR_TO_DATE(dok.tgl_validasi_bagian, '%Y-%m-%d') IS NOT NULL 
+      and STR_TO_DATE(dok.tgl_validasi_kasubbag, '%Y-%m-%d') IS NOT NULL
       and trn.id_pbp is null and trn.kode_transaksi = 2 and trn.kuanta <> 0 and trn.id_aktivitas <> 0 and trn.rupiah <> 0
-      and kt.id_afd = ?";
-      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd)));
+      and trn.id_ppk is not null and kt.id_afd = ? and trn.tahun_giling = ?";
+      return json_encode($this->db->query($query, array($id_dokumen, $tgl_awal, $tgl_akhir, $id_afd, $tahun_giling)));
     }
   }
 
