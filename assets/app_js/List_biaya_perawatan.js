@@ -152,6 +152,7 @@ $("#tblListPerawatan").DataTable({
             }
           }
         }
+
       },
       className: "text-left"
     }

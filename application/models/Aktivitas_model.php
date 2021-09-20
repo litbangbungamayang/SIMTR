@@ -51,12 +51,15 @@ class Aktivitas_model extends CI_Model{
   public function getAktivitasByTahunGiling(){
     $tahun_giling = $this->input->get("tahun_giling");
     $kategori = $this->input->get("kategori");
-    //var_dump($kategori); die();
-    ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
+    if(is_null($kategori)){
+      $kategori = "";
+    } else {
+      ($kategori == 1) ? $kategori = "PC" : $kategori = "RT";
+    }
     $tstr = "TR";
-    $query = $this->db->query("select * from tbl_aktivitas where tahun_giling = ?
-      and tstr = ? and (kategori = ? OR kategori = ?)", array($tahun_giling,$tstr, $kategori, "ALL"));
-    return json_encode($query->result());
+    $query = "select * from tbl_aktivitas where tahun_giling = ? and tstr = ? and (kategori LIKE ? OR kategori = ?)";
+    $result = $this->db->query($query, array($tahun_giling, $tstr, "%".$kategori."%", "ALL"))->result();
+    return json_encode($result);
   }
 
   public function getBibit(){

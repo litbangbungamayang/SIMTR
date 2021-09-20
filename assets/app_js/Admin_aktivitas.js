@@ -70,6 +70,8 @@ function resetForm(){
   txtNamaAktivitas.val("");
   txtBiaya.val("");
   cbxTahunGiling.selectize()[0].selectize.setValue("");
+  cbxJenisAktivitas.selectize()[0].selectize.setValue("");
+  cbxKategori.selectize()[0].selectize.setValue("");
 }
 
 function resetFeedback(){

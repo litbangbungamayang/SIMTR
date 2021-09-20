@@ -214,6 +214,13 @@ class Biaya_tma extends CI_Controller{
       $jml_biaya = 0;
       for($i = 0; $i < sizeof($response); $i++){
         $dataKelompok = json_decode($this->kelompoktani_model->getKelompokByKodeBlok($response[$i]->kode_blok));
+        /* USE FOR DEBUGGING
+        if(is_null($dataKelompok)){
+          var_dump($response[i]);
+          var_dump($i);
+          die();
+        }
+        */
         $dataBiayaTma = json_decode($this->biayatma_model->getBiayaTmaByIdWilayah($dataKelompok->id_wilayah, $dataKelompok->zona));
         $dataElement = [
           "kode_blok" => $dataKelompok->kode_blok,
