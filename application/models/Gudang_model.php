@@ -25,7 +25,6 @@ class Gudang_model extends CI_Model{
 
   public function edit(){
     $post = $this->input->post();
-    var_dump($post);
     $this->nama_gudang = strtoupper($post["nama_gudang"]);
     $this->lokasi_gudang = strtoupper($post["lokasi_gudang"]);
     $this->deskripsi = strtoupper($post["deskripsi"]);

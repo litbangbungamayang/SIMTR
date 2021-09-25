@@ -18,6 +18,11 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_bahan = ?", array($id_bahan))->result());
   }
 
+  public function getTransaksiByIdPotongan(){
+    return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_potongan = ?",
+    array($this->input->post("id_potongan")))->row());
+  }
+
   public function getTransaksiByIdGudang($id_gudang = null){
     if (is_null($id_gudang)) $id_gudang = $this->input->get("id_gudang");
     return json_encode($this->db->query("select * from tbl_simtr_transaksi where id_gudang=?", array($id_gudang))->result());
@@ -55,7 +60,7 @@ class Transaksi_model extends CI_Model{
       join tbl_dokumen dok on dok.id_dokumen = trn.id_ppk
       set trn.id_pbp=?
       where trn.tgl_transaksi >= ? and trn.tgl_transaksi <= date_add(?, interval 1 day)
-      and STR_TO_DATE(dok.tgl_validasi_bagian, '%Y-%m-%d') IS NOT NULL 
+      and STR_TO_DATE(dok.tgl_validasi_bagian, '%Y-%m-%d') IS NOT NULL
       and STR_TO_DATE(dok.tgl_validasi_kasubbag, '%Y-%m-%d') IS NOT NULL
       and trn.id_pbp is null and trn.kode_transaksi = 2 and trn.kuanta <> 0 and trn.id_aktivitas <> 0 and trn.rupiah <> 0
       and trn.id_ppk is not null and kt.id_afd = ? and trn.tahun_giling = ?";
