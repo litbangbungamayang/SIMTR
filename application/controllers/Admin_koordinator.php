@@ -1,10 +1,10 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Admin_potongan extends CI_Controller{
+class Admin_koordinator extends CI_Controller{
   public function __construct(){
     parent :: __construct();
     //if ($this->session->userdata('id_user') == false) redirect('login');
-    $this->load->model("potongan_model");
+    $this->load->model("koordinator_model");
     $this->load->model("transaksi_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
@@ -23,7 +23,7 @@ class Admin_potongan extends CI_Controller{
       if ($this->session->flashdata('notif_msg') == ''){
         $this->session->set_flashdata('notif_div', 'display: none');
       }
-      $data['pageTitle'] = "Administrasi Potongan/Biaya";
+      $data['pageTitle'] = "Administrasi Koordinator Kelompok";
       $data['content'] = $this->loadContent();
       $data['script'] = $this->loadScript();
       $this->load->view('main_view', $data);
@@ -31,11 +31,11 @@ class Admin_potongan extends CI_Controller{
   }
 
   public function loadScript(){
-    return '$.getScript("'.base_url("/assets/app_js/Admin_potongan.js").'");';
+    return '$.getScript("'.base_url("/assets/app_js/Admin_koordinator.js").'");';
   }
 
-  public function getAllPotongan(){
-    echo $this->potongan_model->getAllPotongan();
+  public function getAllKoordinator(){
+    echo $this->koordinator_model->getAllKoordinator();
   }
 
   public function getPotonganByTahunGiling(){
@@ -102,18 +102,17 @@ class Admin_potongan extends CI_Controller{
     '
             <div class="card-body">
               <div class="row" style="margin-bottom: 10px; margin-left: 0px">
-                <button type="button" id="btnTambahPotongan" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddPotongan"> + Tambah Data Potongan</button>
+                <button type="button" id="btnTambahKoord" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#dialogAddKoord"> + Tambah Data Koordinator</button>
               </div>
               <div class="row">
                 <div class="table-responsive col-md-12">
-                  <table id="tblPotongan" class="table card-table table-vcenter text-nowrap datatable table-sm">
+                  <table id="tblKoordinator" class="table card-table table-vcenter text-nowrap datatable table-sm">
                     <thead>
                       <tr>
                         <th class="w-1">No.</th>
                         <th>Tahun Giling</th>
-                        <th>Pot. Karung</th>
-                        <th>Pot. Tetes</th>
-                        <th>Pot. Admin</th>
+                        <th>Nama Koordinator</th>
+                        <th>No. Telepon</th>
                         <th class="text-center">Aksi</th>
                       </tr>
                     </thead>
@@ -137,15 +136,15 @@ class Admin_potongan extends CI_Controller{
     }
     $content_dialogAddBahan =
     '
-      <div class="modal fade" id="dialogAddPotongan">
+      <div class="modal fade" id="dialogAddKoord">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h4 class="modal-title">Data Potongan</h4>
+              <h4 class="modal-title">Data Koordinator</h4>
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-              <form id="formAddPotongan">
+              <form id="formAddKoord">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grTahunGiling">
@@ -155,24 +154,34 @@ class Admin_potongan extends CI_Controller{
                       </select>
                       <div class="invalid-feedback">Tahun giling belum dipilih!</div>
                     </div>
-                    <div class="form-group" id="grPotKarung">
-                      <label class="form-label">Potongan karung (Rp/karung)</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="potongan_karung" name="potongan_karung" placeholder="Potongan karung">
-                      <div class="invalid-feedback" id="fbPotKarung">Potongan karung belum dibuat!</div>
+                    <div class="form-group" id="grNama">
+                      <label class="form-label">Nama Koordinator</label>
+                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="nama_koordinator" name="nama_koordinator" placeholder="Nama Koordinator">
+                      <div class="invalid-feedback" id="fbPotKarung">Nama koordinator harus diisi!</div>
                     </div>
-                    <div class="form-group" id="grPotTetes">
-                      <label class="form-label">Potongan tetes (Rp/ton tetes)</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="potongan_tetes" name="potongan_tetes" placeholder="Potongan tetes">
-                      <div class="invalid-feedback" id="fbPotKarung">Potongan tetes belum dibuat!</div>
+                  </div>
+                  <div class="col-md-12 col-lg-6">
+                    <div class="form-group" id="grNoKtp">
+                      <label class="form-label">Nomor KTP</label>
+                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="no_ktp" name="no_ktp" placeholder="Nomor KTP">
+                      <div class="invalid-feedback" id="fbPotKarung">Nomor KTP harus diisi!</div>
                     </div>
-                    <div class="form-group" id="grPotAdmin">
-                      <label class="form-label">Potongan adminstrasi (Rp/ha)</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="potongan_admin" name="potongan_admin" placeholder="Potongan admin">
-                      <div class="invalid-feedback" id="fbPotKarung">Potongan admin belum dibuat!</div>
+                    <div class="form-group" id="grTelp">
+                      <label class="form-label">Nomor Telepon</label>
+                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="nomor_telepon" name="nomor_telepon" placeholder="Nomor Telepon">
+                      <div class="invalid-feedback" id="fbPotKarung">Nomor telepon harus diisi!</div>
+                    </div>
+                    <div class="form-group" id="grUploadKtp">
+                      <div class="form-label">Scan Image KTP</div>
+                      <div class="custom-file">
+                        <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKtp') != NULL ? "is-invalid" : "").'" name="scanKtp">
+                        <label id="lblScanKtp" class="custom-file-label">Pilih file</label>
+                        <div style="" class="invalid-feedback" id="fbScanKtp">Scan tidak sesuai!</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <button type="button" id="btnSimpanPotongan" class="btn btn-primary btn-block" name="" >Simpan data potongan</button>
+                <button type="button" id="btnSimpanKoord" class="btn btn-primary btn-block" name="" >Simpan data koordinator</button>
               </form>
             </div>
           </div>

@@ -61,6 +61,7 @@
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/admin_bahan')?>" class="dropdown-item "><i class="fe fe-shopping-bag"></i> Master Bahan</a>
               <a href="<? echo site_url('/admin_vendor')?>" class="dropdown-item "><i class="fe fe-users"></i> Master Vendor</a>
+              <a href="<? echo site_url('/admin_koordinator')?>" class="dropdown-item "><i class="fe fe-users"></i> Master Koordinator Kelompok</a>
               <a href="<? echo site_url('/admin_aktivitas')?>" class="dropdown-item "><i class="fe fe-activity"></i> Master Aktivitas</a>
               <a href="<? echo site_url('/admin_tma')?>" class="dropdown-item "><i class="fe fe-zap"></i> Master Biaya TMA</a>
               <a href="<? echo site_url('/admin_potongan')?>" class="dropdown-item "><i class="fe fe-zap"></i> Master Potongan Bagi Hasil</a>
