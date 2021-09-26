@@ -322,7 +322,7 @@ class Penjualan_gula extends CI_Controller{
           <th style="font-size:16px; color:black">'.($i+1).'</th>
           <th style="font-size:16px; color:black">'.$rowData->nama_kelompok.'</th>
           <th style="font-size:16px; color:black">'.$rowData->no_kontrak.'</th>
-          <th style="font-size:16px; color:black" class="text-right">'.$rowData->kuanta.'</th>
+          <th style="font-size:16px; color:black" class="text-right">'.number_format($rowData->kuanta,0).'</th>
           <th style="font-size:16px; color:black" class="text-right"></th>
         </tr>
       ';
@@ -348,7 +348,7 @@ class Penjualan_gula extends CI_Controller{
                 <div>
                   Pada hari ini, '.$hari.' tanggal '.$tanggal.' bulan '.$bulan.' tahun '.$tahun.',
                   kami para Ketua Kelompok Tani Tebu Rakyat yang bertandatangan dibawah ini menyatakan setuju dengan
-                  harga penjualan gula 90% dari bagian Petani Tebu Rakyat sebesar Rp '.$harga_jual.'/kg. Dalam hal ini
+                  harga penjualan gula 90% dari bagian Petani Tebu Rakyat sebesar Rp '.number_format($harga_jual,0).'/kg. Dalam hal ini
                   dilaksanakan kepada Koordinator Kelompok Tani untuk melaksanakan administrasi dan penjualan gula dengan
                   rincian sebagai berikut:
                 </div>
@@ -371,7 +371,7 @@ class Penjualan_gula extends CI_Controller{
                   </tbody>
                   <tfoot>
                     <td colspan="3" style="font-size:16px; color:black" class="text-right">JUMLAH</td>
-                    <th style="font-size:16px; color:black" class="text-right">'.$jml_gula.'</th>
+                    <th style="font-size:16px; color:black" class="text-right">'.number_format($jml_gula,0).'</th>
                     <th style="font-size:16px; color:black;" class="w-25 text-center"></th>
                   </tfoot>
                 </table>
@@ -499,17 +499,17 @@ class Penjualan_gula extends CI_Controller{
                 <div class="row">
                   <div class="col-2">1. Jumlah kuanta</div>
                   <div class="col-1 text-right">:</div>
-                  <div class="col-7"> '.$jml_gula.' kg</div>
+                  <div class="col-7"> '.number_format($jml_gula,0).' kg</div>
                 </div>
                 <div class="row">
                   <div class="col-2">2. Harga jual</div>
                   <div class="col-1 text-right">:</div>
-                  <div class="col-7"> Rp'.$harga_jual.'/kg</div>
+                  <div class="col-7"> Rp'.number_format($harga_jual,0).'/kg</div>
                 </div>
                 <div class="row">
                   <div class="col-2">3. Jumlah harga</div>
                   <div class="col-1 text-right">:</div>
-                  <div class="col-7"> Rp'.($harga_jual*$jml_gula).'</div>
+                  <div class="col-7"> Rp'.number_format(($harga_jual*$jml_gula),0).'</div>
                 </div>
                 <div class="row">
                   <div class="col-2">4. Syarat pembayaran</div>

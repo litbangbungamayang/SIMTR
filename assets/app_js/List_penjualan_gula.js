@@ -157,11 +157,17 @@ $("#tblListPenjualan").DataTable({
     { data: "no_kontrak" },
     {
       data: "kuanta",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     },
     {
       data: "rupiah",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return "Rp" + parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     },
     {
       data: "tgl_buat",

@@ -218,23 +218,38 @@ $("#tblListBasteb").DataTable({
     { data: "no_kontrak" },
     {
       data: "ton_tebu_hitung",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseFloat(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     },
     {
       data: "kg_gula_90",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      }
     },
     {
       data: "gula_terjual",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     },
     {
       data: "kg_tetes_ptr",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     },
     {
       data: "tetes_terjual",
-      className: "text-right"
+      className: "text-right",
+      render: function(data, type, row, meta){
+        return parseInt(data).toLocaleString(undefined, {maximumFractionDigits:2});
+      },
     }
   ],
   rowId: "id_dokumen",

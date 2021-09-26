@@ -62,11 +62,6 @@ class List_penjualan_gula extends CI_Controller{
                 </table>
               </div>
             </div>
-            <div class="row">
-              <div class="col-md-12 col-lg-6">
-                <div style="margin-bottom: 20px;"><button type="button" id="btnKonfirmasiPenjualanGula" class="btn btn-outline-primary btn-sm" onclick="konfirmasiPenjualanGula()" > + Buat Surat Permintaan Penjualan Gula</button></div>
-              </div>
-            </div>
           </form>
           </div>
         </div>
