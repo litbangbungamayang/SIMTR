@@ -34,8 +34,8 @@ class Biayatma_model extends CI_Model{
     $id_dokumen = $request["id_dokumen"];
     $query = "insert into tbl_simtr_ba_tebang(id_kelompok, id_dokumen, nama_kelompok, kode_blok, ton_tebu_timbang, ton_taksasi_maret,
     luas_tebang, luas_baku, ton_rafaksi_bakar, ton_rafaksi_cs, ton_rafaksi_lain, ton_tebu_hitung, ton_tebu_takmar, ton_tebu_bakar, ton_hablur_ptr,
-    kg_gula_ptr, kg_tetes_ptr, awal_timbang, akhir_timbang)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    kg_gula_ptr, kg_tetes_ptr, awal_timbang, akhir_timbang, potongan_karung, potongan_tetes, potongan_admin, user)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ";
     $this->db->query($query, array(
       $dataAffKebun["val_id_kelompok"], $id_dokumen, $dataAffKebun["val_nama_kelompok"], $dataAffKebun["val_kode_blok"], $dataAffKebun["val_tonTimbang"],
@@ -43,7 +43,8 @@ class Biayatma_model extends CI_Model{
       $dataAffKebun["val_tonRafaksiCs"], $dataAffKebun["val_tonRafaksiLain"], $dataAffKebun["val_tonTebuHitung"],
       $dataAffKebun["val_tonTakmar"], $dataAffKebun["val_tonTebuBakar"], $dataAffKebun["val_tonHablurPtr"],
       $dataAffKebun["val_kgGulaPtr"], $dataAffKebun["val_kgTetesPtr"],
-      $dataAffKebun["val_awalTebang"], $dataAffKebun["val_akhirTebang"]
+      $dataAffKebun["val_awalTebang"], $dataAffKebun["val_akhirTebang"], $dataAffKebun["val_potonganKarung"],
+      $dataAffKebun["val_potonganTetes"], $dataAffKebun["val_potonganAdmin"], $this->session->userdata('id_user')
     ));
     return json_encode($this->db->affected_rows());
   }

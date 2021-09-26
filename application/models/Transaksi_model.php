@@ -260,6 +260,7 @@ class Transaksi_model extends CI_Model{
       $post = $data_transaksi;
     }
     if(isset($post["id_gudang"]))$this->id_gudang = $post["id_gudang"];
+    if(isset($post["id_potongan"]))$this->id_potongan = $post["id_potongan"];
     $this->id_bahan = $post["id_bahan"];
     $this->id_aktivitas = $post["id_aktivitas"];
     $this->id_kelompoktani = $post["id_kelompoktani"];
@@ -273,6 +274,10 @@ class Transaksi_model extends CI_Model{
     $this->id_user = $this->session->userdata('id_user');
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
+  }
+
+  public function postPotongan($request){
+
   }
 
   public function updateIdAu58($id_au58 = null, $no_transaksi = null){

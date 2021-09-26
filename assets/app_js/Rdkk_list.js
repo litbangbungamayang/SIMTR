@@ -596,9 +596,17 @@ function cekAffKebun(id_kelompok){
                     type: "GET",
                     success: function(response){
                       if(response.length == 0){
-                        formInputIdKelompok.value = id_kelompok;
-                        formInputKodeBlok.value = kode_blok;
-                        formKonfirmasi.submit();
+                        $.ajax({
+                          url: js_base_url + "Admin_potongan/getPotonganByTahunGiling",
+                          data: {tahun_giling: dataKelompok.tahun_giling},
+                          dataType: "json",
+                          type: "get",
+                          success: function(resp){
+                            formInputIdKelompok.value = id_kelompok;
+                            formInputKodeBlok.value = kode_blok;
+                            formKonfirmasi.submit();
+                          }
+                        })
                       } else {
                         alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
                       }

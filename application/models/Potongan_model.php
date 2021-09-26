@@ -35,8 +35,8 @@ class Potongan_model extends CI_Model{
     return $this->db->where("id_potongan", $post["id_potongan"])->update($this->_table, $this);
   }
 
-  public function getPotonganById(){
-    $id_potongan = $this->input->get("id_potongan");
+  public function getPotonganById($id_potongan = null){
+    (is_null($id_potongan)) ? $id_potongan = $this->input->get("id_potongan") : "";
     return json_encode($this->db->from("tbl_simtr_potongan")->where("id_potongan", $id_potongan)->get()->row());
   }
 
@@ -46,8 +46,8 @@ class Potongan_model extends CI_Model{
     ")->result());
   }
 
-  public function getPotonganByTahunGiling(){
-    $tahun_giling = $this->input->get("tahun_giling");
+  public function getPotonganByTahunGiling($tahun_giling = null){
+    (is_null($tahun_giling)) ? $tahun_giling = $this->input->get("tahun_giling") : "";
     return json_encode($this->db->query("select * from tbl_simtr_potongan where tahun_giling = ?", array($tahun_giling))->result());
   }
 

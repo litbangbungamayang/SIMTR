@@ -13,6 +13,7 @@ class Aff_kebun extends CI_Controller{
     $this->load->model("bahan_model");
     $this->load->model("dokumen_model");
     $this->load->model("user_model");
+    $this->load->model("potongan_model");
     $this->load->helper('url');
     $this->load->helper('form');
     $this->load->helper('html');
@@ -67,7 +68,38 @@ class Aff_kebun extends CI_Controller{
         "dataAffKebun" => $dataAffKebun,
         "id_dokumen" => $id_dokumen
       );
-      echo ($this->biayatma_model->simpanAffKebun($request));
+      //var_dump($dataAffKebun);die();
+      $this->db->trans_begin();
+      if($this->biayatma_model->simpanAffKebun($request) == 1){
+        $dataPotongan = array(
+          array($dataAffKebun["val_potonganKarung"], "POTONGAN KARUNG"),
+          array($dataAffKebun["val_potonganTetes"], "POTONGAN TETES"),
+          array($dataAffKebun["val_potonganAdmin"], "POTONGAN ADMIN")
+        );
+        for($i = 0; $i < 3; $i++){
+          $dataTransaksi = array(
+            "id_bahan" => null,
+            "id_aktivitas" => null,
+            "id_kelompoktani" => $dataAffKebun["val_id_kelompok"],
+            "id_vendor" => null,
+            "kode_transaksi" => 2,
+            "no_transaksi" => "TR-POT-".$dataAffKebun["val_tahun_giling"]."-".date("YmdHis"),
+            "kuanta_bahan" => 0,
+            "rupiah_bahan" => $dataPotongan[$i][0],
+            "catatan" => $dataPotongan[$i][1],
+            "tahun_giling" => $dataAffKebun["val_tahun_giling"],
+            "id_potongan" => $dataAffKebun["val_idPotongan"]
+          );
+          $this->transaksi_model->simpan($dataTransaksi);
+        };
+        if($this->db->trans_status()){
+          $this->db->trans_commit();
+          echo json_encode("Transaksi berhasil");
+        } else {
+          $this->db->trans_rollback();
+          echo json_encode("Transaksi gagal!");
+        }
+      };
     }
   }
 
@@ -320,6 +352,8 @@ class Aff_kebun extends CI_Controller{
     $dataSimpg = $dataContent['dataSimpg'][0];
     $tebuBakar = $dataContent['tebuBakar'][0];
     $dataCs = $dataContent['dataCs'];
+    $dataPotongan = json_decode($this->potongan_model->getPotonganByTahunGiling($dataKelompok->tahun_giling));
+    $dataPotongan = $dataPotongan[0];
     // Perhitungan rafaksi
     $ton_takmar = ($dataSimpg->taksasi_pandang*$dataSimpg->luas_tanam);
     $ton_tebuTimbang = ($dataSimpg->ton_tebu)/1000;
@@ -336,6 +370,10 @@ class Aff_kebun extends CI_Controller{
     $hablurPtr = ROUND($dataCs->total_hablur,2,PHP_ROUND_HALF_UP);
     $kgGulaPtr = ROUND(($hablurPtr*1000*1.003)/50,0,PHP_ROUND_HALF_UP)*50;
     $kgTetesPtr = ROUND($ton_tebuHitung*0.03*1000,0,PHP_ROUND_HALF_UP);
+    $jmlKarung = $kgGulaPtr/50;
+    $rpPotonganKarung = number_format($jmlKarung*$dataPotongan->potongan_karung,0);
+    $rpPotonganTetes = number_format(ROUND($kgTetesPtr/1000*$dataPotongan->potongan_tetes,0,PHP_ROUND_HALF_UP),0);
+    $rpPotonganAdmin = number_format(ROUND($dataKelompok->luas*$dataPotongan->potongan_admin,0,PHP_ROUND_HALF_UP),0);
     //==================================================
     $kode_blok = "";
     $nama_asisten = json_decode($this->user_model->getNamaAsistenByAfd($id_afd))->nama_user;
@@ -386,8 +424,12 @@ class Aff_kebun extends CI_Controller{
                 <div class="row"><label>% rafaksi thd Takmar</label></div>
                 <div class="row"><label>Berat tebu terbakar</label></div>
                 <div class="row"><label>Total hablur bagi hasil</label></div>
+                <div class="row"><label>Total tetes bagi hasil</label></div>
                 <div class="row"><label>Awal timbang</label></div>
                 <div class="row"><label>Akhir timbang</label></div>
+                <div class="row"><label>Potongan karung</label></div>
+                <div class="row"><label>Potongan sewa tangki tetes</label></div>
+                <div class="row"><label>Potongan biaya administrasi</label></div>
               </div>
               <div class="col-lg-4">
                 <div class="row">
@@ -399,10 +441,14 @@ class Aff_kebun extends CI_Controller{
                       value="'.$dataKelompok->id_kelompok.'"/>
                     <input type="hidden" id="val_kode_blok" name="val_kode_blok"
                       value="'.$dataKelompok->kode_blok.'"/>
+                    <input type="hidden" id="val_tahunGiling" name="val_tahun_giling"
+                      value="'.$dataKelompok->tahun_giling.'"/>
                     <input type="hidden" id="val_kgGulaPtr" name="val_kgGulaPtr"
                       value="'.$kgGulaPtr.'"/>
                     <input type="hidden" id="val_kgTetesPtr" name="val_kgTetesPtr"
                       value="'.$kgTetesPtr.'"/>
+                    <input type="hidden" id="val_idPotongan" name="val_idPotongan"
+                      value="'.$dataPotongan->id_potongan.'"/>
                   </div>
                 </div>
                 <div class="row">
@@ -529,6 +575,13 @@ class Aff_kebun extends CI_Controller{
                 </div>
                 <div class="row">
                   <div>
+                    <label for="ton_tetes_ptr">: '.ROUND($kgTetesPtr/1000,2,PHP_ROUND_HALF_UP).' ton</label><input class="ml-2 mb-1" type="checkbox"
+                      id="ton_tetes_ptr" style="vertical-align:middle"/><input type="hidden" id="val_tonTetesPtr" name="val_tonTetesPtr"
+                      value="'.$kgTetesPtr.'"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
                     <label for="awal_tebang">: '.($dataSimpg->awal_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
                       id="awal_tebang" style="vertical-align:middle"/><input type="hidden" id="val_awalTebang" name="val_awalTebang"
                       value="'.$dataSimpg->awal_tebang.'"/>
@@ -539,6 +592,27 @@ class Aff_kebun extends CI_Controller{
                     <label for="akhir_tebang">: '.($dataSimpg->akhir_tebang).'</label><input class="ml-2 mb-1" type="checkbox"
                       id="akhir_tebang" style="vertical-align:middle"/><input type="hidden" id="val_akhirTebang" name="val_akhirTebang"
                       value="'.$dataSimpg->akhir_tebang.'"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="potongan_karung">: '.($jmlKarung).' karung x Rp'.number_format($dataPotongan->potongan_karung,0).'/lembar = Rp'.$rpPotonganKarung.'</label><input class="ml-2 mb-1" type="checkbox"
+                      id="potongan_karung" style="vertical-align:middle"/><input type="hidden" id="val_potonganKarung" name="val_potonganKarung"
+                      value="'.intval(str_replace(",","",$rpPotonganKarung)).'"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="potongan_tetes">: '.(ROUND($kgTetesPtr/1000,2,PHP_ROUND_HALF_UP)).' ton x Rp'.number_format($dataPotongan->potongan_tetes,0).'/ton = Rp'.$rpPotonganTetes.'</label><input class="ml-2 mb-1" type="checkbox"
+                      id="potongan_tetes" style="vertical-align:middle"/><input type="hidden" id="val_potonganTetes" name="val_potonganTetes"
+                      value="'.intval(str_replace(",","",$rpPotonganTetes)).'"/>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <label for="potongan_admin">: '.$dataKelompok->luas.' ha x Rp'.number_format($dataPotongan->potongan_admin,0).'/ha = Rp'.$rpPotonganAdmin.'</label><input class="ml-2 mb-1" type="checkbox"
+                      id="potongan_admin" style="vertical-align:middle"/><input type="hidden" id="val_potonganAdmin" name="val_potonganAdmin"
+                      value="'.intval(str_replace(",","",$rpPotonganAdmin)).'"/>
                   </div>
                 </div>
               </div>

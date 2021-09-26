@@ -19,6 +19,10 @@ var chk_TonTebuBakar = $("#ton_bakar");
 var chk_TonHablurPtr = $("#ton_hablur_ptr");
 var chk_TglAwalTimbang = $("#awal_tebang");
 var chk_TglAkhirTimbang = $("#akhir_tebang");
+var chk_TonTetesPtr = $("#ton_tetes_ptr");
+var chk_PotonganKarung = $("#potongan_karung");
+var chk_PotonganTetes = $("#potongan_tetes");
+var chk_PotonganAdmin = $("#potongan_admin");
 var frm_selesaiTebang = $("#frmSelesaiTebang");
 
 function koreksiDesimal(textBox){
@@ -38,7 +42,8 @@ function cekValidasiField(){
     chk_LuasTebang.is(":checked") && chk_Varietas.is(":checked") && chk_MasaTanam.is(":checked") && chk_TonTakmar.is(":checked") &&
     chk_TonTimbang.is(":checked") && chk_TonRafaksiBakar.is(":checked") && chk_TonTrash.is(":checked") && chk_TonRafaksiCs.is(":checked") &&
     chk_TonRafaksiLain.is(":checked") && chk_TonHitung.is(":checked") && chk_TonTotalRafaksi.is(":checked") && chk_PersenRafaksiTakmar.is(":checked") &&
-    chk_TonTebuBakar.is(":checked") && chk_TonHablurPtr.is(":checked") && chk_TglAwalTimbang.is(":checked") && chk_TglAkhirTimbang.is(":checked")
+    chk_TonTebuBakar.is(":checked") && chk_TonHablurPtr.is(":checked") && chk_TglAwalTimbang.is(":checked") && chk_TglAkhirTimbang.is(":checked") &&
+    chk_TonTetesPtr.is(":checked") && chk_PotonganKarung.is(":checked") && chk_PotonganTetes.is(":checked") && chk_PotonganAdmin.is(":checked")
   ){
     $.ajax({
       url: js_base_url + "Aff_kebun/simpanAffKebun",
@@ -46,7 +51,7 @@ function cekValidasiField(){
       dataType: "json",
       data: frm_selesaiTebang.serialize(),
       success: function(response){
-        if(response == 1){
+        if(response == "Transaksi berhasil"){
           alert("Data berhasil disimpan!");
           window.location.replace(js_base_url + "rdkk_all");
         }
