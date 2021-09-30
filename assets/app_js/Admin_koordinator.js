@@ -62,7 +62,16 @@ function resetForm(){
   txt_no_ktp.val("");
   txt_nomor_telepon.val("");
   scan_ktp.val("");
+  scan_ktp.prop("disabled", false);
+  txt_no_ktp.prop("disabled", false);
+  scan_ktp.prop("disabled", false);
+  txt_nama_koordinator.prop("disabled", false);
   lblScanKtp.text("Pilih file");
+  tahunGiling.removeClass("is-invalid");
+  txt_nama_koordinator.removeClass("is-invalid");
+  txt_no_ktp.removeClass("is-invalid");
+  txt_nomor_telepon.removeClass("is-invalid");
+  scan_ktp.removeClass("is-invalid");
 }
 
 btnTambahKoord.on("click", function(){
@@ -91,18 +100,21 @@ function hapusData(id){
 }
 
 function editData(id){
-  dialogAddPotongan.modal("toggle");
+  dialogAddKoord.modal("toggle");
   $.ajax({
-    url: js_base_url + "Admin_potongan/getPotonganById",
+    url: js_base_url + "Admin_koordinator/getKoordById",
     type: "GET",
-    data: {id_potongan: id},
+    data: {id_koordinator: id},
     dataType: "json",
     success: function(response){
       tahunGiling[0].selectize.setValue(response.tahun_giling,true);
       tahunGiling[0].selectize.disable();
-      txt_potongan_karung.val(response.potongan_karung);
-      txt_potongan_tetes.val(response.potongan_tetes);
-      txt_potongan_admin.val(response.potongan_admin);
+      txt_nama_koordinator.val(response.nama_koordinator);
+      txt_nomor_telepon.val(response.nomor_telepon);
+      txt_no_ktp.val(response.no_ktp);
+      txt_no_ktp.prop("disabled", true);
+      scan_ktp.prop("disabled", true);
+      txt_nama_koordinator.prop("disabled", true);
       edit = true;
       edit_id = id;
     }
@@ -110,32 +122,24 @@ function editData(id){
 }
 
 function simpanEditData(id){
-  if (txt_potongan_karung.val() != "" && txt_potongan_tetes.val() != "" &&
-    txt_potongan_admin.val() != "" && edit){
-      txt_potongan_karung.removeClass("is-invalid");
-      txt_potongan_tetes.removeClass("is-invalid");
-      txt_potongan_admin.removeClass("is-invalid");
+  if (txt_nama_koordinator.val() != "" && txt_no_ktp.val() != "" &&
+    txt_nomor_telepon.val() != "" && tahunGiling.val() !="" &&
+    edit){
     $.ajax({
-      url: js_base_url + "Admin_potongan/editPotongan",
+      url: js_base_url + "Admin_koordinator/editKoordinator",
       type: "POST",
       dataType: "text",
       data: {
-        id_potongan: id,
-        potongan_karung: txt_potongan_karung.val(),
-        potongan_tetes: txt_potongan_tetes.val(),
-        potongan_admin: txt_potongan_admin.val(),
+        id_koordinator: id,
+        nomor_telepon: txt_nomor_telepon.val(),
       },
       success: function(data){
         alert(data);
-        dialogAddPotongan.modal("toggle");
+        dialogAddKoord.modal("toggle");
       }
     });
   } else {
-    (namaBahan.val() == "") ? namaBahan.addClass("is-invalid") : "";
-    (jenisBahan.val() == "") ? jenisBahan.addClass("is-invalid") : "";
-    (satuan.val() == "") ? satuan.addClass("is-invalid") : "";
-    (dosisBahan.val() == "") ? dosisBahan.addClass("is-invalid") : "";
-    (kemasanBahan.val() == "") ? kemasanBahan.addClass("is-invalid") : "";
+    (txt_nomor_telepon.val() == "") ? txt_nomor_telepon.addClass("is-invalid") : "";
   }
 }
 
@@ -144,25 +148,19 @@ $("#btnSimpanKoord").on("click", function(){
     if (txt_nama_koordinator.val() != "" && txt_no_ktp.val() != "" &&
       txt_nomor_telepon.val() != "" && tahunGiling.val() !="" &&
       scan_ktp.val() != ""  && !edit){
+      let formData = new FormData(formAddKoord[0]);
       $.ajax({
-        url: js_base_url + "Admin_potongan/getPotonganByTahunGiling",
-        type: "get",
+        url: js_base_url + "Admin_koordinator/addKoordinator",
+        type: "POST",
+        enctype: "multipart/form-data",
+        processData: false,
+        contentType: false,
         dataType: "json",
-        data: formAddPotongan.serialize(),
+        data: formData,
         success: function(data){
-          if(data.length == 0){
-            $.ajax({
-              url: js_base_url + "Admin_potongan/addPotongan",
-              type: "post",
-              dataType: "text",
-              data: formAddPotongan.serialize(),
-              success: function(data){
-                tblPotongan.DataTable().ajax.reload();
-                dialogAddPotongan.modal("toggle");
-              }
-            })
-          } else {
-            alert("Sudah terdapat data untuk tahun giling " + tahunGiling.val() + "!");
+          if(data > 0){
+            alert("Data berhasil disimpan!");
+            dialogAddKoord.modal("toggle");
           }
         },
         error: function(textStatus){
@@ -204,8 +202,7 @@ $("#tblKoordinator").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return '<button type="button" onclick="editData('+row.id_potongan+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  ' +
-        '<button type="button" onclick="hapusData('+row.id_potongan+')" class="btn btn-danger btn-sm" name="hapus_data" value="'+row.id_bahan+'" title="Hapus Data"><i class="fe fe-trash-2"></i></button>'
+        return '<button type="button" onclick="editData('+row.id_koordinator+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  '
       },
       className: "text-center"
     }
@@ -231,7 +228,8 @@ $("#tblKoordinator").DataTable({
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
       tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-      $("#tblPotongan").DataTable().ajax.url(js_base_url + "Admin_potongan/getPotonganByTahunGiling?tahun_giling=" + tahun_giling).load();
+      $("#tblKoordinator").DataTable().ajax.url(js_base_url + "Admin_koordinator/getKoordByTahunGiling?" +
+        "tahun_giling=" + tahun_giling).load();
     });
   },
   language: {

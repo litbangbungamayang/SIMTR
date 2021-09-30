@@ -38,28 +38,24 @@ class Admin_koordinator extends CI_Controller{
     echo $this->koordinator_model->getAllKoordinator();
   }
 
-  public function getPotonganByTahunGiling(){
-    echo $this->potongan_model->getPotonganByTahunGiling();
+  public function getKoordByTahunGiling(){
+    echo $this->koordinator_model->getKoordByTahunGiling();
   }
 
-  public function addPotongan(){
-    echo $this->potongan_model->simpan();
+  public function addKoordinator(){
+    echo $this->koordinator_model->simpan();
   }
 
-  public function getPotonganById(){
-    echo $this->potongan_model->getPotonganById();
+  public function getKoordById(){
+    echo $this->koordinator_model->getKoordById();
   }
 
-  public function editPotongan(){
-    if(is_null(json_decode($this->transaksi_model->getTransaksiByIdPotongan()))){
-      if($this->potongan_model->edit() == 1){
+  public function editKoordinator(){
+      if($this->koordinator_model->edit()){
         echo "Data berhasil diubah!";
       } else {
         echo "Gagal mengubah data!";
       }
-    } else {
-      echo "Terdapat transaksi dengan data potongan tersebut. Pengubahan tidak dapat dilakukan.";
-    }
   }
 
   public function hapus(){
@@ -144,7 +140,7 @@ class Admin_koordinator extends CI_Controller{
               <button class="close" data-dismiss="modal" type="button"></button>
             </div>
             <div class="modal-body">
-              <form id="formAddKoord">
+              <form action="" id="formAddKoord">
                 <div class="row">
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grTahunGiling">
@@ -176,7 +172,7 @@ class Admin_koordinator extends CI_Controller{
                       <div class="custom-file">
                         <input id="scanKtp" accept= ".jpeg,.jpg" type="file" class="custom-file-input '.(form_error('scanKtp') != NULL ? "is-invalid" : "").'" name="scanKtp">
                         <label id="lblScanKtp" class="custom-file-label">Pilih file</label>
-                        <div style="" class="invalid-feedback" id="fbScanKtp">Scan tidak sesuai!</div>
+                        <div style="" class="invalid-feedback" id="fbScanKtp">Scan KTP belum ada!</div>
                       </div>
                     </div>
                   </div>
