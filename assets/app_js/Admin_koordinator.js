@@ -87,13 +87,13 @@ dialogAddKoord.on("hide.bs.modal", function(){
 function hapusData(id){
   if(confirm("Anda yakin akan menghapus data ini?")){
     $.ajax({
-      url: js_base_url + "Admin_potongan/hapus",
+      url: js_base_url + "Admin_koordinator/hapus",
       type: "POST",
-      data: {id_potongan: id},
+      data: {id_koordinator: id},
       dataType: "text",
       success: function(resp){
         alert(resp);
-        tblPotongan.DataTable().ajax.reload();
+        tblKoordinator.DataTable().ajax.reload();
       }
     });
   }
@@ -202,7 +202,8 @@ $("#tblKoordinator").DataTable({
     },
     {data: "button",
       render: function(data, type, row, meta){
-        return '<button type="button" onclick="editData('+row.id_koordinator+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  '
+        return '<button type="button" onclick="editData('+row.id_koordinator+')" class="btn btn-warning btn-sm" id="btnEditBahan" name="btnEditBahan" title="Ubah Data"><i class="fe fe-edit"></i></button>  ' +
+        '<button type="button" onclick="hapusData('+row.id_koordinator+')" class="btn btn-danger btn-sm" name="hapus_data" value="'+row.id_bahan+'" title="Hapus Data"><i class="fe fe-trash-2"></i></button>'
       },
       className: "text-center"
     }

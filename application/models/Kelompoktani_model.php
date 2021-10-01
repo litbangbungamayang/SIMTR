@@ -269,6 +269,27 @@ class Kelompoktani_model extends CI_Model{
     ",array($priv_level, $afdeling, $id_kelompok))->result());
   }
 
+  public function getKelompokByIdKoord(){
+    $id_koordinator = $this->input->post("id_koordinator");
+    $query = "
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status,
+        skk.keterangan_survey, skk.id_skk, DATE_FORMAT(skk.tgl_survey, '%d-%m-%Y')as tgl_survey, skk.id_dokumen,
+        TO_BASE64(skk.dokumen) as scan_skk, skk.catatan_gm, skk.tgl_buat
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        JOIN tbl_simtr_skk skk on skk.id_kelompok = KT.id_kelompok
+        WHERE EXISTS
+         (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.id_koordinator = ?
+      GROUP BY KT.id_kelompok
+    ";
+    return json_encode($this->db->query($query, array($id_koordinator))->row());
+  }
+
   public function getAllKelompokOrderDesa(){
     $afdeling = $this->session->userdata('afd');
     if (empty($afdeling))$afdeling = "%";

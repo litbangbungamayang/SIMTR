@@ -56,8 +56,8 @@ class Koordinator_model extends CI_Model{
   }
 
   public function hapus(){
-    $id_potongan = $this->input->post("id_potongan");
-    return $this->db->delete($this->_table, array('id_potongan' => $id_potongan));
+    $id_koordinator = $this->input->post("id_koordinator");
+    return $this->db->delete($this->_table, array('id_koordinator' => $id_koordinator));
   }
 
 }

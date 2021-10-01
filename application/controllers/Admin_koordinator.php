@@ -5,6 +5,7 @@ class Admin_koordinator extends CI_Controller{
     parent :: __construct();
     //if ($this->session->userdata('id_user') == false) redirect('login');
     $this->load->model("koordinator_model");
+    $this->load->model("kelompoktani_model");
     $this->load->model("transaksi_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
@@ -50,6 +51,10 @@ class Admin_koordinator extends CI_Controller{
     echo $this->koordinator_model->getKoordById();
   }
 
+  public function getKelompokByIdKoord(){
+    echo $this->kelompoktani_model->getKelompokByIdKoord();
+  }
+
   public function editKoordinator(){
       if($this->koordinator_model->edit()){
         echo "Data berhasil diubah!";
@@ -59,14 +64,14 @@ class Admin_koordinator extends CI_Controller{
   }
 
   public function hapus(){
-    if(is_null(json_decode($this->transaksi_model->getTransaksiByIdPotongan()))){
-      if($this->potongan_model->hapus() == 1){
+    if(is_null(json_decode($this->kelompoktani_model->getKelompokByIdKoord()))){
+      if($this->koordinator_model->hapus() == 1){
         echo "Data berhasil dihapus!";
       } else {
         echo "Gagal menghapus data!";
       }
     } else {
-      echo "Terdapat transaksi dengan data potongan tersebut. Penghapusan data tidak dapat dilakukan.";
+      echo "Terdapat Kelompok Tani dengan data koordinator tersebut. Penghapusan data tidak dapat dilakukan.";
     }
   }
 
