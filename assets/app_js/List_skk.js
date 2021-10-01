@@ -260,7 +260,7 @@ $("#tblList").DataTable({
     $('#tahun_giling').selectize({create: false, sortField: 'value'});
     $("#tahun_giling").on("change", function(){
       tahun_giling = parseInt($("#tahun_giling").val()) || 0;
-      $("#tblList").DataTable().ajax.url(js_base_url + "Rdkk_list/getKelompokByTahun?tahun_giling=" + tahun_giling).load();
+      $("#tblList").DataTable().ajax.url(js_base_url + "List_skk/getRequestByTahunGiling?tahun_giling=" + tahun_giling).load();
     });
   },
   language: {

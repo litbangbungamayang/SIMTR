@@ -50,6 +50,10 @@
       echo $this->kelompoktani_model->getKelompokByKodeBlok();
     }
 
+    public function getRequestByTahunGiling(){
+      echo $this->kelompoktani_model->getRequestByTahunGiling();
+    }
+
     function loadScript(){
       return '$.getScript("'.base_url("/assets/app_js/List_skk.js").'");';
     }

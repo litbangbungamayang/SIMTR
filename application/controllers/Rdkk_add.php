@@ -11,6 +11,7 @@ class Rdkk_add extends CI_Controller{
     $this->load->model("masatanam_model");
     $this->load->model("varietas_model");
     $this->load->model("petani_model");
+    $this->load->model("koordinator_model");
     $this->load->model("geocode_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
@@ -71,6 +72,10 @@ class Rdkk_add extends CI_Controller{
 
   public function getDeskripsiDesaByIdKabupaten(){
     echo $this->wilayah_model->getDeskripsiDesaByIdKabupaten($this->input->get("idKab"));
+  }
+
+  public function getAllKoordinator(){
+    echo $this->koordinator_model->getAllKoordinator();
   }
 
   public function tambahData(){
@@ -228,6 +233,15 @@ class Rdkk_add extends CI_Controller{
                     </select>
                     <div class="invalid-feedback">'.form_error('tahun_giling').'</div>
                   </div>
+                  <div class="form-group" id="grKoordinator">
+                    <label class="form-label">Nama Koordinator</label>
+                    <select name="id_koordinator" id="koordinator" class="custom-control custom-select '.(form_error('koordinator') != NULL ? "is-invalid" : "").'" placeholder="Pilih nama koordinator">
+                    </select>
+                    <div class="invalid-feedback">'.form_error('koordinator').'</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
                   <div class="form-group" id="grMasaTanam">
                     <label class="form-label">Masa Tanam</label>
                     <select name="masaTanam" id="masaTanam" class="custom-control custom-select '.(form_error('masaTanam') != NULL ? "is-invalid" : "").'" placeholder="Pilih masa tanam">
@@ -244,9 +258,6 @@ class Rdkk_add extends CI_Controller{
                     </select>
                     <div class="invalid-feedback">'.form_error('varietas').'</div>
                   </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
                   <div class="form-group" id="grKategori">
                     <label class="form-label">Kategori</label>
                     <select name="kategori" id="kategori" class="custom-control custom-select '.(form_error('kategori') != NULL ? "is-invalid" : "").'" placeholder="Pilih kategori">

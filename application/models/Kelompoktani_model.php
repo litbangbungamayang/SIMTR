@@ -22,7 +22,9 @@ class Kelompoktani_model extends CI_Model{
   public $id_user;
   public $id_afd;
   public $zona;
-  PUBLIC $status;
+  public $status;
+  public $id_koordinator;
+
 
   public function __construct(){
     parent:: __construct();
@@ -83,6 +85,12 @@ class Kelompoktani_model extends CI_Model{
         "label" => "No. KTP",
         "rules" => "required",
         "errors" => ["required" => "No. KTP belum diinput!"]
+      ],
+      [
+        "field" => "id_koordinator",
+        "label" => "Nama Koordinator",
+        "rules" => "required",
+        "errors" => ["required" => "Koordinator belum dipilih!"]
       ]
     ];
   }
@@ -111,6 +119,7 @@ class Kelompoktani_model extends CI_Model{
     $this->id_user = $id_user;
     $this->id_afd = $afdeling;
     $this->status = 0;
+    $this->id_koordinator = $post["id_koordinator"];
     //$this->db->trans_begin();
     $this->db->insert($this->_table, $this);
     $lastId = $this->db->insert_id();
@@ -241,6 +250,26 @@ class Kelompoktani_model extends CI_Model{
         AND KT.id_afd LIKE ? AND KT.no_kontrak IS NULL
       GROUP BY KT.id_kelompok
     ",array($priv_level, $afdeling))->result());
+  }
+
+  public function getRequestByTahunGiling(){
+    $priv_level = $this->session->userdata("jabatan");
+    $afdeling = $this->session->userdata('afd');
+    $tahun_giling = $this->input->get("tahun_giling");
+    if (empty($afdeling))$afdeling = "%%";
+    return json_encode($this->db->query("
+      SELECT DISTINCT
+        KT.id_kelompok, KT.nama_kelompok, KT.no_ktp, KT.no_kontrak, KT.mt, KT.kategori, WIL.nama_wilayah, SUM(PT.luas) as luas,
+        VAR.nama_varietas, KT.tahun_giling, WIL.id_wilayah, KT.status, ? as priv_level
+      FROM tbl_simtr_kelompoktani KT
+        JOIN tbl_simtr_petani PT on PT.id_kelompok = KT.id_kelompok
+        JOIN tbl_varietas VAR on KT.id_varietas = VAR.id_varietas
+        JOIN tbl_simtr_wilayah WIL on WIL.id_wilayah = KT.id_desa
+        WHERE EXISTS
+  	     (SELECT * FROM tbl_simtr_geocode GEO WHERE GEO.id_petani = PT.id_petani)
+        AND KT.id_afd LIKE ? AND KT.no_kontrak IS NULL AND KT.tahun_giling = ?
+      GROUP BY KT.id_kelompok
+    ",array($priv_level, $afdeling, $tahun_giling))->result());
   }
 
   public function viewSkk($id_kelompok = null){

@@ -73,6 +73,31 @@ $zona = $("#zona").selectize({
   placeholder: "Pilih zona TMA"
 });
 
+$koordinator = $("#koordinator").selectize({
+  valueField: "id_koordinator",
+  labelField: "nama_koordinator",
+  sortField: "nama_koordinator",
+  searchField: "nama_koordinator",
+  maxItems: 1,
+  create: false,
+  placeholder: "Pilih nama koordinator"
+});
+
+cbx_koordinator = $koordinator[0].selectize;
+
+$.ajax({
+  url: js_base_url + "Rdkk_add/getAllKoordinator",
+  type: "GET",
+  dataType: "json",
+  success: function(response){
+    if(response.length > 0){
+      for(let i = 0; i < response.length; i++){
+        cbx_koordinator.addOption(response[i]);
+      }
+      zona.refreshOptions();
+    }
+  }
+})
 
 $("#namaDesa").selectize({
   valueField: "id_wilayah",
