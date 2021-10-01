@@ -17,7 +17,7 @@ class Koordinator_model extends CI_Model{
     $post = $this->input->post();
     $scan_ktp = file_get_contents($_FILES["scanKtp"]["tmp_name"]);
     $this->tahun_giling = $post["tahun_giling"];
-    $this->nama_koordinator = $post["nama_koordinator"];
+    $this->nama_koordinator = strtoupper($post["nama_koordinator"]);
     $this->no_ktp = $post["no_ktp"];
     $this->nomor_telepon = $post["nomor_telepon"];
     $this->scan_ktp = $scan_ktp;

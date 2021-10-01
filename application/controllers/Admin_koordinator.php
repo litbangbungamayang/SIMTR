@@ -157,19 +157,19 @@ class Admin_koordinator extends CI_Controller{
                     </div>
                     <div class="form-group" id="grNama">
                       <label class="form-label">Nama Koordinator</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="nama_koordinator" name="nama_koordinator" placeholder="Nama Koordinator">
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="nama_koordinator" name="nama_koordinator" placeholder="Nama Koordinator">
                       <div class="invalid-feedback" id="fbPotKarung">Nama koordinator harus diisi!</div>
                     </div>
                   </div>
                   <div class="col-md-12 col-lg-6">
                     <div class="form-group" id="grNoKtp">
                       <label class="form-label">Nomor KTP</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="no_ktp" name="no_ktp" placeholder="Nomor KTP">
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="no_ktp" name="no_ktp" placeholder="Nomor KTP">
                       <div class="invalid-feedback" id="fbPotKarung">Nomor KTP harus diisi!</div>
                     </div>
                     <div class="form-group" id="grTelp">
                       <label class="form-label">Nomor Telepon</label>
-                      <input type="text" style="text-transform: uppercase; text-align: right;" class="form-control" id="nomor_telepon" name="nomor_telepon" placeholder="Nomor Telepon">
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="nomor_telepon" name="nomor_telepon" placeholder="Nomor Telepon">
                       <div class="invalid-feedback" id="fbPotKarung">Nomor telepon harus diisi!</div>
                     </div>
                     <div class="form-group" id="grUploadKtp">
