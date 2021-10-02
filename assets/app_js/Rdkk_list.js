@@ -559,10 +559,11 @@ formKonfirmasi.on("submit", function(event){
 })
 */
 
-function cekAffKebun(id_kelompok){
+function cekAffKebun(id_kelompok,jenis){
   var kode_blok = null;
   var kode_blok_simtr = null;
   var data_kelompok = null;
+  var data_penjualan = null;
   $.ajax({
     url: js_base_url + "Rdkk_list/getKelompokById",
     data: {id_kelompok: id_kelompok},
@@ -578,48 +579,73 @@ function cekAffKebun(id_kelompok){
         dataType: "json",
         type: "GET",
         success: function(response){
-          if(response == 0){
-            $.ajax({
-              url: js_base_url + "Biaya_tma/cekAffKebun",
-              data: {kode_blok: kode_blok},
-              dataType: "json",
-              type: "GET",
-              success: function(response){
-                var status_aff = response[0].aff_tebang;
-                if(status_aff == 0){
-                  alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
-                } else {
-                  $.ajax({
-                    url: js_base_url + "Biaya_tma/cekDataCs",
-                    data: {kode_blok: kode_blok},
-                    dataType: "json",
-                    type: "GET",
-                    success: function(response){
-                      if(response.length == 0){
-                        $.ajax({
-                          url: js_base_url + "Admin_potongan/getPotonganByTahunGiling",
-                          data: {tahun_giling: dataKelompok.tahun_giling},
-                          dataType: "json",
-                          type: "get",
-                          success: function(resp){
-                            formInputIdKelompok.value = id_kelompok;
-                            formInputKodeBlok.value = kode_blok;
-                            formKonfirmasi.submit();
-                          }
-                        })
-                      } else {
-                        alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
+          if(jenis == "aff"){
+            if(response == 0){
+              $.ajax({
+                url: js_base_url + "Biaya_tma/cekAffKebun",
+                data: {kode_blok: kode_blok},
+                dataType: "json",
+                type: "GET",
+                success: function(response){
+                  var status_aff = response[0].aff_tebang;
+                  if(status_aff == 0){
+                    alert("Kelompok " + dataKelompok.nama_kelompok + " belum AFF di SIMPG! Harap melakukan validasi luasan dan \"SET AFF\" di SIMPG");
+                  } else {
+                    $.ajax({
+                      url: js_base_url + "Biaya_tma/cekDataCs",
+                      data: {kode_blok: kode_blok},
+                      dataType: "json",
+                      type: "GET",
+                      success: function(response){
+                        if(response.length == 0){
+                          $.ajax({
+                            url: js_base_url + "Admin_potongan/getPotonganByTahunGiling",
+                            data: {tahun_giling: dataKelompok.tahun_giling},
+                            dataType: "json",
+                            type: "get",
+                            success: function(resp){
+                              formInputIdKelompok.value = id_kelompok;
+                              formInputKodeBlok.value = kode_blok;
+                              formKonfirmasi.submit();
+                            }
+                          })
+                        } else {
+                          alert("Data hablur Kelompok " + dataKelompok.nama_kelompok + " BELUM LENGKAP. Silahkan hubungi Admin Sistem dan Bagian QA.")
+                        }
                       }
-                    }
-                  })
+                    })
+                  }
                 }
-              }
-            })
-          } else {
-            alert("Berita Acara Selesai Tebang untuk kelompok " + dataKelompok.nama_kelompok + " ini sudah ada!");
-            formInputKodeBlokView.value = kode_blok_simtr;
-            formInputIdKelompokView.value = id_kelompok;
-            formViewBeritaAcaraAff.submit();
+              })
+            } else {
+              alert("Berita Acara Selesai Tebang untuk kelompok " + dataKelompok.nama_kelompok + " ini sudah ada!");
+              formInputKodeBlokView.value = kode_blok_simtr;
+              formInputIdKelompokView.value = id_kelompok;
+              formViewBeritaAcaraAff.submit();
+            }
+          } else if(jenis == "nota"){
+            if(response == 1){
+              //cek penjualan gula
+              //table penjualan_gula => gula_ptr adalah seluruh gula milik petani
+              $.ajax({
+                url: js_base_url + "Rdkk_add/addNotaBunga",
+                data: {
+                  id_kelompok: dataKelompok.id_kelompok,
+                  kode_blok: kode_blok_simtr
+                },
+                dataType: "json",
+                type: "POST",
+                success: function(data){
+                  if(data.status == 1){
+
+                  } else {
+                    alert(data.message);
+                  }
+                }
+              })
+            } else {
+              alert("Berita Acara AFF Tebang belum ada!");
+            }
           }
         }
       })
@@ -710,7 +736,8 @@ function actionButtonView(id_kelompok, kategori, priv_level){
               '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
               '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
               menu_bibit +
-              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ')"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
+              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ', "' + '\'aff\'' + '")"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
+              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ', ' + '\'nota\'' + ')"><i class="fe fe-book-open"></i> Buat Nota Bunga</a>' +
               '<a class="dropdown-item" href="" onclick="" style="display:none"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
             '</div></div>';
   } else {

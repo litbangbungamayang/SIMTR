@@ -912,6 +912,16 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_dokumen, $id_pembeli, $harga_jual, $total_kuanta)));
   }
 
+  public function getPenjualanGulaByIdKelompok(){
+    $id_kelompok = $this->input->post("id_kelompok");
+    $query = "
+      select * from tbl_simtr_transaksi trans
+        join tbl_simtr_penjualan_gula jual on trans.id_gptr = jual.id_dokumen
+      where trans.id_kelompoktani = ?
+    ";
+    return json_encode($this->db->query($query, array($id_kelompok))->result());
+  }
+
   public function getAllPenjualanGula($tahun_giling = null){
     $priv_level = $this->session->userdata("jabatan");
     $id_afd = $this->session->userdata("afd");
@@ -946,6 +956,8 @@ class Transaksi_model extends CI_Model{
     ";
     return json_encode($this->db->query($query, array($request))->result());
   }
+
+
 
   public function getAllBasteb($tahun_giling = null, $id_dokumen = null){
     $priv_level = $this->session->userdata("jabatan");

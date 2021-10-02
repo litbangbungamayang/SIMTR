@@ -50,6 +50,7 @@
             <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown"><i class="fe fe-layers"></i> Bagi Hasil</a>
             <div class="dropdown-menu dropdown-menu-arrow">
               <a href="<? echo site_url('/List_ba_tebang')?>" class="dropdown-item "><i class="fe fe-layers"></i> Penelusuran Berita Acara Selesai Tebang</a>
+              <a href="<? echo site_url('/Nota_bunga')?>" class="dropdown-item "><i class="fe fe-layers"></i> Pembuatan Nota Bunga</a>
               <a href="<? echo site_url('/Penjualan_gula')?>" class="dropdown-item "><i class="fe fe-layers"></i> Penjualan Gula PTR</a>
               <a href="<? echo site_url('/Penjualan_tetes')?>" class="dropdown-item "><i class="fe fe-layers"></i> Penjualan Tetes PTR</a>
               <a href="<? echo site_url('/List_penjualan_gula')?>" class="dropdown-item "><i class="fe fe-layers"></i> Penelusuran Penjualan Gula PTR</a>

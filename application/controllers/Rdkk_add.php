@@ -8,11 +8,13 @@ class Rdkk_add extends CI_Controller{
     parent :: __construct();
     $this->load->model("wilayah_model");
     $this->load->model("kelompoktani_model");
+    $this->load->model("transaksi_model");
     $this->load->model("masatanam_model");
     $this->load->model("varietas_model");
     $this->load->model("petani_model");
     $this->load->model("koordinator_model");
     $this->load->model("geocode_model");
+    $this->load->model("biayatma_model");
     $this->load->library('form_validation');
     $this->load->library('upload');
     $this->load->helper('url');
@@ -76,6 +78,31 @@ class Rdkk_add extends CI_Controller{
 
   public function getAllKoordinator(){
     echo $this->koordinator_model->getAllKoordinator();
+  }
+
+  public function getPenjualanGulaByIdKelompok(){
+    echo $this->transaksi_model->getPenjualanGulaByIdKelompok();
+  }
+
+  public function addNotaBunga(){
+    //cek total penjualan, apakah sudah terjual semua
+    $arr_penjualan = json_decode($this->transaksi_model->getPenjualanGulaByIdKelompok());
+    $dataAffKebun = json_decode($this->biayatma_model->getBeritaAcaraTebangByKodeBlok());
+    $total_penjualan = 0;
+    $total_ptr_90 = ROUND(($dataAffKebun->kg_gula_ptr*0.90)/50,0,PHP_ROUND_HALF_UP)*50;
+    if(sizeof($arr_penjualan) > 0){
+      for($i = 0; $i < sizeof($arr_penjualan); $i++){
+        $total_penjualan += $arr_penjualan[$i]->total_kuanta;
+      }
+    }
+    $notif = [];
+    if($total_penjualan < $total_ptr_90){
+      $notif = array(
+        "status" => 0,
+        "message" => "Gula PTR belum seluruhnya terjual, nota bunga belum dapat dibuat!"
+      );
+      echo json_encode($notif);
+    }
   }
 
   public function tambahData(){
