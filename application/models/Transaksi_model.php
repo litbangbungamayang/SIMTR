@@ -184,6 +184,21 @@ class Transaksi_model extends CI_Model{
     return json_encode($this->db->query($query, array($id_kelompok))->result());
   }
 
+  public function getTransaksiKeluarByIdTransaksi(){
+    $id_transaksi = $this->input->get("id_transaksi");
+    $query =
+    "
+    select
+      TRANS.id_transaksi, TRANS.id_kelompoktani, BAHAN.id_bahan, BAHAN.nama_bahan, BAHAN.satuan,
+      TRANS.no_transaksi, TRANS.kuanta, TRANS.rupiah, TRANS.tgl_transaksi, BAHAN.biaya_muat, BAHAN.biaya_angkut,
+      (ROUND(TRANS.kuanta/BAHAN.dosis_per_ha, 2)) as luas_aplikasi
+    from tbl_simtr_transaksi TRANS
+    join tbl_simtr_bahan BAHAN on BAHAN.id_bahan = TRANS.id_bahan
+    where TRANS.id_transaksi = ? and TRANS.kode_transaksi = 2  and BAHAN.jenis_bahan = 'PUPUK' and TRANS.kuanta > 0
+    ";
+    return json_encode($this->db->query($query, array($id_transaksi))->result());
+  }
+
   public function getTransaksiAktivitasByIdKelompok(){
     $id_kelompok = $this->input->get("id_kelompok");
     $jenis_aktivitas = $this->input->get("jenis_aktivitas");

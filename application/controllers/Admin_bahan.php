@@ -206,6 +206,12 @@ class Admin_bahan extends CI_Controller{
                       <input type="text" style="text-transform: uppercase;" class="form-control" id="biaya_angkut" name="biaya_angkut" placeholder="Biaya angkut">
                     </div>
                   </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group" id="grHargaBahan">
+                      <label class="form-label">Harga Bahan (Rp/satuan)</label>
+                      <input type="text" style="text-transform: uppercase;" class="form-control" id="harga" name="harga" placeholder="Harga bahan">
+                    </div>
+                  </div>
                 </div>
                 <button type="button" id="btnSimpanBahan" class="btn btn-primary btn-block" name="" >Simpan data bahan</button>
               </form>

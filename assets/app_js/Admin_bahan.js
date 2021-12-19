@@ -5,6 +5,7 @@ var namaBahan = $("#nama_bahan");
 var jenisBahan = $("#jenis_bahan");
 var dosisBahan = $("#dosis");
 var kemasanBahan = $("#kemasan");
+var txt_harga = $("#harga");
 var tahunGiling = $("#tahun_giling");
 var biaya_angkut = $("#biaya_angkut");
 var biaya_muat = $("#biaya_muat");
@@ -123,6 +124,8 @@ function editData(id){
       biaya_angkut.val(response.biaya_angkut);
       biaya_muat.val(response.biaya_muat);
       kemasanBahan.val(response.kemasan);
+      txt_harga.val(response.harga);
+      if(response.harga != 0){txt_harga[0].disabled = true};
       //$("#btnSimpanBahan").on("click", function(){simpanEditData(id)});
       edit = true;
       edit_id = id;

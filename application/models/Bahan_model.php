@@ -11,6 +11,7 @@ class Bahan_model extends CI_Model{
   public $biaya_angkut;
   public $biaya_muat;
   public $kemasan;
+  public $harga;
 
   public function rules(){
     return [
@@ -45,6 +46,7 @@ class Bahan_model extends CI_Model{
     $this->biaya_muat = $post["biaya_muat"];
     $this->biaya_angkut = $post["biaya_angkut"];
     $this->kemasan = $post["kemasan"];
+    $this->harga = $post["harga"];
     $this->db->insert($this->_table, $this);
     return $this->db->insert_id();
   }
@@ -59,6 +61,7 @@ class Bahan_model extends CI_Model{
     $this->biaya_angkut = $post["biaya_angkut"];
     $this->biaya_muat = $post["biaya_muat"];
     $this->kemasan = $post["kemasan"];
+    $this->harga = $post["harga"];
     return $this->db->where("id_bahan", $post["id_bahan"])->update($this->_table, $this);
   }
 

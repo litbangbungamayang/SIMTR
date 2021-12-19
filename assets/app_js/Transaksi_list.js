@@ -1,3 +1,25 @@
+dialogAddHargaPupuk = $("#dialogAddHargaPupuk");
+lbl_jenisPupuk = $("#lbl_jenisPupuk");
+lbl_luasAplikasi = $("#lbl_luasAplikasi");
+
+function inputHargaPupuk(id_kelompok, id_transaksi){
+  dialogAddHargaPupuk.modal("toggle");
+  $.ajax({
+    url: js_base_url + "Transaksi_bahan/getTransaksiKeluarByIdTransaksi",
+    type: "GET",
+    dataType: "json",
+    data: {id_transaksi: id_transaksi},
+    success: function(response){
+      if(response.length > 0){
+        let data = response[0];
+        console.log(data);
+        lbl_jenisPupuk.val(data.nama_bahan);
+        lbl_luasAplikasi.val(data.luas_aplikasi);
+      }
+    }
+  })
+}
+
 $("#tblTransPupuk").DataTable({
   bFilter: false,
   bPaginate: true,
@@ -59,7 +81,16 @@ $("#tblTransPupuk").DataTable({
         return '<a class="btn btn-outline-primary btn-sm" id="cetakAu58" href="Transaksi_AU58?no_transaksi='+row.no_transaksi+'&id_kelompok='+row.id_kelompoktani+'"><i class="fe fe-printer"></i></a>'
       },
       className: "text-center"
+    },
+    /*
+    {
+      data: "button",
+      render: function(data, type, row, meta){
+        return '<a class="btn btn-outline-primary btn-sm" id="inputHargaPupuk" href="#" onClick="inputHargaPupuk('+row.id_kelompoktani+','+row.id_transaksi+')"><i class="fe fe-file-plus"></i></a>'
+      },
+      className: "text-center"
     }
+    */
   ]
 });
 

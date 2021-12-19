@@ -481,8 +481,8 @@ function addPupuk(id_kelompok){
         arrayPermintaanPupukExisting = callback;
       });
       $.ajax({
-        //url: js_base_url + "Admin_bahan/getBahanByJenisTahunGiling",
-        url: js_base_url + "Admin_bahan/getBahanByJenis",
+        url: js_base_url + "Admin_bahan/getBahanByJenisTahunGiling",
+        //url: js_base_url + "Admin_bahan/getBahanByJenis",
         type: "GET",
         dataType: "json",
         data: {
@@ -518,7 +518,7 @@ function addPupuk(id_kelompok){
               }
             });
           } else {
-            alert("Master data pupuk belum ada untuk tahun giling " + tahun_giling + " !\n Silahkan hubungi Admin.");
+            alert("Master data pupuk belum ada untuk tahun giling " + selectedKelompok.tahun_giling + " !\n Silahkan hubungi Admin.");
           }
         }
       });
@@ -736,7 +736,7 @@ function actionButtonView(id_kelompok, kategori, priv_level){
               '<a class="dropdown-item" href="#" onclick="addPupuk(' + id_kelompok + ')"><i class="fe fe-sunset"></i> Buat Permintaan Pupuk</a>' +
               '<a class="dropdown-item" href="#" onclick="addPerawatan(' + id_kelompok + ')"><i class="fe fe-feather"></i> Buat Permintaan Perawatan</a>' +
               menu_bibit +
-              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ', "' + '\'aff\'' + '")"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
+              '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ', ' + '\'aff\'' + ')"><i class="fe fe-book-open"></i> Buat Berita Acara Selesai Tebang</a>' +
               '<a class="dropdown-item" href="#" onclick="cekAffKebun(' + id_kelompok + ', ' + '\'nota\'' + ')"><i class="fe fe-book-open"></i> Buat Nota Bunga</a>' +
               '<a class="dropdown-item" href="" onclick="" style="display:none"><i class="fe fe-zap"></i> Buat Permintaan Biaya TMA</a>' +
             '</div></div>';

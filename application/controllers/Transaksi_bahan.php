@@ -49,6 +49,10 @@ class Transaksi_bahan extends CI_Controller{
     echo $this->transaksi_model->getTransaksiKeluarByIdKelompok();
   }
 
+  public function getTransaksiKeluarByIdTransaksi(){
+    echo $this->transaksi_model->getTransaksiKeluarByIdTransaksi();
+  }
+
   public function cekStokBahanByIdBahan(){
     echo $this->transaksi_model->cekStokBahanByIdBahan();
   }

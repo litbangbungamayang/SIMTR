@@ -110,8 +110,23 @@ function setRdkk(id_kelompok,status_skk){
       success: function(response){
         window.location.replace(js_base_url + "List_skk");
       }
-    })
+    })0043
   }
+}
+
+function testFile(){
+  var selectedFile = $("#scanSurat")[0].files[0];
+  const fr = new FileReader();
+  fr.readAsArrayBuffer(selectedFile);
+  fr.onload = f =>{
+    const url = "https://script.google.com/macros/s/AKfycbwRsqGqTaFuRJqsS0U3rd91nvE-JqKwuo2MXKOfFJkhFASHYfWOdV40nJaHmfwy7Zsf/exec";
+    const qs = new URLSearchParams({filename:selectedFile.name, mimeType: selectedFile.type});
+    fetch(`${url}?${qs}`, {method: "POST", body: JSON.stringify([...new Int8Array(f.target.result)])})
+    .then(res => res.json())
+    .then(e => console.log(e))
+    .catch(err => console.log(err));
+  }
+  console.log(selectedFile);
 }
 
 

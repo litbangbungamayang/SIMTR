@@ -277,6 +277,7 @@
                 <div style="'.$display_button_ok.'"><a  href="#" class="btn btn-green" onclick="setRdkk('.$kelompoktani->id_kelompok.','.$set_status_ok.')" style="margin-right: 10px;"><i class="fe fe-check-circle"></i> Layak </a></div>
                 <div style="'.$display_button_reject.'"><a href="#" class="btn btn-danger" onclick="setRdkk('.$kelompoktani->id_kelompok.','.$set_status_reject.')" style="margin-right: 10px;"><i class="fe fe-alert-circle"></i> Tidak Layak</a></div>
                 <div><a href="#" onclick="history.go(-1)" class="btn btn-primary" style="margin-right: 10px;"><i class="fe fe-chevrons-left"></i> Kembali</a></div>
+
               </div>
             </div>
           </div>
@@ -285,6 +286,7 @@
       </div>
       ';
       return $container;
+      //history.go(-1)
     }
 
     function viewBaSkk($request = array()){

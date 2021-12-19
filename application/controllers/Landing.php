@@ -3,6 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Landing extends CI_Controller {
 
+	private $buma_env = "http://simpgbuma.ptpn7.com/index.php/api_bcn/";
+  private $cima_env = "http://simpgcima.ptpn7.com/index.php/api_bcn/";
+  private $lokal = "http://localhost/simpgbuma/api_bcn/";
+
 	public function __construct(){
 			parent::__construct();
 			$this->load->model("dashboard_model");
@@ -21,6 +25,42 @@ class Landing extends CI_Controller {
 		}
 	}
 
+	public function getServer($pg){
+    $server_pg = null;
+    switch($pg){
+      case "buma":
+        $server_pg = $this->buma_env;
+        break;
+      case "cima":
+        $server_pg = $this->cima_env;
+        break;
+      case "lokal":
+        $server_pg = $this->lokal;
+        break;
+    }
+    return $server_pg;
+  }
+
+	function getCurl($request){
+    $db_server = $request["db_server"];
+    $url = str_replace(" ", "", $request["url"]);
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $db_server.$url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => 30,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "GET",
+      CURLOPT_HTTPHEADER => array(
+        "cache-control: no-cache"
+      ),
+    ));
+    $response = curl_exec($curl);
+    $error = curl_error($curl);
+    curl_close($curl);
+    return $response; // output as json encoded
+  }
+
 	public function loadScript(){
     return '$.getScript("'.base_url("/assets/app_js/Landing.js").'");';
   }
@@ -31,6 +71,11 @@ class Landing extends CI_Controller {
 
 	public function loadDataGudang(){
 		echo $this->dashboard_model->loadDataGudang();
+	}
+
+	public function getDataDashboard(){
+		$request = array("db_server"=>$this->getServer("buma"), "url"=>"getDataLastLhp");
+    echo ($this->getCurl($request));
 	}
 
 	public function loadContent(){
@@ -82,7 +127,7 @@ class Landing extends CI_Controller {
 					<div class="card">
 						<div class="card-status bg-blue"></div>
 						<div class="card-header">
-							<div class="card-title">Kemajuan Tebang <sup class="text-danger">(contoh)</sup></div>
+							<div class="card-title">Kemajuan Tebang</div>
 						</div>
 						<table class="table card-table">
 						<tbody id="tblTebang">
@@ -91,14 +136,14 @@ class Landing extends CI_Controller {
 								<td>
 									<div class="clearfix">
 										<div class="float-left">
-											<strong>33%</strong>
+											<strong id="persen_luas"></strong>
 										</div>
 										<div class="float-right">
-											<small class="text-muted">1,250 / 1,355 Ha</small>
+											<small class="text-muted" id="luasan"></small>
 										</div>
 									</div>
 									<div class="progress progress-xs">
-                    <div class="progress-bar bg-red" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div id="progress_luas" class="progress-bar " role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
 								</td>
 							</tr>
@@ -107,14 +152,14 @@ class Landing extends CI_Controller {
 								<td>
 									<div class="clearfix">
 										<div class="float-left">
-											<strong>40%</strong>
+											<strong id="persen_tebang"></strong>
 										</div>
 										<div class="float-right">
-											<small class="text-muted">120,560 / 129,500 ton</small>
+											<small class="text-muted" id="tebu_ditebang"></small>
 										</div>
 									</div>
 									<div class="progress progress-xs">
-                    <div class="progress-bar bg-yellow" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div id="progress_tebang" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
 								</td>
 							</tr>
@@ -123,14 +168,14 @@ class Landing extends CI_Controller {
 								<td>
 									<div class="clearfix">
 										<div class="float-left">
-											<strong>90%</strong>
+											<strong id="persen_rend"></strong>
 										</div>
 										<div class="float-right">
-											<small class="text-muted">6.30 / 7.00 %</small>
+											<small class="text-muted" id="rendemen"></small>
 										</div>
 									</div>
 									<div class="progress progress-xs">
-                    <div class="progress-bar bg-green" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div id="progress_rend" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
 								</td>
 							</tr>
